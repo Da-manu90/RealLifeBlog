@@ -123,71 +123,33 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-/* ==== STABILE MASKE relativ zum NAV-BEREICH ==== */
-/* Eine rAF-gethrottelte Routine, die die Maske inline auf <main> setzt.
-   - Feature-Detect: setzt nur, wenn (webkit)mask-image unterstützt wird
-   - Throttling via requestAnimationFrame
-   - beobachtet scroll/resize/orientation + visualViewport + ResizeObserver
-   - entfernt alle doppelten Listener (nur dieser Block bleibt) */
+/* ==== ROBUSTER OCCLUDER via clip-path (kein mask-image) ==== */
+/* Wir schneiden von .posts (oben) genau so viel ab, wie die NAV in <main> hineinragt.
+   Das ist stabil, performant und funktioniert sauber beim Vor- und Zurückscrollen. */
 
-(function setupNavMask(){
-  const main = document.querySelector('main');
+(function setupNavClip(){
   const nav  = document.querySelector('.chip-nav');
-  if (!main || !nav) return;
+  const main = document.querySelector('main');
+  if (!nav || !main) return;
 
-  const supportsMask =
-    (window.CSS && (CSS.supports('mask-image', 'linear-gradient(black, black)') ||
-                    CSS.supports('-webkit-mask-image', 'linear-gradient(black, black)')))
-    || 'webkitMaskImage' in main.style || 'maskImage' in main.style;
+  let ticking = false;
+  let lastCut = -1;
 
-  if (!supportsMask) {
-    // Browser ohne Masken: nichts tun
-    return;
+  function computeCut(){
+    const navBottom = nav.getBoundingClientRect().bottom;
+    const mainTop   = main.getBoundingClientRect().top;
+    const overlap   = Math.max(0, Math.round(navBottom - mainTop)); // px
+    return overlap;
   }
 
-  let lastGrad = '';
-  let lastOverlap = -9999;
-  let ticking = false;
-
-  function applyNone(){
-    document.body.classList.remove('mask-active');
-    main.style.webkitMaskImage = 'none';
-    main.style.maskImage = 'none';
-    lastGrad = '';
-    lastOverlap = 0;
+  function applyCut(px){
+    if (px === lastCut) return;
+    lastCut = px;
+    document.documentElement.style.setProperty('--nav-cut', `${px}px`);
   }
 
   function frame(){
-    // Messung im gleichen Koordinatensystem (Viewport)
-    const navBottom = nav.getBoundingClientRect().bottom;
-    const mainTop   = main.getBoundingClientRect().top;
-
-    // Wie weit ragt die NAV in den MAIN?
-    const overlap = Math.max(0, Math.round(navBottom - mainTop));
-
-    // Minimaler Schwellenwert verhindert Flattern bei Subpixel-Bewegungen
-    if (overlap <= 1) {
-      if (lastOverlap !== 0) applyNone();
-      return;
-    }
-
-    const fadeStart = overlap + 4;
-    const fadeEnd   = overlap + 24;
-
-    const grad = `linear-gradient(
-      to bottom,
-      rgba(0,0,0,0) 0px,
-      rgba(0,0,0,0) ${fadeStart}px,
-      rgba(0,0,0,1) ${fadeEnd}px
-    )`;
-
-    if (grad !== lastGrad) {
-      document.body.classList.add('mask-active');
-      main.style.webkitMaskImage = grad;
-      main.style.maskImage = grad;
-      lastGrad = grad;
-    }
-    lastOverlap = overlap;
+    applyCut(computeCut());
   }
 
   function onScrollOrResize(){
@@ -205,21 +167,17 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   window.addEventListener('orientationchange', onScrollOrResize, { passive: true });
   window.addEventListener('pageshow', onScrollOrResize, { passive: true });
 
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') onScrollOrResize();
-  });
-
   if (window.visualViewport) {
     visualViewport.addEventListener('scroll', onScrollOrResize, { passive: true });
     visualViewport.addEventListener('resize', onScrollOrResize, { passive: true });
   }
 
-  // Größe/Wrap der NAV kann sich ändern → beobachten
+  // Nav-Höhe/Textwraps beobachten
   const ro = new ResizeObserver(onScrollOrResize);
   ro.observe(nav);
   ro.observe(main);
 
-  // Initial + ein paar Re-Checks nach Fonts/Layout
+  // Initial + Nachstabilisierungen
   window.addEventListener('load', () => {
     onScrollOrResize();
     setTimeout(onScrollOrResize, 50);

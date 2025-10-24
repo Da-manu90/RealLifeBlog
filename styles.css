@@ -11,12 +11,14 @@
   font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 
   /* Dynamik */
-  --nav-overlap: 0px;         /* wird von app.js gesetzt */
   --face-gutter-max: 400px;   /* max. linker Abstand (Desktop) */
   --safe-gap: 24px;           /* Sicherheitsrand rechts */
   --container-pad: 24px;      /* Container padding desktop */
   --card-max: 700px;          /* Card-Max Desktop/Tablet */
   --posts-left: 0px;          /* wird unten per MQ bestimmt */
+
+  /* NAV-Überlappung: wird in JS als px gesetzt */
+  --nav-cut: 0px;
 }
 
 /* Reset / Basics */
@@ -138,9 +140,9 @@ body::before{
 
 /* ===== MAIN + Posts ===== */
 
-/* Hilft Safari, Masken-Updates zuverlässig zu repainten */
 main{
-  will-change: -webkit-mask-image, mask-image;
+  /* kein mask-image mehr – nur Layout-Hinweis */
+  will-change: clip-path;
 }
 
 .posts{
@@ -151,6 +153,11 @@ main{
   padding-bottom: 50px;
   margin-top: 8px; /* direkt unter der Navi */
   padding-left: var(--posts-left); /* Gutter links dynamisch */
+
+  /* Der robuste „Occluder“:
+     schneidet den oberen Bereich hart ab (ohne Mask-Repaint-Bugs) */
+  clip-path: inset(var(--nav-cut, 0px) 0 0 0);
+  will-change: clip-path;
 }
 
 /* ===== Post-Card ===== */
