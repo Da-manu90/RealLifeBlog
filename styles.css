@@ -214,3 +214,104 @@ body::before{
     padding-left: 0;         /* kein Push auf mobilen Geräten */
   }
 }
+
+/* =========================
+   OVERRIDES (ans Dateiende)
+   ========================= */
+
+/* 1) Postcards schmal halten: max 550 px */
+.post-card{
+  max-width: 700px !important;   /* vorher 820px */
+  width: 100%;                    /* bleibt responsiv innerhalb der Spalte */
+}
+
+/* 2) Navi: min. 150 px Abstand links & rechts.
+      -> Wenn der Platz kleiner wird, bricht sie automatisch in neue Zeilen. */
+.chip-nav{
+  padding-left: 400px !important;
+  padding-right: 150px !important;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 64px;                      /* gern anpassen: 50–70 px */
+}
+
+/* Falls noch ein alter "Right-Push" aktiv war (z. B. padding-left: 400px) – neutralisieren */
+@media (min-width: 901px){
+  .chip-nav{
+    padding-left: 400px !important;
+    padding-right: 150px !important;
+  }
+}
+
+/* 3) Hintergrund links verankern (Gesicht bleibt immer sichtbar),
+      auf großen Screens wird nach rechts „mehr“ sichtbar */
+body::before{
+  background-position: left center, left center !important; /* [Bild], [Gradient] */
+  background-size: cover, cover;
+}
+
+/* ================================
+   Responsive Face-Gutter + Card-Breite
+   ================================ */
+
+/* Grundwerte (mobile-first) */
+:root{
+  --face-gutter: 400px;  /* gewünschter Abstand zur linken Gesichtsseite (maximal) */
+  --safe-gap: 24px;      /* kleiner Sicherheitsabstand für Viewport-Ränder */
+  --card-max: 350px;     /* mobile: schmalere Karten */
+}
+
+/* Tablet: etwas breiter */
+@media (min-width: 720px){
+  :root{ --card-max: 540px; }
+}
+
+/* Desktop / größere Tablets: bis 700px erlaubt (dein Wunsch) */
+@media (min-width: 900px){
+  :root{ --card-max: 700px; }
+}
+
+/* 1) Kartenbreite an Variable koppeln */
+.post-card{
+  max-width: var(--card-max) !important;
+  width: 100%;
+}
+
+/* 2) Posts-Spalte so weit nach rechts schieben, wie sinnvoll:
+      - nutze bis zu 400px Face-Gutter
+      - aber nie so viel, dass die Card aus dem Viewport rutscht
+      Formel: min(400px, max(0, 100vw - card_max - safe_gap)) */
+.posts{
+  padding-left: min(
+    var(--face-gutter),
+    max(0px, calc(100vw - var(--card-max) - var(--safe-gap)))
+  ) !important;
+}
+
+/* 3) Navi: mind. 150px Abstand zu den Rändern UND links am Face-Gutter orientieren.
+      Links: zwischen 150px (Minimum) und Face-Gutter – aber auch hier nie so weit,
+      dass rechts kein Platz mehr bleibt. Rechts: fix 150px. */
+.chip-nav{
+  padding-right: 150px !important;
+  padding-left: clamp(
+    150px,
+    calc(100vw - var(--card-max) - 16px),
+    var(--face-gutter)
+  ) !important;
+
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 64px;
+}
+
+/* 4) Hintergrund links verankern (Gesicht bleibt sichtbar) */
+body::before{
+  background-position: left center, left center !important; /* [Bild], [Gradient] */
+  background-size: cover, cover;
+}
+
+/* 5) Sehr kleine Screens: etwas sanftere Rand-/Gap-Werte */
+@media (max-width: 420px){
+  :root{ --safe-gap: 12px; }
+  .chip-nav{ gap: 28px; }
+}
