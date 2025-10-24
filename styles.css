@@ -17,8 +17,8 @@
   --card-max: 700px;          /* Card-Max Desktop/Tablet */
   --posts-left: 0px;          /* wird unten per MQ bestimmt */
 
-  /* NAV-Overlay Parameter (helles Overlay) */
-  --nav-overlay-alpha: 0.45;  /* 45% Deckkraft (weiß) */
+  /* Overlay-Deckkraft (weiß) */
+  --nav-overlay-alpha: 0.45;  /* 45% */
 }
 
 /* Reset / Basics */
@@ -26,7 +26,7 @@
 html, body{ height:100%; margin:0; color:var(--text); -webkit-font-smoothing:antialiased; }
 html, body{ overflow-x: hidden; }
 
-/* Abstand zwischen Header und restlichem Body-Inhalt */
+/* Body: kleiner Abstand über dem Content (Header bleibt sticky oben) */
 body{ background: none; min-height: 100vh; padding-top: 10px; }
 
 /* Seitenhintergrund */
@@ -47,7 +47,7 @@ body::before{
 /* Container */
 .container{ max-width: var(--container); margin: 0 auto; padding: 24px; }
 
-/* ===== Header (clean) ===== */
+/* ===== Header (clean, ohne Fade-Maske) ===== */
 .site-header,
 .site-header::before,
 .site-header::after{
@@ -67,8 +67,7 @@ body::before{
 }
 .site-header .container{ max-width: none; padding: 0; }
 
-/* Header-Bild */
-/* Hinweis: Die visuelle Höhe wird im JS mit 220px für das Overlay berücksichtigt */
+/* Header-Bild: KEINE mask-image mehr → wird nicht „abgeschnitten“ */
 .header-img{
   display: block;
   width: 100vw;
@@ -77,27 +76,20 @@ body::before{
   margin-left: 50%;
   transform: translateX(-50%);
   border-radius: 40px;
-  -webkit-mask-image: linear-gradient(to bottom,
-    rgba(0,0,0,1) 0%,
-    rgba(0,0,0,1) calc(100% - 56px),
-    rgba(0,0,0,0) 100%);
-          mask-image: linear-gradient(to bottom,
-    rgba(0,0,0,1) 0%,
-    rgba(0,0,0,1) calc(100% - 56px),
-    rgba(0,0,0,0) 100%);
+  box-shadow: none;
 }
 
 /* ===== Navigation ===== */
 .chip-nav{
-  position: relative;          /* liegt scharf über dem Bild */
-  z-index: 31;                 /* ÜBER dem Overlay */
+  position: relative;          /* liegt scharf über dem Overlay */
+  z-index: 31;                 /* über Overlay, unter Header ist ok */
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 64px;
   flex-wrap: wrap;
 
-  /* Abstand unter dem Header (halbiert zuvor) – hier belassen */
+  /* Abstand zum Header (deine halbierte Variante) */
   margin: 9px 0 40px;
 }
 
@@ -141,17 +133,17 @@ body::before{
   border-color: rgba(0,0,0,.12);
 }
 
-/* ===== Helles NAV-Overlay (über Content, unter Navi) ===== */
+/* ===== Helles NAV-Overlay (unter Navi, über Content) ===== */
 #nav-overlay{
   position: fixed;
   left: 0;
-  top: 220px;        /* Startet EXAKT unter der Header-Höhe (wird im JS dennoch dynamisch gesetzt) */
+  top: 0;        /* wird per JS exakt auf headerImg.bottom gesetzt */
   width: 100vw;
-  height: 0;         /* JS setzt die Höhe bis zur Nav-Unterkante */
-  z-index: 22;       /* unter Navi (31), über Content */
+  height: 0;     /* JS setzt die Höhe bis zur Nav-Unterkante */
+  z-index: 22;   /* unter Navi (31), über Content */
   pointer-events: none;
 
-  /* Langer, weicher Verlauf: von deckendem Weiß (oben) zu transparent (unten) */
+  /* Langer, weicher Verlauf: Weiß(45%) → transparent */
   background: linear-gradient(
     to bottom,
     rgba(255,255,255,var(--nav-overlay-alpha)) 0%,
@@ -161,7 +153,7 @@ body::before{
 
 /* ===== MAIN + Posts ===== */
 main{
-  will-change: opacity, transform; /* nur Perf-Hinweis */
+  will-change: opacity, transform;
 }
 
 .posts{
@@ -284,8 +276,7 @@ main{
   }
 }
 
-/* Phones (≤600px): mind. 140px links frei,
-   aber niemals so groß, dass rechts die Card rausfällt */
+/* Phones (≤600px): mind. 140px links frei */
 @media (max-width: 600px){
   :root{
     --posts-left: min(

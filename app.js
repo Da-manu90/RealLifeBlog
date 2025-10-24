@@ -124,28 +124,31 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
 });
 
 /* ========= NAV-Overlay exakt ausrichten =========
-   Overlay (#nav-overlay) beginnt JETZT direkt UNTER dem Header (220px)
-   und endet an der Unterkante der Navigation. */
+   Overlay (#nav-overlay) beginnt GENAU unter dem Header-BILD (headerImg.bottom)
+   und endet an der Unterkante der Navigation (nav.bottom).
+   → Header bleibt 100% sichtbar.
+*/
 (function setupNavOverlay(){
-  const nav    = document.querySelector('.chip-nav');
-  const veil   = document.getElementById('nav-overlay');
-  if (!nav || !veil) return;
-
-  const HEADER_VISUAL_HEIGHT = 220; // px – vom Nutzer vorgegeben
+  const nav       = document.querySelector('.chip-nav');
+  const headerImg = document.querySelector('.header-img');
+  const veil      = document.getElementById('nav-overlay');
+  if (!nav || !headerImg || !veil) return;
 
   let ticking = false;
   let lastTop = null;
   let lastH   = null;
 
   function measure(){
-    const navRect = nav.getBoundingClientRect();
+    const navRect   = nav.getBoundingClientRect();
+    const imgRect   = headerImg.getBoundingClientRect();
 
-    // Overlay-Start: fix 220px unter dem Viewport-Top (Header-Höhe)
-    const top = Math.round(HEADER_VISUAL_HEIGHT);
+    // Start exakt an der Unterkante des Header-Bildes
+    const top = Math.round(imgRect.bottom);
 
-    // Overlay-Ende: Unterkante der Navigation
+    // Ende an der Unterkante der Navi
     const bottomY = Math.round(navRect.bottom);
 
+    // Höhe = Bereich zwischen Bildunterkante und Nav-Unterkante
     const height = Math.max(0, bottomY - top);
     return { top, height };
   }
@@ -186,9 +189,15 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
     visualViewport.addEventListener('resize', onScrollOrResize, { passive: true });
   }
 
-  // Nav-Höhe beobachten (Wrap/Zeilenumbrüche, Fonts etc.)
+  // Beobachte Bild- und Nav-Größe (Wrap/Aspekt/Load)
   const ro = new ResizeObserver(onScrollOrResize);
   ro.observe(nav);
+  ro.observe(headerImg);
+
+  // Headerbild kann async laden → bei Load neu messen
+  if (!headerImg.complete) {
+    headerImg.addEventListener('load', onScrollOrResize, { once: true });
+  }
 
   // Initial + kleine Nachstabilisierungen
   window.addEventListener('load', () => {
