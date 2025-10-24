@@ -123,29 +123,37 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-/* ==== ROBUSTER OCCLUDER via clip-path (kein mask-image) ==== */
-/* Wir schneiden von .posts (oben) genau so viel ab, wie die NAV in <main> hineinragt.
-   Das ist stabil, performant und funktioniert sauber beim Vor- und Zurückscrollen. */
+/* ==== ROBUSTER OCCLUDER via clip-path ==== */
+/* Schneidet den oberen Teil von #posts genau im Bereich weg,
+   in dem die NAV (Buttons) darüber liegt. Wir messen ÜBERLAPPUNG
+   zwischen nav.bottom und posts.top (beide im Viewport). */
 
 (function setupNavClip(){
-  const nav  = document.querySelector('.chip-nav');
-  const main = document.querySelector('main');
-  if (!nav || !main) return;
+  const nav   = document.querySelector('.chip-nav');
+  const posts = document.getElementById('posts');
+  if (!nav || !posts) return;
 
   let ticking = false;
   let lastCut = -1;
 
   function computeCut(){
     const navBottom = nav.getBoundingClientRect().bottom;
-    const mainTop   = main.getBoundingClientRect().top;
-    const overlap   = Math.max(0, Math.round(navBottom - mainTop)); // px
+    const postsTop  = posts.getBoundingClientRect().top;
+    const overlap   = Math.max(0, Math.round(navBottom - postsTop)); // px
     return overlap;
   }
 
   function applyCut(px){
     if (px === lastCut) return;
     lastCut = px;
+
+    // 1) Inline CSS-Var (falls du die CSS-Var-Version bevorzugst)
     document.documentElement.style.setProperty('--nav-cut', `${px}px`);
+
+    // 2) Direkt als inline clip-path (sicher für iOS Safari)
+    const inset = `inset(${px}px 0 0 0)`;
+    posts.style.clipPath = inset;
+    posts.style.webkitClipPath = inset;
   }
 
   function frame(){
@@ -167,15 +175,16 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   window.addEventListener('orientationchange', onScrollOrResize, { passive: true });
   window.addEventListener('pageshow', onScrollOrResize, { passive: true });
 
+  // iOS Safari: VisualViewport bewegt sich separat
   if (window.visualViewport) {
     visualViewport.addEventListener('scroll', onScrollOrResize, { passive: true });
     visualViewport.addEventListener('resize', onScrollOrResize, { passive: true });
   }
 
-  // Nav-Höhe/Textwraps beobachten
+  // Nav-Höhe/Textwraps beobachten (Grid/Flex wrap)
   const ro = new ResizeObserver(onScrollOrResize);
   ro.observe(nav);
-  ro.observe(main);
+  ro.observe(posts);
 
   // Initial + Nachstabilisierungen
   window.addEventListener('load', () => {

@@ -10,14 +10,14 @@
   --text: #0b1020;
   font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 
-  /* Dynamik */
+  /* Layout-Dynamik */
   --face-gutter-max: 400px;   /* max. linker Abstand (Desktop) */
   --safe-gap: 24px;           /* Sicherheitsrand rechts */
   --container-pad: 24px;      /* Container padding desktop */
   --card-max: 700px;          /* Card-Max Desktop/Tablet */
   --posts-left: 0px;          /* wird unten per MQ bestimmt */
 
-  /* NAV-Überlappung: wird in JS als px gesetzt */
+  /* nur als Fallback; JS setzt inline */
   --nav-cut: 0px;
 }
 
@@ -26,7 +26,7 @@
 html, body{ height:100%; margin:0; color:var(--text); -webkit-font-smoothing:antialiased; }
 html, body{ overflow-x: hidden; }
 
-/* Seitenhintergrund fix (Bild + Fallback-Verlauf) */
+/* Seitenhintergrund */
 body{ background: none; min-height: 100vh; }
 body::before{
   content:"";
@@ -40,13 +40,12 @@ body::before{
   background-size: cover, cover;
   background-position: left center, left center; /* Gesicht links im Fokus */
   pointer-events: none;
-  will-change: transform;
 }
 
 /* Container */
 .container{ max-width: var(--container); margin: 0 auto; padding: 24px; }
 
-/* ===== Header (clean, ohne Blur) ===== */
+/* ===== Header (clean) ===== */
 .site-header,
 .site-header::before,
 .site-header::after{
@@ -61,12 +60,12 @@ body::before{
   position: sticky;
   top: 0;
   z-index: 30;
-  padding: 0;                  /* randlos */
+  padding: 0;
   background: transparent;
 }
 .site-header .container{ max-width: none; padding: 0; }
 
-/* Header-Bild: vollbreit + 40px Rundung + sanfter Fade nach unten (ohne Blur) */
+/* Header-Bild */
 .header-img{
   display: block;
   width: 100vw;
@@ -75,7 +74,6 @@ body::before{
   margin-left: 50%;
   transform: translateX(-50%);
   border-radius: 40px;
-  box-shadow: none;
   -webkit-mask-image: linear-gradient(to bottom,
     rgba(0,0,0,1) 0%,
     rgba(0,0,0,1) calc(100% - 56px),
@@ -95,17 +93,16 @@ body::before{
   align-items: center;
   gap: 64px;
   flex-wrap: wrap;
-  margin: 18px 0 40px;         /* Abstand zum Content */
+  margin: 18px 0 40px;
 }
 
-/* Desktop/Tablet: linker Rand an linken Gutter koppeln,
-   mind. 150px, max. 400px; rechts immer 150px Platz */
+/* Desktop/Tablet: linker Rand an linken Gutter koppeln */
 .chip-nav{
   padding-left: clamp(150px, var(--posts-left), 400px);
   padding-right: 150px;
 }
 
-/* Mobile: 2×2 Grid + kleiner Rand = mehr Hintergrund sichtbar */
+/* Mobile: 2×2 Grid */
 @media (max-width: 600px){
   .chip-nav{
     display: grid;
@@ -139,10 +136,8 @@ body::before{
 }
 
 /* ===== MAIN + Posts ===== */
-
 main{
-  /* kein mask-image mehr – nur Layout-Hinweis */
-  will-change: clip-path;
+  will-change: clip-path; /* nur Hinweis; kein mask-image mehr */
 }
 
 .posts{
@@ -151,12 +146,12 @@ main{
   align-items: center;
   gap: var(--gap);
   padding-bottom: 50px;
-  margin-top: 8px; /* direkt unter der Navi */
-  padding-left: var(--posts-left); /* Gutter links dynamisch */
+  margin-top: 8px;                 /* direkt unter der Navi */
+  padding-left: var(--posts-left); /* linker Gutter dynamisch */
 
-  /* Der robuste „Occluder“:
-     schneidet den oberen Bereich hart ab (ohne Mask-Repaint-Bugs) */
-  clip-path: inset(var(--nav-cut, 0px) 0 0 0);
+  /* Occluder: wird per JS als inline gesetzt */
+  -webkit-clip-path: inset(var(--nav-cut, 0px) 0 0 0);
+          clip-path: inset(var(--nav-cut, 0px) 0 0 0);
   will-change: clip-path;
 }
 
@@ -172,7 +167,7 @@ main{
   backdrop-filter: blur(6px);
 }
 
-/* Layout in der Card: Video unten links (9:16, ~¼), Text rechts */
+/* Layout in der Card */
 .post-inner{
   display: grid;
   grid-template-columns: minmax(160px, 25%) 1fr;
@@ -259,7 +254,7 @@ main{
   :root{ --container-pad: 16px; }
 }
 
-/* Desktop/Tablet: linker Gutter so groß wie möglich, max 400px */
+/* Desktop/Tablet: linker Gutter */
 @media (min-width: 601px){
   :root{
     --posts-left: clamp(
@@ -270,8 +265,7 @@ main{
   }
 }
 
-/* Phones (≤600px): mind. ~150–175px links frei,
-   aber niemals so groß, dass rechts die Card rausfällt */
+/* Phones (≤600px): mind. ~150–175px links frei */
 @media (max-width: 600px){
   :root{
     --posts-left: min(
