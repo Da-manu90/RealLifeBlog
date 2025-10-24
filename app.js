@@ -123,33 +123,39 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-/* ========= NAV-Overlay exakt ausrichten =========
-   Overlay (#nav-overlay) beginnt GENAU unter dem Header-BILD (headerImg.bottom)
-   und endet an der Unterkante der Navigation (nav.bottom).
-   → Header bleibt 100% sichtbar.
+/* ========= NAV-Overlay exakt ausrichten (IM HEADER) =========
+   Overlay (#nav-overlay) beginnt GENAU am unteren Rand des Header-Bilds
+   und endet an der Unterkante der Navigation – auch auf iOS zuverlässig.
+   -> Overlay ist Kindelement von <header> (position: absolute).
 */
 (function setupNavOverlay(){
+  const header    = document.querySelector('.site-header');
   const nav       = document.querySelector('.chip-nav');
   const headerImg = document.querySelector('.header-img');
   const veil      = document.getElementById('nav-overlay');
-  if (!nav || !headerImg || !veil) return;
+  if (!header || !nav || !headerImg || !veil) return;
 
   let ticking = false;
   let lastTop = null;
   let lastH   = null;
 
+  // Höhe + Position relativ zum Header berechnen
   function measure(){
-    const navRect   = nav.getBoundingClientRect();
-    const imgRect   = headerImg.getBoundingClientRect();
+    const hRect  = header.getBoundingClientRect();
+    const nRect  = nav.getBoundingClientRect();
+    const iRect  = headerImg.getBoundingClientRect();
 
-    // Start exakt an der Unterkante des Header-Bildes
-    const top = Math.round(imgRect.bottom);
+    // Bottom des Bildes relativ zum Header (zwei Methoden -> sicherste nehmen)
+    const relFromRects = Math.round(iRect.bottom - hRect.top);
+    const relFromDOM   = headerImg.offsetTop + headerImg.offsetHeight;
+    const top = Math.max(relFromRects, relFromDOM, 0);
 
-    // Ende an der Unterkante der Navi
-    const bottomY = Math.round(navRect.bottom);
+    // Unterkante der Navi relativ zum Header
+    const navBottomRel = Math.round(nRect.bottom - hRect.top);
 
-    // Höhe = Bereich zwischen Bildunterkante und Nav-Unterkante
-    const height = Math.max(0, bottomY - top);
+    // Höhe = Bereich zwischen Bildunterkante und Navi-Unterkante
+    const height = Math.max(0, navBottomRel - top);
+
     return { top, height };
   }
 

@@ -67,7 +67,7 @@ body::before{
 }
 .site-header .container{ max-width: none; padding: 0; }
 
-/* Header-Bild: KEINE mask-image mehr → wird nicht „abgeschnitten“ */
+/* Header-Bild: KEINE mask-image → wird nicht „abgeschnitten“ */
 .header-img{
   display: block;
   width: 100vw;
@@ -89,7 +89,7 @@ body::before{
   gap: 64px;
   flex-wrap: wrap;
 
-  /* Abstand zum Header (deine halbierte Variante) */
+  /* Abstand zum Header (halbiert) */
   margin: 9px 0 40px;
 }
 
@@ -137,7 +137,7 @@ body::before{
 #nav-overlay{
   position: fixed;
   left: 0;
-  top: 0;        /* wird per JS exakt auf headerImg.bottom gesetzt */
+  top: 0;        /* wird per JS exakt auf (nav.top - nav.marginTop) gesetzt */
   width: 100vw;
   height: 0;     /* JS setzt die Höhe bis zur Nav-Unterkante */
   z-index: 22;   /* unter Navi (31), über Content */
