@@ -657,3 +657,91 @@ body::before{
   background-position: left center, left center !important;
   background-size: cover, cover;
 }
+
+/* =========================
+   FINAL FIXES (ans Dateiende)
+   ========================= */
+
+/* 0) Safety: alte Occluder wirklich aus */
+body::after,
+main::after{
+  content: none !important;
+  background: none !important;
+}
+
+/* 1) Erster Post: direkt unter der Navi starten */
+:root{ --nav-mask-bottom: 0px; } /* wird von app.js gesetzt */
+.posts{
+  margin-top: 0 !important; /* NICHT weit nach unten schieben */
+}
+
+/* 2) Unsichtbar unter Buttons: weiche Maske NUR auf die Posts-Spalte */
+.posts{
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0,
+    rgba(0,0,0,0) calc(var(--nav-mask-bottom) + 4px),
+    rgba(0,0,0,1) calc(var(--nav-mask-bottom) + 24px)
+  );
+          mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--nav-mask-bottom) + 4px),
+    black      calc(var(--nav-mask-bottom) + 24px)
+  );
+}
+
+/* 3) Face-Gutter links: Desktop dynamisch (bis 400px), iPhone mind. 175px */
+:root{
+  --face-gutter-max: 400px;  /* Wunsch links */
+  --safe-gap: 24px;          /* kleiner Sicherheitsrand rechts */
+  --container-pad: 24px;     /* .container-padding Desktop */
+  --card-max: 700px;         /* deine Card-Max auf Desktop/Tablet */
+}
+/* Container-Padding mobil kleiner (wie oben in deiner CSS) */
+@media (max-width: 900px){
+  :root{ --container-pad: 16px; }
+}
+
+/* Desktop/Tablet: so groß wie möglich, max 400px – Karte bleibt sichtbar */
+@media (min-width: 601px){
+  :root{
+    --posts-left: clamp(
+      0px,
+      calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)),
+      var(--face-gutter-max)
+    );
+  }
+}
+
+/* iPhone/Phones: mindestens 175px Abstand links erzwingen */
+@media (max-width: 600px){
+  /* Mobile Card etwas schlanker (kannst du gern auf 360/380 anheben) */
+  :root{ --card-max: 350px; }
+
+  :root{
+    --posts-left: min(
+      var(--face-gutter-max),
+      max(175px, calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)))
+    );
+  }
+}
+
+/* Anwenden: Posts-Spalte nach rechts schieben */
+.posts{
+  padding-left: var(--posts-left) !important;
+}
+
+/* Cards an variable Max-Breite koppeln (bleibt wie gewünscht) */
+.post-card{
+  max-width: var(--card-max) !important;
+  width: 100%;
+}
+
+/* Hintergrund links verankern (Gesicht im Fokus) */
+body::before{
+  background-position: left center, left center !important;
+  background-size: cover, cover;
+}
+
+/* Mobile Navi 2×2 bleibt wie gehabt – kein Eingriff hier */
