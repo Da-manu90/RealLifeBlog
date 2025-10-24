@@ -347,3 +347,53 @@ body::before{
   .chip-nav{ gap: 14px 12px; }
   .chip{ padding: 10px 8px; }
 }
+
+/* ====== OCCLUDER: Content unter der NAV unsichtbar machen ====== */
+/* Höhe wird per JS in --nav-mask-bottom gesetzt (siehe B) */
+:root{
+  --nav-mask-bottom: 0px;   /* wird gefüllt */
+  --face-gutter: 400px;     /* linke „Gesichtszone“ */
+}
+
+/* Deckt den Bereich vom Viewport-Top bis Unterkante der Navi mit dem Hintergrund ab */
+body::after{
+  content: "";
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: var(--nav-mask-bottom);
+  z-index: 15;                  /* über Posts, unter Header/Navi */
+  pointer-events: none;         /* Navi bleibt klickbar */
+
+  /* gleiches Bild wie die Seite, damit es aussieht wie „durchsichtig“ */
+  background-image:
+    url('/images/background.png'),
+    linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
+  background-repeat: no-repeat, no-repeat;
+  background-size: cover, cover;
+  background-position: left center, left center;  /* Gesicht links im Fokus */
+}
+
+/* ====== OCCLUDER: Linke 400px „Gesichts-Gutter“ dauerhaft freihalten ====== */
+main::after{
+  content: "";
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--face-gutter);    /* 400px Standard */
+  z-index: 14;                  /* unter Header/Navi, über Posts */
+  /* WICHTIG: hier NICHT pointer-events:none,
+     sonst könnte man „unsichtbare“ Posts anklicken. */
+  pointer-events: auto;
+
+  background-image:
+    url('/images/background.png'),
+    linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
+  background-repeat: no-repeat, no-repeat;
+  background-size: cover, cover;
+  background-position: left center, left center;
+}
+
+/* Mobile 2x2-Grid für die Navi bleibt wie gehabt – kein Konflikt */

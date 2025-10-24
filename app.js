@@ -122,3 +122,28 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
     btn.classList.add('is-active');
   });
 });
+
+/* ---- Navi-Höhe an CSS geben, damit body::after korrekt maskiert ---- */
+function updateNavMask() {
+    const nav = document.querySelector('.chip-nav');
+    if (!nav) return;
+    const rect = nav.getBoundingClientRect();
+    const bottom = Math.max(0, Math.ceil(rect.bottom)); // px ab Viewport-Top
+    document.documentElement.style.setProperty('--nav-mask-bottom', `${bottom}px`);
+  }
+  
+  // initial + bei Resize/Rotation neu berechnen
+  window.addEventListener('load', updateNavMask);
+  window.addEventListener('resize', updateNavMask);
+  window.addEventListener('orientationchange', updateNavMask);
+  
+  // Falls sich die Navi-Höhe durch Fonts/Wrap ändert, alle 300ms kurz bis stabil:
+  let _maskTimer = null;
+  window.addEventListener('load', () => {
+    let n = 0;
+    _maskTimer = setInterval(() => {
+      updateNavMask();
+      if (++n > 10) clearInterval(_maskTimer); // nach ~3s aufhören
+    }, 300);
+  });
+  
