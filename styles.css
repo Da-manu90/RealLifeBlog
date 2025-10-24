@@ -411,3 +411,54 @@ main::after{
 @media (max-width: 420px){
   :root{ --face-gutter: 320px; } /* gern anpassen (300–340px) */
 }
+
+body::after { content: none !important; }
+
+/* Schiebt den Post-Stream unter die Navi-Unterkante + kleine Luft */
+.posts{
+  margin-top: calc(var(--nav-mask-bottom, 0px) + 8px) !important;
+}
+
+/* Einstellbare Werte */
+:root{
+  --face-gutter-max: 400px;   /* Wunschabstand links */
+  --face-gutter-min: 320px;   /* kleinste Breite auf sehr schmalen Phones */
+  --card-max: 700px;          /* deine Card-Max auf Desktop/Tablet */
+  --safe-gap: 24px;           /* kleiner Sicherheitsrand */
+}
+
+/* Effektiver Gutter: so groß wie möglich, aber nie < min,
+   und so bemessen, dass rechts noch Platz für die Card bleibt */
+:root{
+  --face-gutter-eff: clamp(
+    var(--face-gutter-min),
+    calc(100vw - var(--card-max) - var(--safe-gap)),
+    var(--face-gutter-max)
+  );
+}
+
+/* Posts links genauso weit einrücken wie das Gutter */
+.posts{
+  padding-left: var(--face-gutter-eff) !important;
+}
+
+/* Linke Gesichtszone mit der gleichen Breite maskieren.
+   Diese Maske liegt *nur* über den linken 400px (oder eff.), nicht über den Cards. */
+main::after{
+  content: "";
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--face-gutter-eff);
+  z-index: 14;                 /* unter Header/Navi, über Posts */
+  pointer-events: none;        /* nichts blockieren, nur optisch maskieren */
+
+  background-image:
+    url('/images/background.png'),
+    linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
+  background-repeat: no-repeat, no-repeat;
+  background-size: cover, cover;
+  background-position: left center, left center;
+  background-attachment: fixed, fixed;
+}
