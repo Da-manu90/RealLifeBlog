@@ -9,6 +9,14 @@
   --muted: #6b7280;
   --text: #0b1020;
   font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+
+  /* Dynamik */
+  --nav-overlap: 0px;         /* wird von app.js gesetzt */
+  --face-gutter-max: 400px;   /* max. linker Abstand (Desktop) */
+  --safe-gap: 24px;           /* Sicherheitsrand rechts */
+  --container-pad: 24px;      /* Container padding desktop */
+  --card-max: 700px;          /* Card-Max Desktop/Tablet */
+  --posts-left: 0px;          /* wird unten per MQ bestimmt */
 }
 
 /* Reset / Basics */
@@ -28,7 +36,7 @@ body::before{
     linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
   background-repeat: no-repeat, no-repeat;
   background-size: cover, cover;
-  background-position: center, center;
+  background-position: left center, left center; /* Gesicht links im Fokus */
   pointer-events: none;
   will-change: transform;
 }
@@ -76,7 +84,7 @@ body::before{
     rgba(0,0,0,0) 100%);
 }
 
-/* ===== Navigation (einzige aktive .chip-nav) ===== */
+/* ===== Navigation ===== */
 .chip-nav{
   position: relative;          /* liegt scharf über dem Bild */
   z-index: 2;
@@ -87,8 +95,26 @@ body::before{
   flex-wrap: wrap;
   margin: 18px 0 40px;         /* Abstand zum Content */
 }
-@media (max-width: 480px){
-  .chip-nav{ gap: 28px; margin-bottom: 32px; }
+
+/* Desktop/Tablet: linker Rand an linken Gutter koppeln,
+   mind. 150px, max. 400px; rechts immer 150px Platz */
+.chip-nav{
+  padding-left: clamp(150px, var(--posts-left), 400px);
+  padding-right: 150px;
+}
+
+/* Mobile: 2×2 Grid + kleiner Rand = mehr Hintergrund sichtbar */
+@media (max-width: 600px){
+  .chip-nav{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 16px;
+    padding-left: 16px;
+    padding-right: 16px;
+    margin-bottom: 28px;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 /* Buttons */
@@ -110,24 +136,44 @@ body::before{
   border-color: rgba(255,255,255,.9);
 }
 
-/* ===== Posts-Spalte ===== */
+/* ===== MAIN + Posts ===== */
+
+/* Maske sitzt auf <main> – NICHT auf .posts */
+main{
+  -webkit-mask-image: none;
+          mask-image: none;
+}
+
+body.mask-active main{
+  /* fade alles aus, was unter den Buttons liegt */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--nav-overlap) + 4px),
+    black       calc(var(--nav-overlap) + 24px)
+  );
+          mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--nav-overlap) + 4px),
+    black       calc(var(--nav-overlap) + 24px)
+  );
+}
+
 .posts{
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--gap);
   padding-bottom: 50px;
-  /* Spalte nach rechts schieben (Desktop), mobil normal */
-  padding-left: clamp(160px, 20vw, 400px);
-}
-@media (max-width: 900px){
-  .posts{ padding-left: 0; }
+  margin-top: 8px; /* direkt unter der Navi */
+  padding-left: var(--posts-left); /* Gutter links dynamisch */
 }
 
 /* ===== Post-Card ===== */
 .post-card{
   width: 100%;
-  max-width: 820px;            /* ~50px schmaler als vorher */
+  max-width: var(--card-max);
   background: var(--card-bg-rgba);
   border: var(--card-border);
   border-radius: var(--card-radius);
@@ -202,508 +248,28 @@ body::before{
   }
 }
 
-/* Desktop: Navi 320px nach rechts schieben, mobil zentriert lassen */
-@media (min-width: 901px){
-  .chip-nav{
-    padding-left: 320px;
-    justify-content: center; /* Buttons bleiben innerhalb des restlichen Platzes mittig */
-  }
-}
-@media (max-width: 900px){
-  .chip-nav{
-    padding-left: 0;         /* kein Push auf mobilen Geräten */
-  }
-}
-
 /* =========================
-   OVERRIDES (ans Dateiende)
+   Card-Breite & linker Gutter dynamisch
    ========================= */
 
-/* 1) Postcards schmal halten: max 550 px */
-.post-card{
-  max-width: 700px !important;   /* vorher 820px */
-  width: 100%;                    /* bleibt responsiv innerhalb der Spalte */
-}
-
-/* 2) Navi: min. 150 px Abstand links & rechts.
-      -> Wenn der Platz kleiner wird, bricht sie automatisch in neue Zeilen. */
-.chip-nav{
-  padding-left: 400px !important;
-  padding-right: 150px !important;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 64px;                      /* gern anpassen: 50–70 px */
-}
-
-/* Falls noch ein alter "Right-Push" aktiv war (z. B. padding-left: 400px) – neutralisieren */
-@media (min-width: 901px){
-  .chip-nav{
-    padding-left: 400px !important;
-    padding-right: 150px !important;
-  }
-}
-
-/* 3) Hintergrund links verankern (Gesicht bleibt immer sichtbar),
-      auf großen Screens wird nach rechts „mehr“ sichtbar */
-body::before{
-  background-position: left center, left center !important; /* [Bild], [Gradient] */
-  background-size: cover, cover;
-}
-
-/* ================================
-   Responsive Face-Gutter + Card-Breite
-   ================================ */
-
-/* Grundwerte (mobile-first) */
-:root{
-  --face-gutter: 400px;  /* gewünschter Abstand zur linken Gesichtsseite (maximal) */
-  --safe-gap: 24px;      /* kleiner Sicherheitsabstand für Viewport-Ränder */
-  --card-max: 350px;     /* mobile: schmalere Karten */
-}
-
-/* Tablet: etwas breiter */
-@media (min-width: 720px){
-  :root{ --card-max: 540px; }
-}
-
-/* Desktop / größere Tablets: bis 700px erlaubt (dein Wunsch) */
-@media (min-width: 900px){
-  :root{ --card-max: 700px; }
-}
-
-/* 1) Kartenbreite an Variable koppeln */
-.post-card{
-  max-width: var(--card-max) !important;
-  width: 100%;
-}
-
-/* 2) Posts-Spalte so weit nach rechts schieben, wie sinnvoll:
-      - nutze bis zu 400px Face-Gutter
-      - aber nie so viel, dass die Card aus dem Viewport rutscht
-      Formel: min(400px, max(0, 100vw - card_max - safe_gap)) */
-.posts{
-  padding-left: min(
-    var(--face-gutter),
-    max(0px, calc(100vw - var(--card-max) - var(--safe-gap)))
-  ) !important;
-}
-
-/* 3) Navi: mind. 150px Abstand zu den Rändern UND links am Face-Gutter orientieren.
-      Links: zwischen 150px (Minimum) und Face-Gutter – aber auch hier nie so weit,
-      dass rechts kein Platz mehr bleibt. Rechts: fix 150px. */
-.chip-nav{
-  padding-right: 150px !important;
-  padding-left: clamp(
-    150px,
-    calc(100vw - var(--card-max) - 16px),
-    var(--face-gutter)
-  ) !important;
-
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 64px;
-}
-
-/* 4) Hintergrund links verankern (Gesicht bleibt sichtbar) */
-body::before{
-  background-position: left center, left center !important; /* [Bild], [Gradient] */
-  background-size: cover, cover;
-}
-
-/* 5) Sehr kleine Screens: etwas sanftere Rand-/Gap-Werte */
-@media (max-width: 420px){
-  :root{ --safe-gap: 12px; }
-  .chip-nav{ gap: 28px; }
-}
-
-/* ===== Mobile-Layout für die Navi: 2x2 Grid, mehr Hintergrund sichtbar ===== */
+/* Mobile Cards etwas schlanker */
 @media (max-width: 600px){
-  /* statt Flex -> Grid */
-  .chip-nav{
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 Spalten */
-    gap: 16px 16px;                                   /* Abstand zwischen Buttons */
-    padding-left: 16px !important;                    /* kleiner Rand = mehr Hintergrund */
-    padding-right: 16px !important;
-    margin-bottom: 28px;                              /* etwas Luft nach unten */
-    justify-content: center;                          /* safety */
-    align-items: center;
-  }
-
-  /* Buttons füllen die Grid-Zellen, dürfen schmaler als 150px werden */
-  .chip{
-    min-width: 0 !important;  /* überschreibt dein 150px-Minimum nur mobil */
-    width: 100%;              /* Zelle voll ausnutzen */
-    padding: 12px 10px;       /* touch-freundlich, kompakt */
-    text-align: center;
-    white-space: nowrap;      /* bleibt einzeilig */
-    /* optional: leichte Schrumpfung auf sehr kleinen Screens:
-       font-size: clamp(0.9rem, 3.6vw, 1rem); */
-  }
+  :root{ --card-max: 350px; }
 }
-
-/* iPhone-„Mini“-Tuning (sehr schmale Geräte): etwas kompakter */
-@media (max-width: 380px){
-  .chip-nav{ gap: 14px 12px; }
-  .chip{ padding: 10px 8px; }
-}
-
-/* ===== Occluder für NAV-Bereich (verdeckt Posts unter den Buttons) ===== */
-/* Höhe wird per JS in --nav-mask-bottom gesetzt */
-:root{
-  --nav-mask-bottom: 0px;
-  --face-gutter: 400px; /* linke Gesichtszone bleibt frei */
-}
-
-/* Occluder oben: zeigt den *gleichen* Background wie die Seite
-   und blendet unten weich aus -> keine sichtbare Kante */
-body::after{
-  content: "";
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: var(--nav-mask-bottom);
-  z-index: 15;                 /* über Posts, unter Header/Navi */
-  pointer-events: none;
-
-  background-image:
-    url('/images/background.png'),
-    linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
-  background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;
-  background-position: left center, left center;
-  background-attachment: fixed, fixed;
-
-  /* Weich ausfaden: die unteren 14px werden transparent */
-  -webkit-mask-image: linear-gradient(to bottom,
-                        rgba(0,0,0,1) 0%,
-                        rgba(0,0,0,1) calc(100% - 14px),
-                        rgba(0,0,0,0) 100%);
-          mask-image: linear-gradient(to bottom,
-                        rgba(0,0,0,1) 0%,
-                        rgba(0,0,0,1) calc(100% - 14px),
-                        rgba(0,0,0,0) 100%);
-}
-
-/* Occluder links: hält die Gesichtszone *immer* frei */
-main::after{
-  content: "";
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: var(--face-gutter);   /* 400px standard */
-  z-index: 14;                 /* unter Header/Navi, über Posts */
-  pointer-events: auto;        /* blockt Klicks auf verdeckte Posts */
-
-  background-image:
-    url('/images/background.png'),
-    linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
-  background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;
-  background-position: left center, left center;
-  background-attachment: fixed, fixed;
-}
-
-/* Optional: auf sehr kleinen Phones die Gesichtszone leicht reduzieren,
-   damit Content nicht komplett abgeschnitten wird */
-@media (max-width: 420px){
-  :root{ --face-gutter: 320px; } /* gern anpassen (300–340px) */
-}
-
-body::after { content: none !important; }
-
-/* Schiebt den Post-Stream unter die Navi-Unterkante + kleine Luft */
-.posts{
-  margin-top: calc(var(--nav-mask-bottom, 0px) + 8px) !important;
-}
-
-/* Einstellbare Werte */
-:root{
-  --face-gutter-max: 400px;   /* Wunschabstand links */
-  --face-gutter-min: 320px;   /* kleinste Breite auf sehr schmalen Phones */
-  --card-max: 700px;          /* deine Card-Max auf Desktop/Tablet */
-  --safe-gap: 24px;           /* kleiner Sicherheitsrand */
-}
-
-/* Effektiver Gutter: so groß wie möglich, aber nie < min,
-   und so bemessen, dass rechts noch Platz für die Card bleibt */
-:root{
-  --face-gutter-eff: clamp(
-    var(--face-gutter-min),
-    calc(100vw - var(--card-max) - var(--safe-gap)),
-    var(--face-gutter-max)
-  );
-}
-
-/* Posts links genauso weit einrücken wie das Gutter */
-.posts{
-  padding-left: var(--face-gutter-eff) !important;
-}
-
-/* Linke Gesichtszone mit der gleichen Breite maskieren.
-   Diese Maske liegt *nur* über den linken 400px (oder eff.), nicht über den Cards. */
-main::after{
-  content: "";
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: var(--face-gutter-eff);
-  z-index: 14;                 /* unter Header/Navi, über Posts */
-  pointer-events: none;        /* nichts blockieren, nur optisch maskieren */
-
-  background-image:
-    url('/images/background.png'),
-    linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
-  background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;
-  background-position: left center, left center;
-  background-attachment: fixed, fixed;
-}
-
-@media (max-width: 390px){
-  :root{ --face-gutter-min: 300px; }
-}
-@media (max-width: 360px){
-  :root{ --face-gutter-min: 280px; }
-}
-
-/* =========================
-   FIX: Konflikte neutralisieren
-   ========================= */
-
-/* Alte Occluder sicher deaktivieren (verhindert „doppelten“ Hintergrund) */
-body::after,
-main::after{
-  content: none !important;
-  background: none !important;
-}
-
-/* Posts starten unterhalb der Navigation (Höhe kommt aus JS: --nav-mask-bottom) */
-.posts{
-  margin-top: calc(var(--nav-mask-bottom, 0px) + 12px) !important;
-}
-
-/* Hintergrund links verankern (Gesicht im Fokus) */
-body::before{
-  background-position: left center, left center !important;
-  background-size: cover, cover;
-}
-
-
-/* =========================
-   Responsive Face-Gutter + Card-Breite
-   ========================= */
-
-/* Grundwerte (mobile-first) */
-:root{
-  --face-gutter-max: 400px;  /* gewünschter Abstand links (maximal) */
-  --safe-gap: 24px;          /* Sicherheitsrand rechts */
-  --container-pad: 24px;     /* .container padding desktop */
-  --card-max: 350px;         /* mobile Card-Max */
-}
-
 /* Tablet breiter */
 @media (min-width: 720px){
   :root{ --card-max: 540px; }
 }
-
-/* Desktop/Tablet groß: bis 700px (dein Wunsch) */
+/* Desktop groß */
 @media (min-width: 900px){
   :root{ --card-max: 700px; }
-}
-
-/* Container-Padding auf kleineren Screens (deine CSS hat 16px) */
-@media (max-width: 900px){
-  :root{ --container-pad: 16px; }
-}
-
-/* Effektiver linker Gutter:
-   so groß wie möglich, aber niemals größer als der freie Platz,
-   damit die Karte nie rausgeschoben wird. */
-:root{
-  --face-gutter-eff: clamp(
-    0px,
-    calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)),
-    var(--face-gutter-max)
-  );
-}
-
-/* Anwenden: Posts-Spalte nach rechts schieben */
-.posts{
-  padding-left: var(--face-gutter-eff) !important;
-}
-
-/* Cards an die variable Max-Breite koppeln */
-.post-card{
-  max-width: var(--card-max) !important;
-  width: 100%;
-}
-
-
-/* =========================
-   Navigation
-   ========================= */
-
-/* Desktop/Tablet: linker Rand an Face-Gutter koppeln,
-   mind. 150px, max. 400px; rechts immer 150px Platz */
-.chip-nav{
-  padding-left: clamp(150px, var(--face-gutter-eff), 400px) !important;
-  padding-right: 150px !important;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 64px;
-}
-
-/* Mobile: 2×2 Grid + kleiner Rand = mehr Hintergrund sichtbar */
-@media (max-width: 600px){
-  .chip-nav{
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px 16px;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-    margin-bottom: 28px;
-    justify-content: center;
-    align-items: center;
-  }
-  .chip{
-    min-width: 0 !important;
-    width: 100%;
-    padding: 12px 10px;
-    white-space: nowrap;
-  }
-}
-
-/* iPhone Mini / sehr schmal: etwas enger */
-@media (max-width: 380px){
-  .chip-nav{ gap: 14px 12px; }
-  .chip{ padding: 10px 8px; }
-}
-
-/* ==== 0) Safety: alte Occluder wirklich aus ==== */
-body::after,
-main::after{
-  content: none !important;
-  background: none !important;
-}
-
-/* ==== 1) Posts direkt unter der Navi (nicht weit weg) ==== */
-:root{ --nav-mask-bottom: 0px; } /* wird per JS gesetzt */
-.posts{
-  margin-top: 8px !important; /* wieder knapp unter der Navi starten */
-}
-
-/* ==== 2) Smooth Fade: Posts unter der Navi unsichtbar (keine 2. BG-Schicht) ==== */
-/* -> wir maskieren nur die Posts-Kolonne, nicht den Seitenhintergrund */
-.posts{
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    rgba(0,0,0,0) 0,
-    rgba(0,0,0,0) calc(var(--nav-mask-bottom) + 8px),
-    rgba(0,0,0,1) calc(var(--nav-mask-bottom) + 24px)
-  );
-          mask-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent calc(var(--nav-mask-bottom) + 8px),
-    black      calc(var(--nav-mask-bottom) + 24px)
-  );
-}
-
-/* ==== 3) Face-Gutter: iPhone links immer mind. 175px frei ==== */
-/* Basis-Berechnung (Desktop/Tablet): so groß wie möglich, max 400px */
-:root{
-  --face-gutter-max: 400px;
-  --safe-gap: 24px;
-  --container-pad: 24px;
-  --card-max: 700px; /* dein Desktop/Tablet-Wert */
 }
 /* Container-Padding mobil kleiner */
 @media (max-width: 900px){
   :root{ --container-pad: 16px; }
 }
-/* Effektiver Gutter desktop/tablet */
-:root{
-  --face-gutter-eff: clamp(
-    0px,
-    calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)),
-    var(--face-gutter-max)
-  );
-}
-/* Standard: Posts nach rechts schieben */
-.posts{
-  padding-left: var(--face-gutter-eff) !important;
-}
 
-/* iPhone/Phones: Mindestabstand 175px erzwingen, aber nie mehr als möglich */
-@media (max-width: 600px){
-  /* mobile Card-Breite etwas kleiner, damit alles passt */
-  :root{ --card-max: 350px; }
-
-  .posts{
-    /* min 175px, max 400px, aber nie so groß, dass die Card rausfällt */
-    padding-left: min(
-      var(--face-gutter-max),
-      max(175px, calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)))
-    ) !important;
-  }
-}
-
-/* BG bleibt links verankert (Gesicht im Fokus) */
-body::before{
-  background-position: left center, left center !important;
-  background-size: cover, cover;
-}
-
-/* =========================
-   FINAL FIXES (ans Dateiende)
-   ========================= */
-
-/* 0) Safety: alte Occluder wirklich aus */
-body::after,
-main::after{
-  content: none !important;
-  background: none !important;
-}
-
-/* 1) Erster Post: direkt unter der Navi starten */
-:root{ --nav-mask-bottom: 0px; } /* wird von app.js gesetzt */
-.posts{
-  margin-top: 0 !important; /* NICHT weit nach unten schieben */
-}
-
-/* 2) Unsichtbar unter Buttons: weiche Maske NUR auf die Posts-Spalte */
-.posts{
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    rgba(0,0,0,0) 0,
-    rgba(0,0,0,0) calc(var(--nav-mask-bottom) + 4px),
-    rgba(0,0,0,1) calc(var(--nav-mask-bottom) + 24px)
-  );
-          mask-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent calc(var(--nav-mask-bottom) + 4px),
-    black      calc(var(--nav-mask-bottom) + 24px)
-  );
-}
-
-/* 3) Face-Gutter links: Desktop dynamisch (bis 400px), iPhone mind. 175px */
-:root{
-  --face-gutter-max: 400px;  /* Wunsch links */
-  --safe-gap: 24px;          /* kleiner Sicherheitsrand rechts */
-  --container-pad: 24px;     /* .container-padding Desktop */
-  --card-max: 700px;         /* deine Card-Max auf Desktop/Tablet */
-}
-/* Container-Padding mobil kleiner (wie oben in deiner CSS) */
-@media (max-width: 900px){
-  :root{ --container-pad: 16px; }
-}
-
-/* Desktop/Tablet: so groß wie möglich, max 400px – Karte bleibt sichtbar */
+/* Desktop/Tablet: linker Gutter so groß wie möglich, max 400px */
 @media (min-width: 601px){
   :root{
     --posts-left: clamp(
@@ -714,11 +280,9 @@ main::after{
   }
 }
 
-/* iPhone/Phones: mindestens 175px Abstand links erzwingen */
+/* Phones (≤600px): mindestens 175px Abstand links,
+   aber niemals so groß, dass rechts die Card rausfällt */
 @media (max-width: 600px){
-  /* Mobile Card etwas schlanker (kannst du gern auf 360/380 anheben) */
-  :root{ --card-max: 350px; }
-
   :root{
     --posts-left: min(
       var(--face-gutter-max),
@@ -726,22 +290,3 @@ main::after{
     );
   }
 }
-
-/* Anwenden: Posts-Spalte nach rechts schieben */
-.posts{
-  padding-left: var(--posts-left) !important;
-}
-
-/* Cards an variable Max-Breite koppeln (bleibt wie gewünscht) */
-.post-card{
-  max-width: var(--card-max) !important;
-  width: 100%;
-}
-
-/* Hintergrund links verankern (Gesicht im Fokus) */
-body::before{
-  background-position: left center, left center !important;
-  background-size: cover, cover;
-}
-
-/* Mobile Navi 2×2 bleibt wie gehabt – kein Eingriff hier */

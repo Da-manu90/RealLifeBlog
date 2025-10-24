@@ -123,21 +123,22 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-/* ==== Maske korrekt positionieren (relativ zu .posts) ==== */
+/* ==== KORREKTE MASKE relativ zum NAV-BEREICH (Buttons) ==== */
+/* Wir messen die Überlappung zwischen der Unterkante der NAV und der Oberkante von <main>.
+   Die Maske wird auf <main> angewendet – so verschwindet Content unter den Buttons. */
 function updateNavMask() {
   const nav = document.querySelector('.chip-nav');
-  const posts = document.querySelector('.posts');
-  if (!nav || !posts) return;
+  const main = document.querySelector('main');
+  if (!nav || !main) return;
 
-  // Abstand der Navi-Unterkante zur OBERKANTE von .posts
-  const navBottom = nav.getBoundingClientRect().bottom;
-  const postsTop  = posts.getBoundingClientRect().top;
-  const overlap   = Math.max(0, Math.round(navBottom - postsTop));
+  const navBottom = nav.getBoundingClientRect().bottom; // px zur Viewport-Oberkante
+  const mainTop   = main.getBoundingClientRect().top;   // px zur Viewport-Oberkante
+  const overlap   = Math.max(0, Math.round(navBottom - mainTop)); // wieviel von <main> liegt unter NAV?
 
-  // Variable für CSS setzen
-  document.documentElement.style.setProperty('--posts-mask-offset', `${overlap}px`);
+  // CSS-Variable setzen
+  document.documentElement.style.setProperty('--nav-overlap', `${overlap}px`);
 
-  // Maske nur aktivieren, wenn tatsächlich Überlappung vorhanden ist
+  // Maske nur aktivieren, wenn wirklich Überlappung vorhanden ist
   if (overlap > 0) {
     document.body.classList.add('mask-active');
   } else {
