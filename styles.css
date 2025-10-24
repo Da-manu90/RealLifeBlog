@@ -17,7 +17,7 @@
   --card-max: 700px;          /* Card-Max Desktop/Tablet */
   --posts-left: 0px;          /* wird unten per MQ bestimmt */
 
-  /* Overlay-Deckkraft (weiß) */
+  /* Overlay-Deckkraft (weiß, hinter den Buttons) */
   --nav-overlay-alpha: 0.45;  /* 45% */
 }
 
@@ -64,6 +64,7 @@ body::before{
   z-index: 30;
   padding: 0;
   background: transparent;
+  isolation: isolate; /* eigener Stacking-Context */
 }
 .site-header .container{ max-width: none; padding: 0; }
 
@@ -84,13 +85,13 @@ body::before{
           clip-path: none !important;
 
   position: relative;
-  z-index: 35; /* über jeglicher Deko */
+  z-index: 35; /* sicher über Deko */
 }
 
 /* ===== Navigation ===== */
 .chip-nav{
-  position: relative;          /* Overlay bezieht sich auf diese Box */
-  z-index: 31;                 /* über Overlay, unter Header ok */
+  position: relative;          /* Anker für das CSS-Overlay (::before) */
+  z-index: 31;                 /* über Content, unter Header-Bild (35) */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -100,6 +101,27 @@ body::before{
   /* halbierter Abstand zum Header */
   margin: 9px 0 40px;
 }
+
+/* CSS-Overlay: helles Weiß 45% -> 0%, sanfte lange Kante.
+   Es sitzt GENAU hinter den Buttons: von 10px über Nav bis 10px darunter. */
+.chip-nav::before{
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  top: -10px;
+  bottom: -10px;
+  pointer-events: none;
+  /* lange, weiche Kante über die ganze Höhe */
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,var(--nav-overlay-alpha)) 0%,
+    rgba(255,255,255,0) 100%
+  );
+  /* unter Button-Inhalt bleiben */
+  z-index: 0;
+}
+/* Buttons sicher über dem Overlay */
+.chip-nav > *{ position: relative; z-index: 1; }
 
 /* Desktop/Tablet: linker Rand an linken Gutter koppeln */
 .chip-nav{
@@ -141,26 +163,8 @@ body::before{
   border-color: rgba(0,0,0,.12);
 }
 
-/* ===== EINZIGES helles NAV-Overlay (unter Navi, über Content) ===== */
-#nav-overlay-fixed{
-  position: fixed;
-  left: 0;
-  top: 0;        /* JS setzt top dynamisch (Nav-Top) */
-  width: 100vw;
-  height: 0;     /* JS setzt Höhe dynamisch (Nav-Höhe) */
-  z-index: 22;   /* unter Navi (31), über Content */
-  pointer-events: none;
-
-  /* Weicher Verlauf: Weiß(45%) → transparent */
-  background: linear-gradient(
-    to bottom,
-    rgba(255,255,255,var(--nav-overlay-alpha)) 0%,
-    rgba(255,255,255,0) 100%
-  );
-}
-
-/* Killswitch: falls altes Element #nav-overlay doch im DOM ist */
-#nav-overlay{ display: none !important; }
+/* ==== KEINE separaten Overlay-Elemente mehr ==== */
+#nav-overlay, #nav-overlay-fixed, #nav-veil, #overlay{ display: none !important; }
 
 /* ===== MAIN + Posts ===== */
 main{

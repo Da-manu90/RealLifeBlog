@@ -123,78 +123,11 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-/* ========= EINZIGES NAV-Overlay: exakt Nav-Bereich =========
-   Start = NAV-Oberkante
-   Höhe  = NAV-Höhe
-   -> Header bleibt 100% sichtbar, Overlay liegt nur hinter den Buttons.
-*/
-(function setupNavOverlayNavOnly(){
-  const nav  = document.querySelector('.chip-nav');
-  const veil = document.getElementById('nav-overlay-fixed');
-  if (!nav || !veil) return;
-
-  // Hard kill: falls ein altes #nav-overlay (falsches Target) existiert, verstecken
-  const old = document.getElementById('nav-overlay');
-  if (old) old.style.display = 'none';
-
-  let ticking = false;
-  let lastTop = NaN;
-  let lastH   = NaN;
-
-  function measure(){
-    const r = nav.getBoundingClientRect();
-    const top = Math.max(0, Math.round(r.top));
-    const height = Math.max(0, Math.round(r.height));
-    return { top, height };
-  }
-
-  function apply({ top, height }){
-    let changed = false;
-    if (top !== lastTop) {
-      veil.style.top = `${top}px`;
-      lastTop = top;
-      changed = true;
-    }
-    if (height !== lastH) {
-      veil.style.height = `${height}px`;
-      lastH = height;
-      changed = true;
-    }
-    if (changed) {
-      // iOS Safari Repaint-Nudge
-      veil.style.transform = 'translateZ(0)';
-      requestAnimationFrame(() => { veil.style.transform = ''; });
-    }
-  }
-
-  function onScrollOrResize(){
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => {
-      apply(measure());
-      ticking = false;
-    });
-  }
-
-  // Events
-  window.addEventListener('scroll', onScrollOrResize, { passive: true });
-  window.addEventListener('resize', onScrollOrResize, { passive: true });
-  window.addEventListener('orientationchange', onScrollOrResize, { passive: true });
-  window.addEventListener('pageshow', onScrollOrResize, { passive: true });
-
-  if (window.visualViewport) {
-    visualViewport.addEventListener('scroll', onScrollOrResize, { passive: true });
-    visualViewport.addEventListener('resize', onScrollOrResize, { passive: true });
-  }
-
-  const ro = new ResizeObserver(onScrollOrResize);
-  ro.observe(nav);
-
-  // Initial + Nachstabilisierung (Fonts/Wrap etc.)
-  window.addEventListener('load', () => {
-    onScrollOrResize();
-    setTimeout(onScrollOrResize, 50);
-    setTimeout(onScrollOrResize, 250);
-    setTimeout(onScrollOrResize, 800);
+/* ==== SAFETY-CLEANUP: Entferne alte Overlay-Knoten, falls vorhanden ==== */
+(function killLegacyOverlays(){
+  const legacyIds = ['nav-overlay', 'nav-overlay-fixed', 'nav-veil', 'overlay'];
+  legacyIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.remove();
   });
 })();
