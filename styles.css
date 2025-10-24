@@ -563,7 +563,7 @@ body::before{
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px 16px;
-    padding-left: 16px !important;
+    padding-left: 200px !important;
     padding-right: 16px !important;
     margin-bottom: 28px;
     justify-content: center;
