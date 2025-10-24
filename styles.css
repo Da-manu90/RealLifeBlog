@@ -348,14 +348,15 @@ body::before{
   .chip{ padding: 10px 8px; }
 }
 
-/* ====== OCCLUDER: Content unter der NAV unsichtbar machen ====== */
-/* Höhe wird per JS in --nav-mask-bottom gesetzt (siehe B) */
+/* ===== Occluder für NAV-Bereich (verdeckt Posts unter den Buttons) ===== */
+/* Höhe wird per JS in --nav-mask-bottom gesetzt */
 :root{
-  --nav-mask-bottom: 0px;   /* wird gefüllt */
-  --face-gutter: 400px;     /* linke „Gesichtszone“ */
+  --nav-mask-bottom: 0px;
+  --face-gutter: 400px; /* linke Gesichtszone bleibt frei */
 }
 
-/* Deckt den Bereich vom Viewport-Top bis Unterkante der Navi mit dem Hintergrund ab */
+/* Occluder oben: zeigt den *gleichen* Background wie die Seite
+   und blendet unten weich aus -> keine sichtbare Kante */
 body::after{
   content: "";
   position: fixed;
@@ -363,30 +364,8 @@ body::after{
   top: 0;
   width: 100vw;
   height: var(--nav-mask-bottom);
-  z-index: 15;                  /* über Posts, unter Header/Navi */
-  pointer-events: none;         /* Navi bleibt klickbar */
-
-  /* gleiches Bild wie die Seite, damit es aussieht wie „durchsichtig“ */
-  background-image:
-    url('/images/background.png'),
-    linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
-  background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;
-  background-position: left center, left center;  /* Gesicht links im Fokus */
-}
-
-/* ====== OCCLUDER: Linke 400px „Gesichts-Gutter“ dauerhaft freihalten ====== */
-main::after{
-  content: "";
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: var(--face-gutter);    /* 400px Standard */
-  z-index: 14;                  /* unter Header/Navi, über Posts */
-  /* WICHTIG: hier NICHT pointer-events:none,
-     sonst könnte man „unsichtbare“ Posts anklicken. */
-  pointer-events: auto;
+  z-index: 15;                 /* über Posts, unter Header/Navi */
+  pointer-events: none;
 
   background-image:
     url('/images/background.png'),
@@ -394,6 +373,41 @@ main::after{
   background-repeat: no-repeat, no-repeat;
   background-size: cover, cover;
   background-position: left center, left center;
+  background-attachment: fixed, fixed;
+
+  /* Weich ausfaden: die unteren 14px werden transparent */
+  -webkit-mask-image: linear-gradient(to bottom,
+                        rgba(0,0,0,1) 0%,
+                        rgba(0,0,0,1) calc(100% - 14px),
+                        rgba(0,0,0,0) 100%);
+          mask-image: linear-gradient(to bottom,
+                        rgba(0,0,0,1) 0%,
+                        rgba(0,0,0,1) calc(100% - 14px),
+                        rgba(0,0,0,0) 100%);
 }
 
-/* Mobile 2x2-Grid für die Navi bleibt wie gehabt – kein Konflikt */
+/* Occluder links: hält die Gesichtszone *immer* frei */
+main::after{
+  content: "";
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--face-gutter);   /* 400px standard */
+  z-index: 14;                 /* unter Header/Navi, über Posts */
+  pointer-events: auto;        /* blockt Klicks auf verdeckte Posts */
+
+  background-image:
+    url('/images/background.png'),
+    linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
+  background-repeat: no-repeat, no-repeat;
+  background-size: cover, cover;
+  background-position: left center, left center;
+  background-attachment: fixed, fixed;
+}
+
+/* Optional: auf sehr kleinen Phones die Gesichtszone leicht reduzieren,
+   damit Content nicht komplett abgeschnitten wird */
+@media (max-width: 420px){
+  :root{ --face-gutter: 320px; } /* gern anpassen (300–340px) */
+}
