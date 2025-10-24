@@ -123,40 +123,28 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-/* ========= NAV-Overlay: Position + Höhe exakt ausrichten =========
-   Overlay (#nav-overlay) beginnt JETZT unterhalb des HEADERS und
-   endet wie bisher an der berechneten Unterkante (Nav-Bottom + Extra - BottomOffset). */
+/* ========= NAV-Overlay exakt ausrichten =========
+   Overlay (#nav-overlay) beginnt JETZT direkt UNTER dem Header (220px)
+   und endet an der Unterkante der Navigation. */
 (function setupNavOverlay(){
-  const header = document.querySelector('.site-header');
   const nav    = document.querySelector('.chip-nav');
   const veil   = document.getElementById('nav-overlay');
-  if (!header || !nav || !veil) return;
+  if (!nav || !veil) return;
 
-  const readPxVar = (name, fallback = 0) => {
-    const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-    if (!v) return fallback;
-    const n = parseFloat(v);
-    return Number.isFinite(n) ? n : fallback;
-  };
+  const HEADER_VISUAL_HEIGHT = 220; // px – vom Nutzer vorgegeben
 
   let ticking = false;
   let lastTop = null;
   let lastH   = null;
 
   function measure(){
-    const headerRect = header.getBoundingClientRect();
-    const navRect    = nav.getBoundingClientRect();
+    const navRect = nav.getBoundingClientRect();
 
-    const topOffset    = readPxVar('--nav-overlay-top-offset');      // jetzt 0px
-    const bottomOffset = readPxVar('--nav-overlay-bottom-offset');   // z.B. -10
-    const extra        = readPxVar('--nav-overlay-extra');           // z.B. 80
+    // Overlay-Start: fix 220px unter dem Viewport-Top (Header-Höhe)
+    const top = Math.round(HEADER_VISUAL_HEIGHT);
 
-    // OVERLAY START: direkt UNTER dem Header
-    const top = Math.round(headerRect.bottom + topOffset);
-
-    // OVERLAY ENDE: wie bisher – Nav-Bottom inkl. Extra & Bottom-Offset
-    // (negativer Bottom-Offset erweitert nach unten)
-    const bottomY = Math.round(navRect.bottom - bottomOffset + extra);
+    // Overlay-Ende: Unterkante der Navigation
+    const bottomY = Math.round(navRect.bottom);
 
     const height = Math.max(0, bottomY - top);
     return { top, height };
@@ -198,9 +186,8 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
     visualViewport.addEventListener('resize', onScrollOrResize, { passive: true });
   }
 
-  // Beobachte Header- und Nav-Höhe (Wrap/Zeilenumbrüche, Fonts etc.)
+  // Nav-Höhe beobachten (Wrap/Zeilenumbrüche, Fonts etc.)
   const ro = new ResizeObserver(onScrollOrResize);
-  ro.observe(header);
   ro.observe(nav);
 
   // Initial + kleine Nachstabilisierungen

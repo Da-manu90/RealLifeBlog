@@ -18,10 +18,7 @@
   --posts-left: 0px;          /* wird unten per MQ bestimmt */
 
   /* NAV-Overlay Parameter (helles Overlay) */
-  --nav-overlay-alpha: 0.45;      /* 45% Deckkraft (weiß) */
-  --nav-overlay-extra: 80px;      /* zusätzliche Verlängerung NACH unten */
-  --nav-overlay-top-offset: 0px;      /* NEU: Overlay startet exakt UNTER dem Header */
-  --nav-overlay-bottom-offset: -10px; /* unten 10px über den Nav-Bereich hinaus */
+  --nav-overlay-alpha: 0.45;  /* 45% Deckkraft (weiß) */
 }
 
 /* Reset / Basics */
@@ -29,8 +26,10 @@
 html, body{ height:100%; margin:0; color:var(--text); -webkit-font-smoothing:antialiased; }
 html, body{ overflow-x: hidden; }
 
+/* Abstand zwischen Header und restlichem Body-Inhalt */
+body{ background: none; min-height: 100vh; padding-top: 10px; }
+
 /* Seitenhintergrund */
-body{ background: none; min-height: 100vh; }
 body::before{
   content:"";
   position: fixed;
@@ -69,6 +68,7 @@ body::before{
 .site-header .container{ max-width: none; padding: 0; }
 
 /* Header-Bild */
+/* Hinweis: Die visuelle Höhe wird im JS mit 220px für das Overlay berücksichtigt */
 .header-img{
   display: block;
   width: 100vw;
@@ -97,7 +97,7 @@ body::before{
   gap: 64px;
   flex-wrap: wrap;
 
-  /* Abstand unter dem Header HALBIERT (18px -> 9px) */
+  /* Abstand unter dem Header (halbiert zuvor) – hier belassen */
   margin: 9px 0 40px;
 }
 
@@ -145,10 +145,10 @@ body::before{
 #nav-overlay{
   position: fixed;
   left: 0;
-  top: 0;             /* tatsächliche Position wird via JS gesetzt */
+  top: 220px;        /* Startet EXAKT unter der Header-Höhe (wird im JS dennoch dynamisch gesetzt) */
   width: 100vw;
-  height: 0;          /* wird via JS gesetzt */
-  z-index: 22;        /* unter Navi (31), über Content */
+  height: 0;         /* JS setzt die Höhe bis zur Nav-Unterkante */
+  z-index: 22;       /* unter Navi (31), über Content */
   pointer-events: none;
 
   /* Langer, weicher Verlauf: von deckendem Weiß (oben) zu transparent (unten) */
