@@ -123,10 +123,10 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-/* ========= NAV-Overlay: ausschließlich der NAV-Bereich =========
+/* ========= EINZIGES NAV-Overlay: exakt die Navi, sonst nichts =========
    Top  = nav.top
    Höhe = nav.height
-   → Es gibt KEIN Overlay mehr zwischen Header-Unterkante und NAV-Oberkante.
+   → Header bleibt 100% sichtbar; kein Overlay zwischen Header-Unterkante und Nav-Oberkante.
 */
 (function setupNavOverlay(){
   const nav  = document.querySelector('.chip-nav');
@@ -139,7 +139,7 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
 
   function measure(){
     const r = nav.getBoundingClientRect();
-    const top = Math.round(r.top);
+    const top = Math.round(r.top);      // Viewport-Koordinaten, weil veil position:fixed
     const height = Math.max(0, Math.round(r.height));
     return { top, height };
   }
@@ -157,7 +157,7 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
       changed = true;
     }
     if (changed) {
-      // iOS Safari: Repaint-Nudge
+      // iOS Safari: kleiner Repaint-Nudge
       veil.style.transform = 'translateZ(0)';
       requestAnimationFrame(() => { veil.style.transform = ''; });
     }
@@ -172,11 +172,11 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
     });
   }
 
-  // Events
+  // Events (robust, aber nicht doppelt):
   window.addEventListener('scroll', onScrollOrResize, { passive: true });
   window.addEventListener('resize', onScrollOrResize, { passive: true });
   window.addEventListener('orientationchange', onScrollOrResize, { passive: true });
-  window.addEventListener('pageshow', onScrollOrResize, { passive: true });
+  window.addEventListener('pageshow', onScrollOrResize, { passive: true }); // bfcache
 
   if (window.visualViewport) {
     visualViewport.addEventListener('scroll', onScrollOrResize, { passive: true });
@@ -186,7 +186,6 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   const ro = new ResizeObserver(onScrollOrResize);
   ro.observe(nav);
 
-  // Initial + kleine Nachstabilisierungen
   window.addEventListener('load', () => {
     onScrollOrResize();
     setTimeout(onScrollOrResize, 50);

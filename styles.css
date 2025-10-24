@@ -17,8 +17,8 @@
   --card-max: 700px;          /* Card-Max Desktop/Tablet */
   --posts-left: 0px;          /* wird unten per MQ bestimmt */
 
-  /* Overlay-Deckkraft (weiß) */
-  --nav-overlay-alpha: 0.45;  /* 45% */
+  /* Overlay-Deckkraft (weiß) – 0.45 = 45 % */
+  --nav-overlay-alpha: 0.45;
 }
 
 /* Reset / Basics */
@@ -40,7 +40,7 @@ body::before{
     linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
   background-repeat: no-repeat, no-repeat;
   background-size: cover, cover;
-  background-position: left center, left center; /* Gesicht links im Fokus */
+  background-position: left center, left center;
   pointer-events: none;
 }
 
@@ -67,7 +67,7 @@ body::before{
 }
 .site-header .container{ max-width: none; padding: 0; }
 
-/* Header-Bild: ALLE Masken/Clips hart aus! (gegen Cache-Reste) */
+/* Header-Bild: alle alten Masken/Clips AUS (gegen Cache-Reste) */
 .header-img{
   display: block;
   width: 100vw;
@@ -88,16 +88,14 @@ body::before{
 
 /* ===== Navigation ===== */
 .chip-nav{
-  position: relative;          /* liegt scharf über dem Overlay */
-  z-index: 31;                 /* über Overlay, unter Header ist ok */
+  position: relative;   /* liegt scharf über dem Overlay */
+  z-index: 31;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 64px;
   flex-wrap: wrap;
-
-  /* Abstand zum Header (halbiert) */
-  margin: 9px 0 40px;
+  margin: 9px 0 40px;   /* halbierter Abstand zum Header */
 }
 
 /* Desktop/Tablet: linker Rand an linken Gutter koppeln */
@@ -144,13 +142,12 @@ body::before{
 #nav-overlay{
   position: fixed;
   left: 0;
-  top: 0;        /* JS setzt top dynamisch (NAV-Oberkante) */
+  top: 0;        /* JS setzt top = nav.top */
   width: 100vw;
-  height: 0;     /* JS setzt Höhe dynamisch (NAV-Höhe) */
+  height: 0;     /* JS setzt Höhe = nav.height */
   z-index: 22;   /* unter Navi (31), über Content */
   pointer-events: none;
 
-  /* Verlauf innerhalb der NAV-Höhe: Weiß(45%) → transparent */
   background: linear-gradient(
     to bottom,
     rgba(255,255,255,var(--nav-overlay-alpha)) 0%,
@@ -163,7 +160,7 @@ main{
   will-change: opacity, transform;
 }
 
-/* Alte Masken/Clips auf main/.posts explizit aus (gegen Cache-Reste) */
+/* Alte Masken/Clips auf main/.posts explizit aus */
 main, .posts{
   -webkit-mask-image: none !important;
           mask-image: none !important;

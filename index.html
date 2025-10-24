@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>RealLifeBlog</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <!-- Cache-Busting gegen iOS-CSS-Cache -->
-  <link rel="stylesheet" href="styles.css?v=navfix12">
+  <!-- Cache-Busting -->
+  <link rel="stylesheet" href="styles.css?v=navfix13">
 </head>
 <body>
   <!-- Header mit Banner-Bild -->
@@ -51,7 +51,7 @@
     <div class="container">© RealLifeBlog</div>
   </footer>
 
-  <!-- >>> HIER: Supabase-Umgebungswerte einfügen (vor app.js) <<< -->
+  <!-- >>> Supabase ENV (vor app.js) <<< -->
   <script>
     window.env = {
       SUPABASE_URL: "https://pmtmuqnnygmhpanfedir.supabase.co",
@@ -59,7 +59,7 @@
     };
   </script>
 
-  <!-- App lädt danach und kann window.env nutzen -->
-  <script type="module" src="app.js?v=navfix12"></script>
+  <!-- App -->
+  <script type="module" src="app.js?v=navfix13"></script>
 </body>
 </html>
