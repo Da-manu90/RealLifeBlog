@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RealLifeBlog</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Header mit Banner-Bild -->
+  <header class="site-header">
+    <div class="container">
+      <img src="images/Header.png" alt="RealLifeBlog Banner" class="header-img">
+      <nav class="chip-nav" aria-label="Hauptnavigation">
+        <button class="chip is-active" data-key="video">Video Blog</button>
+        <button class="chip" data-key="about">Über mich</button>
+        <button class="chip" data-key="news">Neuigkeiten</button>
+        <button class="chip" data-key="thoughts">Gedanken</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Posts -->
+    <section id="posts" class="posts" aria-live="polite"></section>
+  </main>
+
+  <!-- Template -->
+  <template id="post-template">
+    <article class="post-card">
+      <div class="post-inner">
+        <div class="thumb">
+          <img class="thumb-img" src="" alt="" width="800" height="450" loading="lazy">
+          <button class="play" aria-label="Video abspielen"></button>
+        </div>
+        <div class="post-meta">
+          <time class="post-date" datetime=""></time>
+          <h3 class="post-title"></h3>
+          <p class="post-desc"></p>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <footer class="site-footer">
+    <div class="container">© RealLifeBlog</div>
+  </footer>
+
+  <!-- >>> HIER: Supabase-Umgebungswerte einfügen (vor app.js) <<< -->
+  <script>
+    window.env = {
+      SUPABASE_URL: "https://pmtmuqnnygmhpanfedir.supabase.co",
+      SUPABASE_ANON: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBtdG11cW5ueWdtaHBhbmZlZGlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyNjIzOTgsImV4cCI6MjA3NjgzODM5OH0.e-yAlOw2-_QTnZhq95AH_tROeRsdhJ83LSaQa3pKi6s" // Client/anon key
+    };
+  </script>
+
+  <!-- App lädt danach und kann window.env nutzen -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>
