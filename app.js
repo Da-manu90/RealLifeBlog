@@ -128,21 +128,78 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
    Höhe = nav.height
    → Header bleibt 100% sichtbar; kein Overlay zwischen Header-Unterkante und Nav-Oberkante.
 */
+/* ========= EINZIGES NAV-Overlay: exakt Nav-Höhe =========
+   Start = NAV-Oberkante
+   Ende  = NAV-Unterkante
+   -> Kein Overlay mehr über der Nav (kein „Segment A“), Header bleibt 100%.
+*/
 (function setupNavOverlay(){
-  const nav  = document.querySelector('.chip-nav');
-  const veil = document.getElementById('nav-overlay');
-  if (!nav || !veil) return;
-
-  let ticking = false;
-  let lastTop = NaN;
-  let lastH   = NaN;
-
-  function measure(){
-    const r = nav.getBoundingClientRect();
-    const top = Math.round(r.top);      // Viewport-Koordinaten, weil veil position:fixed
-    const height = Math.max(0, Math.round(r.height));
-    return { top, height };
-  }
+    const nav  = document.querySelector('.chip-nav');
+    const veil = document.getElementById('nav-overlay');
+    if (!nav || !veil) return;
+  
+    let ticking = false;
+    let lastTop = NaN;
+    let lastH   = NaN;
+  
+    function measure(){
+      const r = nav.getBoundingClientRect();
+      // Nur der Nav-Bereich:
+      const top = Math.max(0, Math.round(r.top));
+      const height = Math.max(0, Math.round(r.height));
+      return { top, height };
+    }
+  
+    function apply({ top, height }){
+      let changed = false;
+      if (top !== lastTop) {
+        veil.style.top = `${top}px`;
+        lastTop = top;
+        changed = true;
+      }
+      if (height !== lastH) {
+        veil.style.height = `${height}px`;
+        lastH = height;
+        changed = true;
+      }
+      if (changed) {
+        // iOS Safari repaint-nudge:
+        veil.style.transform = 'translateZ(0)';
+        requestAnimationFrame(() => { veil.style.transform = ''; });
+      }
+    }
+  
+    function onScrollOrResize(){
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        apply(measure());
+        ticking = false;
+      });
+    }
+  
+    // Events
+    window.addEventListener('scroll', onScrollOrResize, { passive: true });
+    window.addEventListener('resize', onScrollOrResize, { passive: true });
+    window.addEventListener('orientationchange', onScrollOrResize, { passive: true });
+    window.addEventListener('pageshow', onScrollOrResize, { passive: true });
+  
+    if (window.visualViewport) {
+      visualViewport.addEventListener('scroll', onScrollOrResize, { passive: true });
+      visualViewport.addEventListener('resize', onScrollOrResize, { passive: true });
+    }
+  
+    const ro = new ResizeObserver(onScrollOrResize);
+    ro.observe(nav);
+  
+    window.addEventListener('load', () => {
+      onScrollOrResize();
+      setTimeout(onScrollOrResize, 50);
+      setTimeout(onScrollOrResize, 250);
+      setTimeout(onScrollOrResize, 800);
+    });
+  })();
+  
 
   function apply({ top, height }){
     let changed = false;
