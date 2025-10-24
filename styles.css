@@ -17,8 +17,8 @@
   --card-max: 700px;          /* Card-Max Desktop/Tablet */
   --posts-left: 0px;          /* wird unten per MQ bestimmt */
 
-  /* Overlay-Deckkraft (weiß) – 0.45 = 45 % */
-  --nav-overlay-alpha: 0.45;
+  /* Overlay-Deckkraft (weiß) */
+  --nav-overlay-alpha: 0.45;  /* 45% */
 }
 
 /* Reset / Basics */
@@ -40,7 +40,7 @@ body::before{
     linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
   background-repeat: no-repeat, no-repeat;
   background-size: cover, cover;
-  background-position: left center, left center;
+  background-position: left center, left center; /* Gesicht links im Fokus */
   pointer-events: none;
 }
 
@@ -67,7 +67,7 @@ body::before{
 }
 .site-header .container{ max-width: none; padding: 0; }
 
-/* Header-Bild: alle alten Masken/Clips AUS (gegen Cache-Reste) */
+/* Header-Bild: niemals maskieren/clippen */
 .header-img{
   display: block;
   width: 100vw;
@@ -82,20 +82,23 @@ body::before{
           mask-image: none !important;
   -webkit-clip-path: none !important;
           clip-path: none !important;
-  z-index: 35;
+
   position: relative;
+  z-index: 35; /* über jeglicher Deko */
 }
 
 /* ===== Navigation ===== */
 .chip-nav{
-  position: relative;   /* liegt scharf über dem Overlay */
-  z-index: 31;
+  position: relative;          /* Overlay-Pseudo etc. an diese Box */
+  z-index: 31;                 /* über Overlay, unter Header ok */
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 64px;
   flex-wrap: wrap;
-  margin: 9px 0 40px;   /* halbierter Abstand zum Header */
+
+  /* halbierter Abstand zum Header */
+  margin: 9px 0 40px;
 }
 
 /* Desktop/Tablet: linker Rand an linken Gutter koppeln */
@@ -139,15 +142,16 @@ body::before{
 }
 
 /* ===== EINZIGES helles NAV-Overlay (unter Navi, über Content) ===== */
-#nav-overlay{
+#nav-overlay-fixed{
   position: fixed;
   left: 0;
-  top: 0;        /* JS setzt top = nav.top */
+  top: 0;        /* JS setzt top dynamisch (Nav-Top) */
   width: 100vw;
-  height: 0;     /* JS setzt Höhe = nav.height */
+  height: 0;     /* JS setzt Höhe dynamisch (Nav-Höhe) */
   z-index: 22;   /* unter Navi (31), über Content */
   pointer-events: none;
 
+  /* Weicher Verlauf: Weiß(45%) → transparent */
   background: linear-gradient(
     to bottom,
     rgba(255,255,255,var(--nav-overlay-alpha)) 0%,
@@ -160,7 +164,7 @@ main{
   will-change: opacity, transform;
 }
 
-/* Alte Masken/Clips auf main/.posts explizit aus */
+/* Sicherheit: alte Masken/Clips auf main/.posts neutralisieren */
 main, .posts{
   -webkit-mask-image: none !important;
           mask-image: none !important;
