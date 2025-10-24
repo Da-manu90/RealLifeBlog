@@ -82,6 +82,8 @@ body::before{
           mask-image: none !important;
   -webkit-clip-path: none !important;
           clip-path: none !important;
+  z-index: 35;
+  position: relative;
 }
 
 /* ===== Navigation ===== */
@@ -138,17 +140,17 @@ body::before{
   border-color: rgba(0,0,0,.12);
 }
 
-/* ===== Helles NAV-Overlay (unter Navi, über Content) ===== */
+/* ===== EINZIGES helles NAV-Overlay (unter Navi, über Content) ===== */
 #nav-overlay{
   position: fixed;
   left: 0;
-  top: 0;        /* JS setzt top dynamisch */
+  top: 0;        /* JS setzt top dynamisch (Header-Bild-Unterkante + Fudge) */
   width: 100vw;
-  height: 0;     /* JS setzt Höhe dynamisch */
+  height: 0;     /* JS setzt Höhe dynamisch (bis Nav-Unterkante) */
   z-index: 22;   /* unter Navi (31), über Content */
   pointer-events: none;
 
-  /* Langer, weicher Verlauf: Weiß(45%) → transparent */
+  /* Langer, weicher Verlauf: Weiß(45%) → transparent über gesamte Höhe */
   background: linear-gradient(
     to bottom,
     rgba(255,255,255,var(--nav-overlay-alpha)) 0%,
