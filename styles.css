@@ -18,8 +18,9 @@
   --posts-left: 0px;          /* wird unten per MQ bestimmt */
 
   /* NAV-Overlay Parameter */
-  --nav-overlay-alpha: 0.55;  /* 0.5–0.65 gut lesbar; 0.9–1.0 = stark abdunkeln */
-  --nav-overlay-fade: 14px;   /* weiche Kante unten (0 = harte Kante) */
+  --nav-overlay-alpha: 0.75;  /* 0.5–1.0: Dunkelheit der Abdunklung */
+  --nav-overlay-fade: 48px;   /* weiche Kante unten (0 = hart) */
+  --nav-overlay-extra: 56px;  /* zusätzliche Abdunklung UNTER der Navi */
 }
 
 /* Reset / Basics */
@@ -94,7 +95,9 @@ body::before{
   align-items: center;
   gap: 64px;
   flex-wrap: wrap;
-  margin: 18px 0 40px;
+
+  /* Abstand unter dem Header HALBIERT (18px -> 9px) */
+  margin: 9px 0 40px;
 }
 
 /* Desktop/Tablet: linker Rand an linken Gutter koppeln */
@@ -157,8 +160,7 @@ body::before{
 
 /* ===== MAIN + Posts ===== */
 main{
-  /* kleiner Perf-Hinweis – kein mask/clip nötig */
-  will-change: opacity, transform;
+  will-change: opacity, transform; /* nur Perf-Hinweis */
 }
 
 .posts{
@@ -281,13 +283,13 @@ main{
   }
 }
 
-/* Phones (≤600px): mind. 175px links frei,
+/* Phones (≤600px): mind. 140px links frei,
    aber niemals so groß, dass rechts die Card rausfällt */
 @media (max-width: 600px){
   :root{
     --posts-left: min(
       var(--face-gutter-max),
-      max(175px, calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)))
+      max(140px, calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)))
     );
   }
 }

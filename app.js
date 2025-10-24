@@ -123,24 +123,29 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-/* ========= NAV-Overlay: Höhe = nav.bottom (im Viewport) =========
-   Das Overlay (#nav-overlay) dunkelt ALLES unter der Navigationsfläche ab,
+/* ========= NAV-Overlay: Höhe = nav.bottom + extra =========
+   Overlay (#nav-overlay) dunkelt ALLES unter der Navigationsfläche ab,
    bleibt aber unter der Navi (z-index) und blockiert keine Klicks. */
 (function setupNavOverlay(){
   const nav  = document.querySelector('.chip-nav');
   const veil = document.getElementById('nav-overlay');
   if (!nav || !veil) return;
 
+  const readPxVar = (name, fallback = 0) => {
+    const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    if (!v) return fallback;
+    const n = parseFloat(v);
+    return Number.isFinite(n) ? n : fallback;
+  };
+
   let ticking = false;
   let lastH = -1;
 
   function measureNavOverlayHeight(){
-    // Unterkante der Navi relativ zum Viewport
     const rect = nav.getBoundingClientRect();
-    const navBottom = rect.bottom;
-
-    // Höhe für das Overlay: 0..viewport
-    const h = Math.max(0, Math.round(navBottom));
+    const navBottom = rect.bottom;                  // Navi-Unterkante (Viewport)
+    const extra = readPxVar('--nav-overlay-extra'); // zusätzliche Abdunklung
+    const h = Math.max(0, Math.round(navBottom + extra));
     return h;
   }
 
