@@ -89,7 +89,7 @@ body::before{
 
 /* ===== Navigation ===== */
 .chip-nav{
-  position: relative;          /* Overlay-Pseudo etc. an diese Box */
+  position: relative;          /* Overlay bezieht sich auf diese Box */
   z-index: 31;                 /* über Overlay, unter Header ok */
   display: flex;
   justify-content: center;
@@ -158,6 +158,9 @@ body::before{
     rgba(255,255,255,0) 100%
   );
 }
+
+/* Killswitch: falls altes Element #nav-overlay doch im DOM ist */
+#nav-overlay{ display: none !important; }
 
 /* ===== MAIN + Posts ===== */
 main{

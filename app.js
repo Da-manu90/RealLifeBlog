@@ -124,14 +124,18 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
 });
 
 /* ========= EINZIGES NAV-Overlay: exakt Nav-Bereich =========
-   Start = NAV-Oberkante (Viewport)
+   Start = NAV-Oberkante
    Höhe  = NAV-Höhe
    -> Header bleibt 100% sichtbar, Overlay liegt nur hinter den Buttons.
 */
-(function setupNavOverlayFixed(){
+(function setupNavOverlayNavOnly(){
   const nav  = document.querySelector('.chip-nav');
   const veil = document.getElementById('nav-overlay-fixed');
   if (!nav || !veil) return;
+
+  // Hard kill: falls ein altes #nav-overlay (falsches Target) existiert, verstecken
+  const old = document.getElementById('nav-overlay');
+  if (old) old.style.display = 'none';
 
   let ticking = false;
   let lastTop = NaN;
