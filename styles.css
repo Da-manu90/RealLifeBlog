@@ -144,13 +144,13 @@ body::before{
 #nav-overlay{
   position: fixed;
   left: 0;
-  top: 0;        /* JS setzt top dynamisch (Header-Bild-Unterkante + Fudge) */
+  top: 0;        /* JS setzt top dynamisch (NAV-Oberkante) */
   width: 100vw;
-  height: 0;     /* JS setzt Höhe dynamisch (bis Nav-Unterkante) */
+  height: 0;     /* JS setzt Höhe dynamisch (NAV-Höhe) */
   z-index: 22;   /* unter Navi (31), über Content */
   pointer-events: none;
 
-  /* Langer, weicher Verlauf: Weiß(45%) → transparent über gesamte Höhe */
+  /* Verlauf innerhalb der NAV-Höhe: Weiß(45%) → transparent */
   background: linear-gradient(
     to bottom,
     rgba(255,255,255,var(--nav-overlay-alpha)) 0%,

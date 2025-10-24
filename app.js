@@ -123,43 +123,24 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-/* ========= EINZIGES NAV-Overlay exakt ausrichten =========
-   Start = Header-BILD-Unterkante (+ kleine iOS-Toleranz)
-   Ende  = NAV-Unterkante
-   -> Header bleibt 100% sichtbar, kein zweites Overlay.
+/* ========= NAV-Overlay: ausschließlich der NAV-Bereich =========
+   Top  = nav.top
+   Höhe = nav.height
+   → Es gibt KEIN Overlay mehr zwischen Header-Unterkante und NAV-Oberkante.
 */
 (function setupNavOverlay(){
-  const nav       = document.querySelector('.chip-nav');
-  const headerImg = document.querySelector('.header-img');
-  const veil      = document.getElementById('nav-overlay');
-  if (!nav || !headerImg || !veil) return;
-
-  // iOS-Erkennung (für minimalen Top-Fudge)
-  const isiOS = /iP(hone|ad|od)/.test(navigator.userAgent);
+  const nav  = document.querySelector('.chip-nav');
+  const veil = document.getElementById('nav-overlay');
+  if (!nav || !veil) return;
 
   let ticking = false;
   let lastTop = NaN;
   let lastH   = NaN;
 
-  // Sicherheits-Reset gegen alte Masken, auch falls aus Cache
-  function hardResetHeaderMasks() {
-    headerImg.style.webkitMaskImage = 'none';
-    headerImg.style.maskImage = 'none';
-    headerImg.style.webkitClipPath = 'none';
-    headerImg.style.clipPath = 'none';
-  }
-
   function measure(){
-    const imgRect = headerImg.getBoundingClientRect();
-    const navRect = nav.getBoundingClientRect();
-
-    // +Fudge, damit die weiße Fläche NIEMALS in den Header „reinragt“
-    const TOP_FUDGE = isiOS ? 3 : 1;   // iOS etwas großzügiger
-    const top = Math.ceil(imgRect.bottom) + TOP_FUDGE;
-
-    const bottom = Math.round(navRect.bottom);
-    const height = Math.max(0, bottom - top);
-
+    const r = nav.getBoundingClientRect();
+    const top = Math.round(r.top);
+    const height = Math.max(0, Math.round(r.height));
     return { top, height };
   }
 
@@ -176,22 +157,17 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
       changed = true;
     }
     if (changed) {
-      // iOS Safari Repaint nudgen
+      // iOS Safari: Repaint-Nudge
       veil.style.transform = 'translateZ(0)';
       requestAnimationFrame(() => { veil.style.transform = ''; });
     }
-  }
-
-  function rafUpdate(){
-    hardResetHeaderMasks();
-    apply(measure());
   }
 
   function onScrollOrResize(){
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
-      rafUpdate();
+      apply(measure());
       ticking = false;
     });
   }
@@ -202,23 +178,15 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   window.addEventListener('orientationchange', onScrollOrResize, { passive: true });
   window.addEventListener('pageshow', onScrollOrResize, { passive: true });
 
-  // iOS Safari: VisualViewport bewegt sich separat
   if (window.visualViewport) {
     visualViewport.addEventListener('scroll', onScrollOrResize, { passive: true });
     visualViewport.addEventListener('resize', onScrollOrResize, { passive: true });
   }
 
-  // Größe/Wrapping von Nav & Bild beobachten
   const ro = new ResizeObserver(onScrollOrResize);
   ro.observe(nav);
-  ro.observe(headerImg);
 
-  // Headerbild kann async laden
-  if (!headerImg.complete) {
-    headerImg.addEventListener('load', onScrollOrResize, { once: true });
-  }
-
-  // Initial + Nachstabilisierung
+  // Initial + kleine Nachstabilisierungen
   window.addEventListener('load', () => {
     onScrollOrResize();
     setTimeout(onScrollOrResize, 50);
