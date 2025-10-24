@@ -126,25 +126,50 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
 /* ==== KORREKTE MASKE relativ zum NAV-BEREICH (Buttons) ==== */
 /* Wir messen die Überlappung zwischen der Unterkante der NAV und der Oberkante von <main>.
    Die Maske wird auf <main> angewendet – so verschwindet Content unter den Buttons. */
-function updateNavMask() {
-  const nav = document.querySelector('.chip-nav');
-  const main = document.querySelector('main');
-  if (!nav || !main) return;
-
-  const navBottom = nav.getBoundingClientRect().bottom; // px zur Viewport-Oberkante
-  const mainTop   = main.getBoundingClientRect().top;   // px zur Viewport-Oberkante
-  const overlap   = Math.max(0, Math.round(navBottom - mainTop)); // wieviel von <main> liegt unter NAV?
-
-  // CSS-Variable setzen
-  document.documentElement.style.setProperty('--nav-overlap', `${overlap}px`);
-
-  // Maske nur aktivieren, wenn wirklich Überlappung vorhanden ist
-  if (overlap > 0) {
+   function updateNavMask() {
+    const nav  = document.querySelector('.chip-nav');
+    const main = document.querySelector('main');
+    if (!nav || !main) return;
+  
+    const EPS = 2; // px-Toleranz gegen Subpixel-Jitter (iOS/Safari)
+    const navBottom = nav.getBoundingClientRect().bottom;
+    const mainTop   = main.getBoundingClientRect().top;
+  
+    // Wie viel von <main> liegt unter der Navi?
+    let overlapRaw = navBottom - mainTop;
+  
+    // Wenn Überlappung <= EPS: Maske aus
+    if (overlapRaw <= EPS) {
+      document.body.classList.remove('mask-active');
+      document.documentElement.style.setProperty('--nav-overlap', '0px');
+  
+      // Inline-Maske sicher entfernen + Safari repaint anstoßen
+      main.style.webkitMaskImage = 'none';
+      main.style.maskImage = 'none';
+      main.style.transform = 'translateZ(0)';       // Repaint-Nudge
+      requestAnimationFrame(() => { main.style.transform = ''; });
+      return;
+    }
+  
+    // Maske aktiv: runde auf ganze Pixel für stabile Optik
+    const overlap = Math.round(overlapRaw);
     document.body.classList.add('mask-active');
-  } else {
-    document.body.classList.remove('mask-active');
+    document.documentElement.style.setProperty('--nav-overlap', `${overlap}px`);
+  
+    // Weicher Fade: 4–24px unterhalb der NAV-Unterkante
+    const fadeStart = overlap + 4;
+    const fadeEnd   = overlap + 24;
+    const grad = `linear-gradient(
+      to bottom,
+      rgba(0,0,0,0) 0,
+      rgba(0,0,0,0) ${fadeStart}px,
+      rgba(0,0,0,1) ${fadeEnd}px
+    )`;
+  
+    // Inline setzen (übersteuert CSS; zuverlässiger auf iOS)
+    main.style.webkitMaskImage = grad;
+    main.style.maskImage = grad;
   }
-}
 
 window.addEventListener('load', updateNavMask);
 window.addEventListener('resize', updateNavMask, { passive: true });

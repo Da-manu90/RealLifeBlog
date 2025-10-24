@@ -144,22 +144,6 @@ main{
           mask-image: none;
 }
 
-body.mask-active main{
-  /* fade alles aus, was unter den Buttons liegt */
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent calc(var(--nav-overlap) + 4px),
-    black       calc(var(--nav-overlap) + 24px)
-  );
-          mask-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent calc(var(--nav-overlap) + 4px),
-    black       calc(var(--nav-overlap) + 24px)
-  );
-}
-
 .posts{
   display: flex;
   flex-direction: column;
@@ -286,7 +270,7 @@ body.mask-active main{
   :root{
     --posts-left: min(
       var(--face-gutter-max),
-      max(175px, calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)))
+      max(150px, calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)))
     );
   }
 }
