@@ -462,3 +462,10 @@ main::after{
   background-position: left center, left center;
   background-attachment: fixed, fixed;
 }
+
+@media (max-width: 390px){
+  :root{ --face-gutter-min: 300px; }
+}
+@media (max-width: 360px){
+  :root{ --face-gutter-min: 280px; }
+}
