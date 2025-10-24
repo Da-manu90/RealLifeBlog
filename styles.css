@@ -315,3 +315,35 @@ body::before{
   :root{ --safe-gap: 12px; }
   .chip-nav{ gap: 28px; }
 }
+
+/* ===== Mobile-Layout für die Navi: 2x2 Grid, mehr Hintergrund sichtbar ===== */
+@media (max-width: 600px){
+  /* statt Flex -> Grid */
+  .chip-nav{
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 Spalten */
+    gap: 16px 16px;                                   /* Abstand zwischen Buttons */
+    padding-left: 16px !important;                    /* kleiner Rand = mehr Hintergrund */
+    padding-right: 16px !important;
+    margin-bottom: 28px;                              /* etwas Luft nach unten */
+    justify-content: center;                          /* safety */
+    align-items: center;
+  }
+
+  /* Buttons füllen die Grid-Zellen, dürfen schmaler als 150px werden */
+  .chip{
+    min-width: 0 !important;  /* überschreibt dein 150px-Minimum nur mobil */
+    width: 100%;              /* Zelle voll ausnutzen */
+    padding: 12px 10px;       /* touch-freundlich, kompakt */
+    text-align: center;
+    white-space: nowrap;      /* bleibt einzeilig */
+    /* optional: leichte Schrumpfung auf sehr kleinen Screens:
+       font-size: clamp(0.9rem, 3.6vw, 1rem); */
+  }
+}
+
+/* iPhone-„Mini“-Tuning (sehr schmale Geräte): etwas kompakter */
+@media (max-width: 380px){
+  .chip-nav{ gap: 14px 12px; }
+  .chip{ padding: 10px 8px; }
+}
