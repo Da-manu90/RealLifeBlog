@@ -582,3 +582,78 @@ body::before{
   .chip-nav{ gap: 14px 12px; }
   .chip{ padding: 10px 8px; }
 }
+
+/* ==== 0) Safety: alte Occluder wirklich aus ==== */
+body::after,
+main::after{
+  content: none !important;
+  background: none !important;
+}
+
+/* ==== 1) Posts direkt unter der Navi (nicht weit weg) ==== */
+:root{ --nav-mask-bottom: 0px; } /* wird per JS gesetzt */
+.posts{
+  margin-top: 8px !important; /* wieder knapp unter der Navi starten */
+}
+
+/* ==== 2) Smooth Fade: Posts unter der Navi unsichtbar (keine 2. BG-Schicht) ==== */
+/* -> wir maskieren nur die Posts-Kolonne, nicht den Seitenhintergrund */
+.posts{
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0,
+    rgba(0,0,0,0) calc(var(--nav-mask-bottom) + 8px),
+    rgba(0,0,0,1) calc(var(--nav-mask-bottom) + 24px)
+  );
+          mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--nav-mask-bottom) + 8px),
+    black      calc(var(--nav-mask-bottom) + 24px)
+  );
+}
+
+/* ==== 3) Face-Gutter: iPhone links immer mind. 175px frei ==== */
+/* Basis-Berechnung (Desktop/Tablet): so groß wie möglich, max 400px */
+:root{
+  --face-gutter-max: 400px;
+  --safe-gap: 24px;
+  --container-pad: 24px;
+  --card-max: 700px; /* dein Desktop/Tablet-Wert */
+}
+/* Container-Padding mobil kleiner */
+@media (max-width: 900px){
+  :root{ --container-pad: 16px; }
+}
+/* Effektiver Gutter desktop/tablet */
+:root{
+  --face-gutter-eff: clamp(
+    0px,
+    calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)),
+    var(--face-gutter-max)
+  );
+}
+/* Standard: Posts nach rechts schieben */
+.posts{
+  padding-left: var(--face-gutter-eff) !important;
+}
+
+/* iPhone/Phones: Mindestabstand 175px erzwingen, aber nie mehr als möglich */
+@media (max-width: 600px){
+  /* mobile Card-Breite etwas kleiner, damit alles passt */
+  :root{ --card-max: 350px; }
+
+  .posts{
+    /* min 175px, max 400px, aber nie so groß, dass die Card rausfällt */
+    padding-left: min(
+      var(--face-gutter-max),
+      max(175px, calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)))
+    ) !important;
+  }
+}
+
+/* BG bleibt links verankert (Gesicht im Fokus) */
+body::before{
+  background-position: left center, left center !important;
+  background-size: cover, cover;
+}
