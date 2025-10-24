@@ -469,3 +469,116 @@ main::after{
 @media (max-width: 360px){
   :root{ --face-gutter-min: 280px; }
 }
+
+/* =========================
+   FIX: Konflikte neutralisieren
+   ========================= */
+
+/* Alte Occluder sicher deaktivieren (verhindert „doppelten“ Hintergrund) */
+body::after,
+main::after{
+  content: none !important;
+  background: none !important;
+}
+
+/* Posts starten unterhalb der Navigation (Höhe kommt aus JS: --nav-mask-bottom) */
+.posts{
+  margin-top: calc(var(--nav-mask-bottom, 0px) + 12px) !important;
+}
+
+/* Hintergrund links verankern (Gesicht im Fokus) */
+body::before{
+  background-position: left center, left center !important;
+  background-size: cover, cover;
+}
+
+
+/* =========================
+   Responsive Face-Gutter + Card-Breite
+   ========================= */
+
+/* Grundwerte (mobile-first) */
+:root{
+  --face-gutter-max: 400px;  /* gewünschter Abstand links (maximal) */
+  --safe-gap: 24px;          /* Sicherheitsrand rechts */
+  --container-pad: 24px;     /* .container padding desktop */
+  --card-max: 350px;         /* mobile Card-Max */
+}
+
+/* Tablet breiter */
+@media (min-width: 720px){
+  :root{ --card-max: 540px; }
+}
+
+/* Desktop/Tablet groß: bis 700px (dein Wunsch) */
+@media (min-width: 900px){
+  :root{ --card-max: 700px; }
+}
+
+/* Container-Padding auf kleineren Screens (deine CSS hat 16px) */
+@media (max-width: 900px){
+  :root{ --container-pad: 16px; }
+}
+
+/* Effektiver linker Gutter:
+   so groß wie möglich, aber niemals größer als der freie Platz,
+   damit die Karte nie rausgeschoben wird. */
+:root{
+  --face-gutter-eff: clamp(
+    0px,
+    calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)),
+    var(--face-gutter-max)
+  );
+}
+
+/* Anwenden: Posts-Spalte nach rechts schieben */
+.posts{
+  padding-left: var(--face-gutter-eff) !important;
+}
+
+/* Cards an die variable Max-Breite koppeln */
+.post-card{
+  max-width: var(--card-max) !important;
+  width: 100%;
+}
+
+
+/* =========================
+   Navigation
+   ========================= */
+
+/* Desktop/Tablet: linker Rand an Face-Gutter koppeln,
+   mind. 150px, max. 400px; rechts immer 150px Platz */
+.chip-nav{
+  padding-left: clamp(150px, var(--face-gutter-eff), 400px) !important;
+  padding-right: 150px !important;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 64px;
+}
+
+/* Mobile: 2×2 Grid + kleiner Rand = mehr Hintergrund sichtbar */
+@media (max-width: 600px){
+  .chip-nav{
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 16px;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    margin-bottom: 28px;
+    justify-content: center;
+    align-items: center;
+  }
+  .chip{
+    min-width: 0 !important;
+    width: 100%;
+    padding: 12px 10px;
+    white-space: nowrap;
+  }
+}
+
+/* iPhone Mini / sehr schmal: etwas enger */
+@media (max-width: 380px){
+  .chip-nav{ gap: 14px 12px; }
+  .chip{ padding: 10px 8px; }
+}
