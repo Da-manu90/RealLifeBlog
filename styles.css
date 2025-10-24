@@ -20,8 +20,8 @@
   /* NAV-Overlay Parameter (helles Overlay) */
   --nav-overlay-alpha: 0.45;      /* 45% Deckkraft (weiß) */
   --nav-overlay-extra: 80px;      /* zusätzliche Verlängerung NACH unten */
-  --nav-overlay-top-offset: -10px;    /* oben 10px VOR den Nav-Bereich ragen */
-  --nav-overlay-bottom-offset: -10px; /* unten 10px ÜBER den Nav-Bereich hinaus */
+  --nav-overlay-top-offset: 0px;      /* NEU: Overlay startet exakt UNTER dem Header */
+  --nav-overlay-bottom-offset: -10px; /* unten 10px über den Nav-Bereich hinaus */
 }
 
 /* Reset / Basics */
@@ -151,8 +151,7 @@ body::before{
   z-index: 22;        /* unter Navi (31), über Content */
   pointer-events: none;
 
-  /* Langer, weicher Verlauf: von deckendem Weiß (oben) zu transparent (unten)
-     → reicht über die gesamte Overlay-Höhe */
+  /* Langer, weicher Verlauf: von deckendem Weiß (oben) zu transparent (unten) */
   background: linear-gradient(
     to bottom,
     rgba(255,255,255,var(--nav-overlay-alpha)) 0%,

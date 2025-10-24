@@ -123,13 +123,14 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-/* ========= NAV-Overlay: Position + Höhe exakt am Nav-Bereich ausrichten =========
-   Overlay (#nav-overlay) wird relativ zur aktuellen Position der .chip-nav gesetzt,
-   inklusive Top-/Bottom-Offsets und zusätzlicher Verlängerung nach unten. */
+/* ========= NAV-Overlay: Position + Höhe exakt ausrichten =========
+   Overlay (#nav-overlay) beginnt JETZT unterhalb des HEADERS und
+   endet wie bisher an der berechneten Unterkante (Nav-Bottom + Extra - BottomOffset). */
 (function setupNavOverlay(){
-  const nav  = document.querySelector('.chip-nav');
-  const veil = document.getElementById('nav-overlay');
-  if (!nav || !veil) return;
+  const header = document.querySelector('.site-header');
+  const nav    = document.querySelector('.chip-nav');
+  const veil   = document.getElementById('nav-overlay');
+  if (!header || !nav || !veil) return;
 
   const readPxVar = (name, fallback = 0) => {
     const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -143,25 +144,21 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   let lastH   = null;
 
   function measure(){
-    const rect = nav.getBoundingClientRect();
-    const navTop = rect.top;       // Oberkante Nav (Viewport)
-    const navBot = rect.bottom;    // Unterkante Nav (Viewport)
+    const headerRect = header.getBoundingClientRect();
+    const navRect    = nav.getBoundingClientRect();
 
-    // CSS-Variablen (können negativ sein)
-    const topOffset    = readPxVar('--nav-overlay-top-offset');     // z.B. -10
-    const bottomOffset = readPxVar('--nav-overlay-bottom-offset');  // z.B. -10
-    const extra        = readPxVar('--nav-overlay-extra');          // z.B. 80
+    const topOffset    = readPxVar('--nav-overlay-top-offset');      // jetzt 0px
+    const bottomOffset = readPxVar('--nav-overlay-bottom-offset');   // z.B. -10
+    const extra        = readPxVar('--nav-overlay-extra');           // z.B. 80
 
-    // Ziel-Top relativ zum Viewport
-    const top = Math.round(navTop + topOffset);
+    // OVERLAY START: direkt UNTER dem Header
+    const top = Math.round(headerRect.bottom + topOffset);
 
-    // Höhe: Nav-Höhe minus topOffset + extra - bottomOffset
-    // (negativer Offset vergrößert effektiv die Höhe)
-    const height = Math.max(
-      0,
-      Math.round((navBot - navTop) - topOffset + extra - bottomOffset)
-    );
+    // OVERLAY ENDE: wie bisher – Nav-Bottom inkl. Extra & Bottom-Offset
+    // (negativer Bottom-Offset erweitert nach unten)
+    const bottomY = Math.round(navRect.bottom - bottomOffset + extra);
 
+    const height = Math.max(0, bottomY - top);
     return { top, height };
   }
 
@@ -201,8 +198,9 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
     visualViewport.addEventListener('resize', onScrollOrResize, { passive: true });
   }
 
-  // Beobachte die Nav-Höhe (Wrap/Zeilenumbrüche, Fonts etc.)
+  // Beobachte Header- und Nav-Höhe (Wrap/Zeilenumbrüche, Fonts etc.)
   const ro = new ResizeObserver(onScrollOrResize);
+  ro.observe(header);
   ro.observe(nav);
 
   // Initial + kleine Nachstabilisierungen
