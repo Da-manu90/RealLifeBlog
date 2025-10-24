@@ -123,48 +123,42 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-/* ==== ROBUSTER OCCLUDER via clip-path ==== */
-/* Schneidet den oberen Teil von #posts genau im Bereich weg,
-   in dem die NAV (Buttons) darüber liegt. Wir messen ÜBERLAPPUNG
-   zwischen nav.bottom und posts.top (beide im Viewport). */
-
-(function setupNavClip(){
-  const nav   = document.querySelector('.chip-nav');
-  const posts = document.getElementById('posts');
-  if (!nav || !posts) return;
+/* ========= NAV-Overlay: Höhe = nav.bottom (im Viewport) =========
+   Das Overlay (#nav-overlay) dunkelt ALLES unter der Navigationsfläche ab,
+   bleibt aber unter der Navi (z-index) und blockiert keine Klicks. */
+(function setupNavOverlay(){
+  const nav  = document.querySelector('.chip-nav');
+  const veil = document.getElementById('nav-overlay');
+  if (!nav || !veil) return;
 
   let ticking = false;
-  let lastCut = -1;
+  let lastH = -1;
 
-  function computeCut(){
-    const navBottom = nav.getBoundingClientRect().bottom;
-    const postsTop  = posts.getBoundingClientRect().top;
-    const overlap   = Math.max(0, Math.round(navBottom - postsTop)); // px
-    return overlap;
+  function measureNavOverlayHeight(){
+    // Unterkante der Navi relativ zum Viewport
+    const rect = nav.getBoundingClientRect();
+    const navBottom = rect.bottom;
+
+    // Höhe für das Overlay: 0..viewport
+    const h = Math.max(0, Math.round(navBottom));
+    return h;
   }
 
-  function applyCut(px){
-    if (px === lastCut) return;
-    lastCut = px;
-
-    // 1) Inline CSS-Var (falls du die CSS-Var-Version bevorzugst)
-    document.documentElement.style.setProperty('--nav-cut', `${px}px`);
-
-    // 2) Direkt als inline clip-path (sicher für iOS Safari)
-    const inset = `inset(${px}px 0 0 0)`;
-    posts.style.clipPath = inset;
-    posts.style.webkitClipPath = inset;
+  function applyOverlayHeight(h){
+    if (h === lastH) return;
+    lastH = h;
+    veil.style.height = h + 'px';
   }
 
-  function frame(){
-    applyCut(computeCut());
+  function onFrame(){
+    applyOverlayHeight(measureNavOverlayHeight());
   }
 
   function onScrollOrResize(){
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
-      frame();
+      onFrame();
       ticking = false;
     });
   }
@@ -175,18 +169,17 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   window.addEventListener('orientationchange', onScrollOrResize, { passive: true });
   window.addEventListener('pageshow', onScrollOrResize, { passive: true });
 
-  // iOS Safari: VisualViewport bewegt sich separat
+  // iOS Safari: VisualViewport kann sich separat bewegen
   if (window.visualViewport) {
     visualViewport.addEventListener('scroll', onScrollOrResize, { passive: true });
     visualViewport.addEventListener('resize', onScrollOrResize, { passive: true });
   }
 
-  // Nav-Höhe/Textwraps beobachten (Grid/Flex wrap)
+  // Beobachte die Nav-Höhe (Wrap/Zeilenumbrüche, Fonts etc.)
   const ro = new ResizeObserver(onScrollOrResize);
   ro.observe(nav);
-  ro.observe(posts);
 
-  // Initial + Nachstabilisierungen
+  // Initial + kleine Nachstabilisierungen
   window.addEventListener('load', () => {
     onScrollOrResize();
     setTimeout(onScrollOrResize, 50);

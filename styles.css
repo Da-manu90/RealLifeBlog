@@ -17,8 +17,9 @@
   --card-max: 700px;          /* Card-Max Desktop/Tablet */
   --posts-left: 0px;          /* wird unten per MQ bestimmt */
 
-  /* nur als Fallback; JS setzt inline */
-  --nav-cut: 0px;
+  /* NAV-Overlay Parameter */
+  --nav-overlay-alpha: 0.55;  /* 0.5–0.65 gut lesbar; 0.9–1.0 = stark abdunkeln */
+  --nav-overlay-fade: 14px;   /* weiche Kante unten (0 = harte Kante) */
 }
 
 /* Reset / Basics */
@@ -87,7 +88,7 @@ body::before{
 /* ===== Navigation ===== */
 .chip-nav{
   position: relative;          /* liegt scharf über dem Bild */
-  z-index: 2;
+  z-index: 31;                 /* ÜBER dem Overlay */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -135,9 +136,29 @@ body::before{
   border-color: rgba(255,255,255,.9);
 }
 
+/* ===== NAV-Overlay (dunkelt alles unter der Navi ab) ===== */
+#nav-overlay{
+  position: fixed;
+  left: 0; top: 0; width: 100vw; height: 0; /* Höhe wird per JS gesetzt */
+  z-index: 22;                   /* unter Navi (31), über Content */
+  pointer-events: none;          /* klickt nicht blockieren */
+  background: rgba(0,0,0,var(--nav-overlay-alpha));
+}
+#nav-overlay::after{
+  content:"";
+  position:absolute; left:0; right:0; bottom:-1px; height: var(--nav-overlay-fade);
+  pointer-events:none;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,var(--nav-overlay-alpha)) 0%,
+    rgba(0,0,0,0) 100%
+  );
+}
+
 /* ===== MAIN + Posts ===== */
 main{
-  will-change: clip-path; /* nur Hinweis; kein mask-image mehr */
+  /* kleiner Perf-Hinweis – kein mask/clip nötig */
+  will-change: opacity, transform;
 }
 
 .posts{
@@ -148,11 +169,6 @@ main{
   padding-bottom: 50px;
   margin-top: 8px;                 /* direkt unter der Navi */
   padding-left: var(--posts-left); /* linker Gutter dynamisch */
-
-  /* Occluder: wird per JS als inline gesetzt */
-  -webkit-clip-path: inset(var(--nav-cut, 0px) 0 0 0);
-          clip-path: inset(var(--nav-cut, 0px) 0 0 0);
-  will-change: clip-path;
 }
 
 /* ===== Post-Card ===== */
@@ -265,12 +281,13 @@ main{
   }
 }
 
-/* Phones (≤600px): mind. ~150–175px links frei */
+/* Phones (≤600px): mind. 175px links frei,
+   aber niemals so groß, dass rechts die Card rausfällt */
 @media (max-width: 600px){
   :root{
     --posts-left: min(
       var(--face-gutter-max),
-      max(150px, calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)))
+      max(175px, calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)))
     );
   }
 }
