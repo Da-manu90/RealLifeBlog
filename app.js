@@ -4,7 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const postsContainer = document.getElementById('posts');
 const template = document.getElementById('post-template');
 
-// Werte kommen aus window.env (du hast das Snippet ja in index.html eingefügt)
+// ENV aus index.html
 const SUPABASE_URL = window.env?.SUPABASE_URL;
 const SUPABASE_ANON = window.env?.SUPABASE_ANON;
 
@@ -16,44 +16,44 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 // Robust: YouTube-ID aus watch-, youtu.be-, shorts-, embed- und nackter ID ziehen
 function extractYouTubeId(input) {
-    if (!input) return null;
-  
-    // nackte ID?
-    if (/^[0-9A-Za-z_-]{11}$/.test(input)) return input;
-  
-    try {
-      const u = new URL(input);
-  
-      // ?v=VIDEOID
-      const v = u.searchParams.get('v');
-      if (v && /^[0-9A-Za-z_-]{11}$/.test(v)) return v;
-  
-      // youtu.be/VIDEOID
-      if (u.hostname.endsWith('youtu.be')) {
-        const id = u.pathname.slice(1).split('/')[0];
-        if (/^[0-9A-Za-z_-]{11}$/.test(id)) return id;
-      }
-  
-      // /shorts/VIDEOID
-      if (u.pathname.startsWith('/shorts/')) {
-        const id = u.pathname.split('/shorts/')[1].split('/')[0];
-        const clean = id.split(/[?&]/)[0];
-        if (/^[0-9A-Za-z_-]{11}$/.test(clean)) return clean;
-      }
-  
-      // /embed/VIDEOID
-      const m = u.pathname.match(/\/embed\/([0-9A-Za-z_-]{11})/);
-      if (m) return m[1];
-  
-    } catch (_) {
-      // war keine URL; vielleicht ist es doch eine ID
-      if (/^[0-9A-Za-z_-]{11}$/.test(input)) return input;
+  if (!input) return null;
+
+  // nackte ID?
+  if (/^[0-9A-Za-z_-]{11}$/.test(input)) return input;
+
+  try {
+    const u = new URL(input);
+
+    // ?v=VIDEOID
+    const v = u.searchParams.get('v');
+    if (v && /^[0-9A-Za-z_-]{11}$/.test(v)) return v;
+
+    // youtu.be/VIDEOID
+    if (u.hostname.endsWith('youtu.be')) {
+      const id = u.pathname.slice(1).split('/')[0];
+      if (/^[0-9A-Za-z_-]{11}$/.test(id)) return id;
     }
-  
-    // letzte Rückfall-Strategie: 11-Zeichen-Token im String finden
-    const last = String(input).match(/([0-9A-Za-z_-]{11})(?!.*[0-9A-Za-z_-]{11})/);
-    return last ? last[1] : null;
+
+    // /shorts/VIDEOID
+    if (u.pathname.startsWith('/shorts/')) {
+      const id = u.pathname.split('/shorts/')[1].split('/')[0];
+      const clean = id.split(/[?&]/)[0];
+      if (/^[0-9A-Za-z_-]{11}$/.test(clean)) return clean;
+    }
+
+    // /embed/VIDEOID
+    const m = u.pathname.match(/\/embed\/([0-9A-Za-z_-]{11})/);
+    if (m) return m[1];
+
+  } catch (_) {
+    // war keine URL; vielleicht ist es doch eine ID
+    if (/^[0-9A-Za-z_-]{11}$/.test(input)) return input;
   }
+
+  // Rückfall: letztes 11er-Token nehmen
+  const last = String(input).match(/([0-9A-Za-z_-]{11})(?!.*[0-9A-Za-z_-]{11})/);
+  return last ? last[1] : null;
+}
 
 function createPost({ title, description, youtube_url, image_url, published_at }) {
   const tpl = template.content.cloneNode(true);
@@ -115,7 +115,7 @@ async function loadPosts() {
 
 loadPosts();
 
-// (Optional) Active-State der Navigation (Filter baue ich dir gern später)
+// (Optional) Active-State der Navigation
 document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.chip-nav .chip').forEach(b => b.classList.remove('is-active'));
@@ -123,23 +123,38 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
+/* ==== Maske korrekt positionieren (relativ zu .posts) ==== */
 function updateNavMask() {
-    const nav = document.querySelector('.chip-nav');
-    if (!nav) return;
-    const rect = nav.getBoundingClientRect();
-    const bottom = Math.max(0, Math.ceil(rect.bottom));
-    document.documentElement.style.setProperty('--nav-mask-bottom', `${bottom}px`);
+  const nav = document.querySelector('.chip-nav');
+  const posts = document.querySelector('.posts');
+  if (!nav || !posts) return;
+
+  // Abstand der Navi-Unterkante zur OBERKANTE von .posts
+  const navBottom = nav.getBoundingClientRect().bottom;
+  const postsTop  = posts.getBoundingClientRect().top;
+  const overlap   = Math.max(0, Math.round(navBottom - postsTop));
+
+  // Variable für CSS setzen
+  document.documentElement.style.setProperty('--posts-mask-offset', `${overlap}px`);
+
+  // Maske nur aktivieren, wenn tatsächlich Überlappung vorhanden ist
+  if (overlap > 0) {
+    document.body.classList.add('mask-active');
+  } else {
+    document.body.classList.remove('mask-active');
   }
-  
-  window.addEventListener('load', updateNavMask);
-  window.addEventListener('resize', updateNavMask);
-  window.addEventListener('orientationchange', updateNavMask);
-  
-  /* kurze Stabilisierung direkt nach Load (Fonts/Wrap können die Höhe ändern) */
-  window.addEventListener('load', () => {
-    let n = 0;
-    const t = setInterval(() => {
-      updateNavMask();
-      if (++n > 10) clearInterval(t); // ~3s
-    }, 300);
-  });
+}
+
+window.addEventListener('load', updateNavMask);
+window.addEventListener('resize', updateNavMask, { passive: true });
+window.addEventListener('orientationchange', updateNavMask, { passive: true });
+window.addEventListener('scroll', updateNavMask, { passive: true });
+
+// kleine Stabilisierung nach Fonts/Wraps
+window.addEventListener('load', () => {
+  let n = 0;
+  const t = setInterval(() => {
+    updateNavMask();
+    if (++n > 10) clearInterval(t); // ~3s
+  }, 300);
+});
