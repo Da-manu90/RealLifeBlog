@@ -131,34 +131,33 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
     const main = document.querySelector('main');
     if (!nav || !main) return;
   
-    const EPS = 2; // px-Toleranz gegen Subpixel-Jitter (iOS/Safari)
-    const navBottom = nav.getBoundingClientRect().bottom;
-    const mainTop   = main.getBoundingClientRect().top;
+    // Toleranz gegen Subpixel-Jitter (iOS URL-Bar etc.)
+    const EPS = 12; // ruhig großzügig, damit sie zuverlässig „aus“ geht
   
-    // Wie viel von <main> liegt unter der Navi?
-    let overlapRaw = navBottom - mainTop;
+    const navBottom = nav.getBoundingClientRect().bottom; // im Viewport
+    const mainTop   = main.getBoundingClientRect().top;   // im Viewport
   
-    // Wenn Überlappung <= EPS: Maske aus
+    // Distanz von main-Top bis Nav-Unterkante (in main-Koordinaten)
+    const overlapRaw = navBottom - mainTop;
+  
+    // Wenn keine (nennenswerte) Überlappung -> Maske AUS
     if (overlapRaw <= EPS) {
       document.body.classList.remove('mask-active');
       document.documentElement.style.setProperty('--nav-overlap', '0px');
   
-      // Inline-Maske sicher entfernen + Safari repaint anstoßen
+      // Inline-Maske sicher entfernen + Safari zwingen zu repainten
       main.style.webkitMaskImage = 'none';
       main.style.maskImage = 'none';
-      main.style.transform = 'translateZ(0)';       // Repaint-Nudge
+      main.style.transform = 'translateZ(0)';
       requestAnimationFrame(() => { main.style.transform = ''; });
       return;
     }
   
-    // Maske aktiv: runde auf ganze Pixel für stabile Optik
-    const overlap = Math.round(overlapRaw);
-    document.body.classList.add('mask-active');
-    document.documentElement.style.setProperty('--nav-overlap', `${overlap}px`);
-  
-    // Weicher Fade: 4–24px unterhalb der NAV-Unterkante
+    // Maske AN: weiche Kante 4–24px unterhalb der Nav-Unterkante
+    const overlap   = Math.round(overlapRaw);
     const fadeStart = overlap + 4;
     const fadeEnd   = overlap + 24;
+  
     const grad = `linear-gradient(
       to bottom,
       rgba(0,0,0,0) 0,
@@ -166,10 +165,45 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
       rgba(0,0,0,1) ${fadeEnd}px
     )`;
   
-    // Inline setzen (übersteuert CSS; zuverlässiger auf iOS)
+    document.body.classList.add('mask-active');
+    document.documentElement.style.setProperty('--nav-overlap', `${overlap}px`);
     main.style.webkitMaskImage = grad;
     main.style.maskImage = grad;
   }
+  
+  // --- Events: kontinuierlich und performant updaten ---
+  let ticking = false;
+  function onScrollOrResize() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      updateNavMask();
+      ticking = false;
+    });
+  }
+  
+  window.addEventListener('scroll', onScrollOrResize, { passive: true });
+  window.addEventListener('resize', onScrollOrResize, { passive: true });
+  window.addEventListener('orientationchange', onScrollOrResize, { passive: true });
+  window.addEventListener('pageshow', onScrollOrResize, { passive: true });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') onScrollOrResize();
+  });
+  
+  // iOS Safari: VisualViewport bewegt sich separat → mit beobachten
+  if (window.visualViewport) {
+    visualViewport.addEventListener('scroll', onScrollOrResize, { passive: true });
+    visualViewport.addEventListener('resize', onScrollOrResize, { passive: true });
+  }
+  
+  // initial + kurze Nachstabilisierungen (Font reflow etc.)
+  window.addEventListener('load', () => {
+    onScrollOrResize();
+    setTimeout(onScrollOrResize, 0);
+    setTimeout(onScrollOrResize, 250);
+    setTimeout(onScrollOrResize, 800);
+  });
+  
 
 window.addEventListener('load', updateNavMask);
 window.addEventListener('resize', updateNavMask, { passive: true });

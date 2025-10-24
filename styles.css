@@ -138,10 +138,9 @@ body::before{
 
 /* ===== MAIN + Posts ===== */
 
-/* Maske sitzt auf <main> – NICHT auf .posts */
+/* Hilft Safari, Masken-Updates zuverlässig zu repainten */
 main{
-  -webkit-mask-image: none;
-          mask-image: none;
+  will-change: -webkit-mask-image, mask-image;
 }
 
 .posts{
