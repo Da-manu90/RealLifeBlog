@@ -123,9 +123,9 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-/* ========= NAV-Overlay: Höhe = nav.bottom + extra =========
-   Overlay (#nav-overlay) dunkelt ALLES unter der Navigationsfläche ab,
-   bleibt aber unter der Navi (z-index) und blockiert keine Klicks. */
+/* ========= NAV-Overlay: Position + Höhe exakt am Nav-Bereich ausrichten =========
+   Overlay (#nav-overlay) wird relativ zur aktuellen Position der .chip-nav gesetzt,
+   inklusive Top-/Bottom-Offsets und zusätzlicher Verlängerung nach unten. */
 (function setupNavOverlay(){
   const nav  = document.querySelector('.chip-nav');
   const veil = document.getElementById('nav-overlay');
@@ -139,24 +139,45 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   };
 
   let ticking = false;
-  let lastH = -1;
+  let lastTop = null;
+  let lastH   = null;
 
-  function measureNavOverlayHeight(){
+  function measure(){
     const rect = nav.getBoundingClientRect();
-    const navBottom = rect.bottom;                  // Navi-Unterkante (Viewport)
-    const extra = readPxVar('--nav-overlay-extra'); // zusätzliche Abdunklung
-    const h = Math.max(0, Math.round(navBottom + extra));
-    return h;
+    const navTop = rect.top;       // Oberkante Nav (Viewport)
+    const navBot = rect.bottom;    // Unterkante Nav (Viewport)
+
+    // CSS-Variablen (können negativ sein)
+    const topOffset    = readPxVar('--nav-overlay-top-offset');     // z.B. -10
+    const bottomOffset = readPxVar('--nav-overlay-bottom-offset');  // z.B. -10
+    const extra        = readPxVar('--nav-overlay-extra');          // z.B. 80
+
+    // Ziel-Top relativ zum Viewport
+    const top = Math.round(navTop + topOffset);
+
+    // Höhe: Nav-Höhe minus topOffset + extra - bottomOffset
+    // (negativer Offset vergrößert effektiv die Höhe)
+    const height = Math.max(
+      0,
+      Math.round((navBot - navTop) - topOffset + extra - bottomOffset)
+    );
+
+    return { top, height };
   }
 
-  function applyOverlayHeight(h){
-    if (h === lastH) return;
-    lastH = h;
-    veil.style.height = h + 'px';
+  function apply({ top, height }){
+    if (top !== lastTop) {
+      veil.style.top = `${top}px`;
+      lastTop = top;
+    }
+    if (height !== lastH) {
+      veil.style.height = `${height}px`;
+      lastH = height;
+    }
   }
 
   function onFrame(){
-    applyOverlayHeight(measureNavOverlayHeight());
+    apply(measure());
   }
 
   function onScrollOrResize(){
