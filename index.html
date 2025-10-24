@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>RealLifeBlog</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <!-- Cache-Busting gegen iOS-CSS-Cache -->
+  <link rel="stylesheet" href="styles.css?v=navfix10">
 </head>
 <body>
   <!-- Header mit Banner-Bild -->
@@ -59,6 +60,6 @@
   </script>
 
   <!-- App lädt danach und kann window.env nutzen -->
-  <script type="module" src="app.js"></script>
+  <script type="module" src="app.js?v=navfix10"></script>
 </body>
 </html>

@@ -47,7 +47,7 @@ body::before{
 /* Container */
 .container{ max-width: var(--container); margin: 0 auto; padding: 24px; }
 
-/* ===== Header (clean, ohne Fade-Maske) ===== */
+/* ===== Header (clean) ===== */
 .site-header,
 .site-header::before,
 .site-header::after{
@@ -67,7 +67,7 @@ body::before{
 }
 .site-header .container{ max-width: none; padding: 0; }
 
-/* Header-Bild: KEINE mask-image → wird nicht „abgeschnitten“ */
+/* Header-Bild: ALLE Masken/Clips hart aus! (gegen Cache-Reste) */
 .header-img{
   display: block;
   width: 100vw;
@@ -77,6 +77,11 @@ body::before{
   transform: translateX(-50%);
   border-radius: 40px;
   box-shadow: none;
+
+  -webkit-mask-image: none !important;
+          mask-image: none !important;
+  -webkit-clip-path: none !important;
+          clip-path: none !important;
 }
 
 /* ===== Navigation ===== */
@@ -137,9 +142,9 @@ body::before{
 #nav-overlay{
   position: fixed;
   left: 0;
-  top: 0;        /* wird per JS exakt auf (nav.top - nav.marginTop) gesetzt */
+  top: 0;        /* JS setzt top dynamisch */
   width: 100vw;
-  height: 0;     /* JS setzt die Höhe bis zur Nav-Unterkante */
+  height: 0;     /* JS setzt Höhe dynamisch */
   z-index: 22;   /* unter Navi (31), über Content */
   pointer-events: none;
 
@@ -154,6 +159,14 @@ body::before{
 /* ===== MAIN + Posts ===== */
 main{
   will-change: opacity, transform;
+}
+
+/* Alte Masken/Clips auf main/.posts explizit aus (gegen Cache-Reste) */
+main, .posts{
+  -webkit-mask-image: none !important;
+          mask-image: none !important;
+  -webkit-clip-path: none !important;
+          clip-path: none !important;
 }
 
 .posts{

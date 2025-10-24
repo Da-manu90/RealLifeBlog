@@ -123,38 +123,28 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-/* ========= NAV-Overlay exakt ausrichten (IM HEADER) =========
-   Overlay (#nav-overlay) beginnt GENAU am unteren Rand des Header-Bilds
-   und endet an der Unterkante der Navigation – auch auf iOS zuverlässig.
-   -> Overlay ist Kindelement von <header> (position: absolute).
+/* ========= NAV-Overlay exakt ausrichten (Header bleibt unangetastet) =========
+   Start = Oberkante der NAV minus deren margin-top  (≈ Unterkante Header)
+   Ende  = Unterkante der NAV
+   -> Ein Overlay, kein Doppel-Effekt. iOS-Safari Repaint-Workaround inklusive.
 */
 (function setupNavOverlay(){
-  const header    = document.querySelector('.site-header');
-  const nav       = document.querySelector('.chip-nav');
-  const headerImg = document.querySelector('.header-img');
-  const veil      = document.getElementById('nav-overlay');
-  if (!header || !nav || !headerImg || !veil) return;
+  const nav  = document.querySelector('.chip-nav');
+  const veil = document.getElementById('nav-overlay');
+  if (!nav || !veil) return;
 
   let ticking = false;
-  let lastTop = null;
-  let lastH   = null;
+  let lastTop = NaN;
+  let lastH   = NaN;
 
-  // Höhe + Position relativ zum Header berechnen
   function measure(){
-    const hRect  = header.getBoundingClientRect();
-    const nRect  = nav.getBoundingClientRect();
-    const iRect  = headerImg.getBoundingClientRect();
+    const r  = nav.getBoundingClientRect();
+    const mt = parseFloat(getComputedStyle(nav).marginTop) || 0;
 
-    // Bottom des Bildes relativ zum Header (zwei Methoden -> sicherste nehmen)
-    const relFromRects = Math.round(iRect.bottom - hRect.top);
-    const relFromDOM   = headerImg.offsetTop + headerImg.offsetHeight;
-    const top = Math.max(relFromRects, relFromDOM, 0);
-
-    // Unterkante der Navi relativ zum Header
-    const navBottomRel = Math.round(nRect.bottom - hRect.top);
-
-    // Höhe = Bereich zwischen Bildunterkante und Navi-Unterkante
-    const height = Math.max(0, navBottomRel - top);
+    // Viewport-Koordinate der Header-Unterkante (≈ nav.top - marginTop)
+    const top = Math.round(r.top - mt);
+    const bottom = Math.round(r.bottom);
+    const height = Math.max(0, bottom - top);
 
     return { top, height };
   }
@@ -167,10 +157,14 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
     if (height !== lastH) {
       veil.style.height = `${height}px`;
       lastH = height;
+
+      // iOS Safari Repaint nudgen
+      veil.style.transform = 'translateZ(0)';
+      requestAnimationFrame(() => { veil.style.transform = ''; });
     }
   }
 
-  function onFrame(){
+  function rafUpdate(){
     apply(measure());
   }
 
@@ -178,7 +172,7 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
-      onFrame();
+      rafUpdate();
       ticking = false;
     });
   }
@@ -189,23 +183,17 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   window.addEventListener('orientationchange', onScrollOrResize, { passive: true });
   window.addEventListener('pageshow', onScrollOrResize, { passive: true });
 
-  // iOS Safari: VisualViewport kann sich separat bewegen
+  // iOS Safari: VisualViewport bewegt sich separat
   if (window.visualViewport) {
     visualViewport.addEventListener('scroll', onScrollOrResize, { passive: true });
     visualViewport.addEventListener('resize', onScrollOrResize, { passive: true });
   }
 
-  // Beobachte Bild- und Nav-Größe (Wrap/Aspekt/Load)
+  // Größe/Wrapping der Nav beobachten
   const ro = new ResizeObserver(onScrollOrResize);
   ro.observe(nav);
-  ro.observe(headerImg);
 
-  // Headerbild kann async laden → bei Load neu messen
-  if (!headerImg.complete) {
-    headerImg.addEventListener('load', onScrollOrResize, { once: true });
-  }
-
-  // Initial + kleine Nachstabilisierungen
+  // Initial + Nachstabilisierung
   window.addEventListener('load', () => {
     onScrollOrResize();
     setTimeout(onScrollOrResize, 50);
