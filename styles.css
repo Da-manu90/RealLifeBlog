@@ -263,7 +263,7 @@ main{
   }
 }
 
-/* Phones (≤600px): mindestens 175px Abstand links,
+/* Phones (≤600px): mind. ~150–175px links frei,
    aber niemals so groß, dass rechts die Card rausfällt */
 @media (max-width: 600px){
   :root{

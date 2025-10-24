@@ -123,98 +123,107 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-/* ==== KORREKTE MASKE relativ zum NAV-BEREICH (Buttons) ==== */
-/* Wir messen die Überlappung zwischen der Unterkante der NAV und der Oberkante von <main>.
-   Die Maske wird auf <main> angewendet – so verschwindet Content unter den Buttons. */
-   function updateNavMask() {
-    const nav  = document.querySelector('.chip-nav');
-    const main = document.querySelector('main');
-    if (!nav || !main) return;
-  
-    // Toleranz gegen Subpixel-Jitter (iOS URL-Bar etc.)
-    const EPS = 12; // ruhig großzügig, damit sie zuverlässig „aus“ geht
-  
-    const navBottom = nav.getBoundingClientRect().bottom; // im Viewport
-    const mainTop   = main.getBoundingClientRect().top;   // im Viewport
-  
-    // Distanz von main-Top bis Nav-Unterkante (in main-Koordinaten)
-    const overlapRaw = navBottom - mainTop;
-  
-    // Wenn keine (nennenswerte) Überlappung -> Maske AUS
-    if (overlapRaw <= EPS) {
-      document.body.classList.remove('mask-active');
-      document.documentElement.style.setProperty('--nav-overlap', '0px');
-  
-      // Inline-Maske sicher entfernen + Safari zwingen zu repainten
-      main.style.webkitMaskImage = 'none';
-      main.style.maskImage = 'none';
-      main.style.transform = 'translateZ(0)';
-      requestAnimationFrame(() => { main.style.transform = ''; });
+/* ==== STABILE MASKE relativ zum NAV-BEREICH ==== */
+/* Eine rAF-gethrottelte Routine, die die Maske inline auf <main> setzt.
+   - Feature-Detect: setzt nur, wenn (webkit)mask-image unterstützt wird
+   - Throttling via requestAnimationFrame
+   - beobachtet scroll/resize/orientation + visualViewport + ResizeObserver
+   - entfernt alle doppelten Listener (nur dieser Block bleibt) */
+
+(function setupNavMask(){
+  const main = document.querySelector('main');
+  const nav  = document.querySelector('.chip-nav');
+  if (!main || !nav) return;
+
+  const supportsMask =
+    (window.CSS && (CSS.supports('mask-image', 'linear-gradient(black, black)') ||
+                    CSS.supports('-webkit-mask-image', 'linear-gradient(black, black)')))
+    || 'webkitMaskImage' in main.style || 'maskImage' in main.style;
+
+  if (!supportsMask) {
+    // Browser ohne Masken: nichts tun
+    return;
+  }
+
+  let lastGrad = '';
+  let lastOverlap = -9999;
+  let ticking = false;
+
+  function applyNone(){
+    document.body.classList.remove('mask-active');
+    main.style.webkitMaskImage = 'none';
+    main.style.maskImage = 'none';
+    lastGrad = '';
+    lastOverlap = 0;
+  }
+
+  function frame(){
+    // Messung im gleichen Koordinatensystem (Viewport)
+    const navBottom = nav.getBoundingClientRect().bottom;
+    const mainTop   = main.getBoundingClientRect().top;
+
+    // Wie weit ragt die NAV in den MAIN?
+    const overlap = Math.max(0, Math.round(navBottom - mainTop));
+
+    // Minimaler Schwellenwert verhindert Flattern bei Subpixel-Bewegungen
+    if (overlap <= 1) {
+      if (lastOverlap !== 0) applyNone();
       return;
     }
-  
-    // Maske AN: weiche Kante 4–24px unterhalb der Nav-Unterkante
-    const overlap   = Math.round(overlapRaw);
+
     const fadeStart = overlap + 4;
     const fadeEnd   = overlap + 24;
-  
+
     const grad = `linear-gradient(
       to bottom,
-      rgba(0,0,0,0) 0,
+      rgba(0,0,0,0) 0px,
       rgba(0,0,0,0) ${fadeStart}px,
       rgba(0,0,0,1) ${fadeEnd}px
     )`;
-  
-    document.body.classList.add('mask-active');
-    document.documentElement.style.setProperty('--nav-overlap', `${overlap}px`);
-    main.style.webkitMaskImage = grad;
-    main.style.maskImage = grad;
+
+    if (grad !== lastGrad) {
+      document.body.classList.add('mask-active');
+      main.style.webkitMaskImage = grad;
+      main.style.maskImage = grad;
+      lastGrad = grad;
+    }
+    lastOverlap = overlap;
   }
-  
-  // --- Events: kontinuierlich und performant updaten ---
-  let ticking = false;
-  function onScrollOrResize() {
+
+  function onScrollOrResize(){
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
-      updateNavMask();
+      frame();
       ticking = false;
     });
   }
-  
+
+  // Events
   window.addEventListener('scroll', onScrollOrResize, { passive: true });
   window.addEventListener('resize', onScrollOrResize, { passive: true });
   window.addEventListener('orientationchange', onScrollOrResize, { passive: true });
   window.addEventListener('pageshow', onScrollOrResize, { passive: true });
+
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') onScrollOrResize();
   });
-  
-  // iOS Safari: VisualViewport bewegt sich separat → mit beobachten
+
   if (window.visualViewport) {
     visualViewport.addEventListener('scroll', onScrollOrResize, { passive: true });
     visualViewport.addEventListener('resize', onScrollOrResize, { passive: true });
   }
-  
-  // initial + kurze Nachstabilisierungen (Font reflow etc.)
+
+  // Größe/Wrap der NAV kann sich ändern → beobachten
+  const ro = new ResizeObserver(onScrollOrResize);
+  ro.observe(nav);
+  ro.observe(main);
+
+  // Initial + ein paar Re-Checks nach Fonts/Layout
   window.addEventListener('load', () => {
     onScrollOrResize();
-    setTimeout(onScrollOrResize, 0);
+    setTimeout(onScrollOrResize, 50);
     setTimeout(onScrollOrResize, 250);
     setTimeout(onScrollOrResize, 800);
   });
-  
-
-window.addEventListener('load', updateNavMask);
-window.addEventListener('resize', updateNavMask, { passive: true });
-window.addEventListener('orientationchange', updateNavMask, { passive: true });
-window.addEventListener('scroll', updateNavMask, { passive: true });
-
-// kleine Stabilisierung nach Fonts/Wraps
-window.addEventListener('load', () => {
-  let n = 0;
-  const t = setInterval(() => {
-    updateNavMask();
-    if (++n > 10) clearInterval(t); // ~3s
-  }, 300);
-});
+})();
