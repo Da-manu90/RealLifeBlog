@@ -123,11 +123,50 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-/* ==== SAFETY-CLEANUP: Entferne alte Overlay-Knoten, falls vorhanden ==== */
+/* ==== SAFETY: Entferne ALLE alten Overlay-/Mask-Quellen ==== */
 (function killLegacyOverlays(){
+  // 1) Eventuelle „alte“ Overlay-Knoten aus früheren Versionen entfernen
   const legacyIds = ['nav-overlay', 'nav-overlay-fixed', 'nav-veil', 'overlay'];
   legacyIds.forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.remove();
+    if (el) {
+      console.warn('[cleanup] remove node:', id);
+      el.remove();
+    }
   });
+
+  // 2) Alte globale Funktionen neutralisieren (falls sie existieren)
+  const noOps = ['updateNavMask', 'setupNavOverlay'];
+  noOps.forEach(fn => {
+    if (typeof window[fn] === 'function') {
+      console.warn('[cleanup] override function:', fn);
+      window[fn] = () => {};
+    }
+  });
+
+  // 3) Sicherheits-Styles ganz am Ende injizieren (höchste Priorität)
+  const style = document.createElement('style');
+  style.textContent = `
+    /* kill alte Overlays hart */
+    #nav-overlay, #nav-overlay-fixed, #nav-veil, #overlay {
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      -webkit-mask-image: none !important;
+              mask-image: none !important;
+      -webkit-clip-path: none !important;
+              clip-path: none !important;
+    }
+    /* nie wieder Masken auf Header/Bild/Main/Posts */
+    header, .site-header, .header-img, main, .posts {
+      -webkit-mask-image: none !important;
+              mask-image: none !important;
+      -webkit-clip-path: none !important;
+              clip-path: none !important;
+    }
+    body.mask-active { /* falls Alt-JS Klassen toggelt */
+      /* keine Wirkung mehr */
+    }
+  `;
+  document.head.appendChild(style);
 })();

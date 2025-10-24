@@ -54,10 +54,8 @@ body::before{
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   box-shadow: none !important;
+  content: none !important;
 }
-.site-header::before,
-.site-header::after{ content: none !important; }
-
 .site-header{
   position: sticky;
   top: 0;
@@ -102,23 +100,22 @@ body::before{
   margin: 9px 0 40px;
 }
 
-/* CSS-Overlay: helles Weiß 45% -> 0%, sanfte lange Kante.
-   Es sitzt GENAU hinter den Buttons: von 10px über Nav bis 10px darunter. */
+/* EINZIGES CSS-Overlay hinter den Buttons */
 .chip-nav::before{
   content: "";
   position: absolute;
   left: 0; right: 0;
-  top: -10px;
-  bottom: -10px;
+  top: 0;            /* exakt an der Nav-Oberkante */
+  bottom: 0;         /* bis zur Nav-Unterkante */
   pointer-events: none;
-  /* lange, weiche Kante über die ganze Höhe */
+
+  /* weicher, langer Verlauf (weiß 45% -> 0%) */
   background: linear-gradient(
     to bottom,
     rgba(255,255,255,var(--nav-overlay-alpha)) 0%,
     rgba(255,255,255,0) 100%
   );
-  /* unter Button-Inhalt bleiben */
-  z-index: 0;
+  z-index: 0; /* unter Buttons bleiben */
 }
 /* Buttons sicher über dem Overlay */
 .chip-nav > *{ position: relative; z-index: 1; }
@@ -163,8 +160,16 @@ body::before{
   border-color: rgba(0,0,0,.12);
 }
 
-/* ==== KEINE separaten Overlay-Elemente mehr ==== */
-#nav-overlay, #nav-overlay-fixed, #nav-veil, #overlay{ display: none !important; }
+/* ==== Kill-Switch: alte Overlays/Masken NIEMALS anzeigen ==== */
+#nav-overlay, #nav-overlay-fixed, #nav-veil, #overlay{
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  -webkit-mask-image: none !important;
+          mask-image: none !important;
+  -webkit-clip-path: none !important;
+          clip-path: none !important;
+}
 
 /* ===== MAIN + Posts ===== */
 main{
