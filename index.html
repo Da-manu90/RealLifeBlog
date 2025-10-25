@@ -5,18 +5,17 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>RealLifeBlog</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <!-- Cache-Busting -->
-  <link rel="stylesheet" href="styles.css?v=navrework1">
+  <link rel="stylesheet" href="styles.css?v=nav-static-01">
 </head>
 <body>
-  <!-- Header mit Banner-Bild (vollbreit) -->
+  <!-- Header mit Banner-Bild -->
   <header class="site-header">
     <div class="container">
       <img src="images/Header.png" alt="RealLifeBlog Banner" class="header-img">
     </div>
   </header>
 
-  <!-- NAV-AREA: PNG-Aufhellung + Buttons darauf -->
+  <!-- NAV-AREA: PNG-Aufhellung + Buttons darauf (ohne JS) -->
   <section class="nav-hero" aria-label="Navigation">
     <img src="images/nav-overlay.png" alt="" class="nav-hero-img" aria-hidden="true">
     <nav class="chip-nav" aria-label="Hauptnavigation">
@@ -27,8 +26,8 @@
     </nav>
   </section>
 
-  <!-- Ab hier beginnt der Seitenhintergrund -->
   <main class="container">
+    <!-- Posts -->
     <section id="posts" class="posts" aria-live="polite"></section>
   </main>
 
@@ -53,7 +52,7 @@
     <div class="container">© RealLifeBlog</div>
   </footer>
 
-  <!-- Supabase-ENV -->
+  <!-- Supabase ENV -->
   <script>
     window.env = {
       SUPABASE_URL: "https://pmtmuqnnygmhpanfedir.supabase.co",
@@ -62,6 +61,6 @@
   </script>
 
   <!-- App -->
-  <script type="module" src="app.js?v=navrework1"></script>
+  <script type="module" src="app.js?v=nav-static-01"></script>
 </body>
 </html>

@@ -123,4 +123,4 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-// *** WICHTIG: KEIN Overlay-/Mask-/Clip-JS mehr. ***
+// KEIN Overlay-/Mask-/Clip-JS mehr.
