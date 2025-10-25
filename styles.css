@@ -22,6 +22,7 @@
   --card-max: 740px;
   --posts-left: 0px;
 
+  /* Fallback-Farbe */
   --bottom-fallback: #fd5525;
 
   font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
@@ -56,7 +57,7 @@ body{
 
   background-image:
     url('images/background.png'),
-    linear-gradient(180deg,#fd5525 0%, #fd5525 100%); /* „Gradient“ in Uni-Farbe */
+    linear-gradient(180deg,#fd5525 0%, #fd5525 100%);
   background-repeat: no-repeat, no-repeat;
   background-size: cover, cover;
   background-position: left top, left top;
@@ -64,12 +65,11 @@ body{
   transform: translateZ(0);
 }
 
-/* Desktop: Hintergrundbild in voller Höhe zeigen (Gesicht komplett sichtbar) */
+/* Desktop: Hintergrundbild in voller Höhe zeigen */
 @media (min-width: 1024px){
   #bg{
-    /* 1. Bild = deine PNG; 2. Ebene = der Verlauf (bleibt fullscreen) */
-    background-size: auto 100%, cover;   /* Bild an Höhe, Gradient füllt den Rest */
-    background-position: left center, left top;  /* Bild links verankert, vertikal zentriert */
+    background-size: auto 100%, cover;
+    background-position: left center, left top;
     background-repeat: no-repeat, no-repeat;
   }
 }
@@ -122,12 +122,12 @@ body{
   height: 100%;
   object-fit: cover;
   pointer-events: none;
-  z-index: 0;           /* Overlay unten */
+  z-index: 0;
   display:block;
 }
 .chip-nav{
   position: relative;
-  z-index: 1;           /* Buttons oben */
+  z-index: 1;
   display: flex;
   flex-wrap: wrap;
   gap: 24px;
@@ -338,61 +338,26 @@ main.container{
 .why-box h4{ margin:0 0 8px; font-size:1.05rem; }
 .why-box p{ margin:0; line-height:1.55; }
 
-/* Share-Leiste */
-.share-bar{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
-.share-btn, .share-chip{
-  display:inline-flex; align-items:center; gap:8px; line-height:1;
+/* Share-Leiste (einmalig, ohne Dopplungen) */
+.share-bar{
+  display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.4rem;
 }
-.share-icon{ width:18px; height:18px; display:inline-block; flex:0 0 18px; line-height:0; }
-.share-btn svg, .share-chip svg{ width:18px; height:18px; flex:0 0 auto; }
-.share-btn img, .share-chip img{ width:18px; height:18px; display:inline-block; flex:0 0 auto; }
+.share-btn, .share-bar a{
+  display:inline-flex; align-items:center; gap:.35rem;
+  padding:.4rem .6rem; border-radius:.6rem;
+  text-decoration:none; cursor:pointer; line-height:1;
+  border:1px solid rgba(0,0,0,.08); background: rgba(255,255,255,.85);
+  backdrop-filter:saturate(120%) blur(2px);
+}
+.share-bar img{ width:18px; height:18px; display:block; }
 .share-fb{ border-color: rgba(24,119,242,.18); }
 .share-wa{ border-color: rgba(37,211,102,.18); }
 
+/* Mobile Header-Höhe */
 @media (max-width: 768px){
-  :root{
-    --header-h: 120px !important;        /* steuert alle Offsets/Layouts */
-  }
-  .site-header{
-    height: var(--header-h) !important;  /* Header wirklich auf 120px zwingen */
-  }
-  .nav-strip{
-    top: calc(var(--header-h) + var(--nav-gap)) !important;  /* Nav korrekt nachziehen */
-  }
-  main.container{
-    /* Content-Start unter Header + Nav neu berechnen */
-    padding-top: calc(var(--header-h) + var(--nav-gap) + var(--nav-h) + 16px) !important;
-  }
-  /* nur zur Sicherheit: Bild füllt den kleineren Header sauber */
-  .header-img{
-    height: 100% !important;
-    width: 100% !important;
-    object-fit: cover;
-    object-position: center top;
-  }
+  :root{ --header-h: 120px !important; }
+  .site-header{ height: var(--header-h) !important; }
+  .nav-strip{ top: calc(var(--header-h) + var(--nav-gap)) !important; }
+  main.container{ padding-top: calc(var(--header-h) + var(--nav-gap) + var(--nav-h) + 16px) !important; }
+  .header-img{ height: 100% !important; width: 100% !important; object-fit: cover; object-position: center top; }
 }
-
-html, body{ background: var(--bottom-fallback); }
-#bg{ background-color: var(--bottom-fallback); }
-
-.share-bar {
-  display: flex;
-  gap: .6rem;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-top: .5rem;
-}
-.share-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: .35rem;
-  border: 1px solid #0001;
-  padding: .35rem .6rem;
-  border-radius: .5rem;
-  font-size: .9rem;
-  line-height: 1;
-  cursor: pointer;
-  background: #fff8;
-  backdrop-filter: blur(4px);
-}
-.share-btn img { width: 18px; height: 18px; }
