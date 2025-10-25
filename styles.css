@@ -1,6 +1,5 @@
 :root{
   --page-bg-image: url('images/background.png'); /* kleinschreibung */
-  --card-width: 870px;
   --card-radius: 28px;
   --card-border: 4px solid #000;
   --card-bg-rgba: rgba(255,255,255,0.55);
@@ -14,11 +13,8 @@
   --face-gutter-max: 400px;   /* max. linker Abstand (Desktop) */
   --safe-gap: 24px;           /* Sicherheitsrand rechts */
   --container-pad: 24px;      /* Container padding desktop */
-  --card-max: 700px;          /* Card-Max Desktop/Tablet */
+  --card-max: 820px;          /* Cards auf Desktop etwas breiter */
   --posts-left: 0px;          /* wird unten per MQ bestimmt */
-
-  /* Overlay-Deckkraft (weiß, hinter den Buttons) */
-  --nav-overlay-alpha: 0.45;  /* 45% */
 }
 
 /* Reset / Basics */
@@ -26,28 +22,13 @@
 html, body{ height:100%; margin:0; color:var(--text); -webkit-font-smoothing:antialiased; }
 html, body{ overflow-x: hidden; }
 
-/* Body: kleiner Abstand über dem Content (Header bleibt sticky oben) */
-body{ background: none; min-height: 100vh; padding-top: 10px; }
-
-/* Seitenhintergrund */
-body::before{
-  content:"";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background-image:
-    url('images/background.png'),
-    linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
-  background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;
-  background-position: left center, left center; /* Gesicht links im Fokus */
-  pointer-events: none;
-}
+/* Body ohne Seitenhintergrund (der beginnt erst ab <main>) */
+body{ background: none; min-height: 100vh; }
 
 /* Container */
 .container{ max-width: var(--container); margin: 0 auto; padding: 24px; }
 
-/* ===== Header (clean) ===== */
+/* ===== Header (vollbreit, ohne Masken) ===== */
 .site-header,
 .site-header::before,
 .site-header::after{
@@ -57,16 +38,15 @@ body::before{
   content: none !important;
 }
 .site-header{
-  position: sticky;
-  top: 0;
-  z-index: 30;
+  position: relative;
+  z-index: 20;
   padding: 0;
   background: transparent;
-  isolation: isolate; /* eigener Stacking-Context */
+  isolation: isolate;
 }
 .site-header .container{ max-width: none; padding: 0; }
 
-/* Header-Bild: niemals maskieren/clippen */
+/* Header-Bild vollbreit */
 .header-img{
   display: block;
   width: 100vw;
@@ -81,49 +61,42 @@ body::before{
           mask-image: none !important;
   -webkit-clip-path: none !important;
           clip-path: none !important;
-
-  position: relative;
-  z-index: 35; /* sicher über Deko */
 }
 
-/* ===== Navigation ===== */
+/* ===== NAV-HERO: PNG-Aufhellung + Buttons ===== */
+.nav-hero{
+  position: relative;
+  z-index: 21; /* über dem späteren Main-Background */
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  /* optional: etwas Abstand zum Content unten */
+  margin-bottom: 12px;
+}
+
+.nav-hero-img{
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Fallback-Höhe, bis Bild geladen ist */
+  min-height: 160px;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Buttons auf dem Bild zentriert */
 .chip-nav{
-  position: relative;          /* Anker für das CSS-Overlay (::before) */
-  z-index: 31;                 /* über Content, unter Header-Bild (35) */
+  position: absolute;
+  inset: 0; /* über das ganze PNG */
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 64px;
   flex-wrap: wrap;
-
-  /* halbierter Abstand zum Header */
-  margin: 9px 0 40px;
-}
-
-/* EINZIGES CSS-Overlay hinter den Buttons */
-.chip-nav::before{
-  content: "";
-  position: absolute;
-  left: 0; right: 0;
-  top: 0;            /* exakt an der Nav-Oberkante */
-  bottom: 0;         /* bis zur Nav-Unterkante */
-  pointer-events: none;
-
-  /* weicher, langer Verlauf (weiß 45% -> 0%) */
-  background: linear-gradient(
-    to bottom,
-    rgba(255,255,255,var(--nav-overlay-alpha)) 0%,
-    rgba(255,255,255,0) 100%
-  );
-  z-index: 0; /* unter Buttons bleiben */
-}
-/* Buttons sicher über dem Overlay */
-.chip-nav > *{ position: relative; z-index: 1; }
-
-/* Desktop/Tablet: linker Rand an linken Gutter koppeln */
-.chip-nav{
-  padding-left: clamp(150px, var(--posts-left), 400px);
-  padding-right: 150px;
+  padding: 0 24px;
+  z-index: 1;
 }
 
 /* Mobile: 2×2 Grid */
@@ -132,18 +105,15 @@ body::before{
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px 16px;
-    padding-left: 16px;
-    padding-right: 16px;
-    margin-bottom: 28px;
-    justify-content: center;
-    align-items: center;
+    padding: 16px;
+    place-items: center;
   }
 }
 
 /* Buttons */
 .chip{
   border: 1px solid rgba(0,0,0,.08);
-  background: rgba(255,255,255,.75);
+  background: rgba(255,255,255,.85);
   padding: 10px 18px;
   border-radius: 999px;
   cursor: pointer;
@@ -156,32 +126,25 @@ body::before{
 }
 .chip:hover{ transform: translateY(1px); }
 .chip.is-active{
-  background: rgba(255,255,255,.95);
+  background: rgba(255,255,255,.98);
   border-color: rgba(0,0,0,.12);
 }
 
-/* ==== Kill-Switch: alte Overlays/Masken NIEMALS anzeigen ==== */
-#nav-overlay, #nav-overlay-fixed, #nav-veil, #overlay{
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  -webkit-mask-image: none !important;
-          mask-image: none !important;
-  -webkit-clip-path: none !important;
-          clip-path: none !important;
-}
-
 /* ===== MAIN + Posts ===== */
+/* Ab hier beginnt der Seitenhintergrund */
 main{
-  will-change: opacity, transform;
-}
+  background-image:
+    var(--page-bg-image),
+    linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
+  background-repeat: no-repeat, no-repeat;
+  background-size: cover, cover;
+  background-position: left center, left center; /* Gesicht links im Fokus */
+  /* Auf iOS verhält fixed sich zickig – wir lassen es „scroll“ */
+  background-attachment: scroll, scroll;
 
-/* Sicherheit: alte Masken/Clips auf main/.posts neutralisieren */
-main, .posts{
-  -webkit-mask-image: none !important;
-          mask-image: none !important;
-  -webkit-clip-path: none !important;
-          clip-path: none !important;
+  /* optischer Stack über Body */
+  position: relative;
+  z-index: 10;
 }
 
 .posts{
@@ -190,7 +153,7 @@ main, .posts{
   align-items: center;
   gap: var(--gap);
   padding-bottom: 50px;
-  margin-top: 8px;                 /* direkt unter der Navi */
+  margin-top: 8px;                 /* direkt unter der Navi-Sektion */
   padding-left: var(--posts-left); /* linker Gutter dynamisch */
 }
 
@@ -278,15 +241,15 @@ main, .posts{
 
 /* Mobile Cards etwas schlanker */
 @media (max-width: 600px){
-  :root{ --card-max: 350px; }
+  :root{ --card-max: 360px; }
 }
 /* Tablet breiter */
 @media (min-width: 720px){
-  :root{ --card-max: 540px; }
+  :root{ --card-max: 560px; }
 }
 /* Desktop groß */
 @media (min-width: 900px){
-  :root{ --card-max: 700px; }
+  :root{ --card-max: 820px; }
 }
 /* Container-Padding mobil kleiner */
 @media (max-width: 900px){
@@ -304,7 +267,7 @@ main, .posts{
   }
 }
 
-/* Phones (≤600px): mind. 140px links frei */
+/* Phones (≤600px): mind. 140px links frei (falls Gesicht sichtbar) */
 @media (max-width: 600px){
   :root{
     --posts-left: min(

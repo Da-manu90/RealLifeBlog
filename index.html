@@ -6,26 +6,29 @@
   <title>RealLifeBlog</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <!-- Cache-Busting -->
-  <link rel="stylesheet" href="styles.css?v=cssoverlay-final-1">
+  <link rel="stylesheet" href="styles.css?v=navrework1">
 </head>
 <body>
-  <!-- Header mit Banner-Bild -->
+  <!-- Header mit Banner-Bild (vollbreit) -->
   <header class="site-header">
     <div class="container">
       <img src="images/Header.png" alt="RealLifeBlog Banner" class="header-img">
-      <nav class="chip-nav" aria-label="Hauptnavigation">
-        <button class="chip is-active" data-key="video">Video Blog</button>
-        <button class="chip" data-key="about">Über mich</button>
-        <button class="chip" data-key="news">Neuigkeiten</button>
-        <button class="chip" data-key="thoughts">Gedanken</button>
-      </nav>
     </div>
   </header>
 
-  <!-- KEIN separates Overlay-Element mehr! (bewusst entfernt) -->
+  <!-- NAV-AREA: PNG-Aufhellung + Buttons darauf -->
+  <section class="nav-hero" aria-label="Navigation">
+    <img src="images/nav-overlay.png" alt="" class="nav-hero-img" aria-hidden="true">
+    <nav class="chip-nav" aria-label="Hauptnavigation">
+      <button class="chip is-active" data-key="video">Video Blog</button>
+      <button class="chip" data-key="about">Über mich</button>
+      <button class="chip" data-key="news">Neuigkeiten</button>
+      <button class="chip" data-key="thoughts">Gedanken</button>
+    </nav>
+  </section>
 
+  <!-- Ab hier beginnt der Seitenhintergrund -->
   <main class="container">
-    <!-- Posts -->
     <section id="posts" class="posts" aria-live="polite"></section>
   </main>
 
@@ -59,6 +62,6 @@
   </script>
 
   <!-- App -->
-  <script type="module" src="app.js?v=cssoverlay-final-1"></script>
+  <script type="module" src="app.js?v=navrework1"></script>
 </body>
 </html>
