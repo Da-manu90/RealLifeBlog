@@ -135,7 +135,7 @@ shareBar.innerHTML = `
   </a>
 
   <button class="share-btn share-copy" type="button" aria-label="Link kopieren">
-    <img src="images/link.png" alt="" width="18" height="18">
+    <img src="images/copy-link.png" alt="" width="18" height="18">
     <span>Link kopieren</span>
   </button>
 `;
