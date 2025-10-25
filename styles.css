@@ -16,7 +16,7 @@
   --face-gutter-max: 320px;   /* kompakter Max-Gutter auf Desktop */
   --gutter-min-phone: 100px;  /* min. linker Gutter ≤600px */
   --safe-gap: 24px;           /* Sicherheitsrand rechts (Container) */
-  --edge-right: 10px;         /* 10px Abstand rechts gegen „Durchscheinen“ */
+  --edge-right: 10px;         /* 10px rechts gegen „Durchscheinen“ */
   --container-pad: 24px;      /* Container padding desktop */
   --card-max: 740px;          /* Desktop-Card-Max (breiter, +40px) */
   --posts-left: 0px;          /* wird über MQs gesetzt */
@@ -117,7 +117,7 @@ body{
 }
 
 /* ===========================
-   FIXED Nav-Streifen (ein PNG-Overlay als <img>)
+   FIXED Nav-Streifen (PNG-Overlay als <img>)
    =========================== */
 .nav-strip{
   position: fixed;
@@ -130,10 +130,10 @@ body{
   transform: translateZ(0);
 }
 
-/* Dein PNG-Overlay füllt die Nav */
+/* Overlay füllt die Nav */
 .nav-overlay{
   position: absolute;
-  inset: 0;                    /* links/rechts/oben/unten 0 */
+  inset: 0;                    /* oben/links/rechts/unten 0 */
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -310,7 +310,7 @@ main.container{
   :root{ --container-pad: 16px; }
 }
 
-/* Desktop/Tablet: linker Gutter dynamisch, mit geringerem Max */
+/* Desktop/Tablet: linker Gutter dynamisch */
 @media (min-width: 601px){
   :root{
     --posts-left: clamp(

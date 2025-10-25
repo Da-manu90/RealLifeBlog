@@ -5,26 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>RealLifeBlog</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=rlb-works-video-blog-key">
+  <link rel="stylesheet" href="styles.css?v=clean-classic">
 </head>
 <body>
   <!-- FIXER HINTERGRUND -->
   <div id="bg" aria-hidden="true"></div>
 
-  <!-- FIXED HEADER -->
+  <!-- HEADER -->
   <header class="site-header">
     <div class="container">
       <img src="images/Header.png" alt="RealLifeBlog Banner" class="header-img">
     </div>
   </header>
 
-  <!-- FIXED NAV (MIT PNG-OVERLAY) -->
+  <!-- NAV-STREIFEN mit PNG-Overlay -->
   <section class="nav-strip" aria-label="Navigation">
     <img src="images/nav-overlay.png" alt="" aria-hidden="true" class="nav-overlay">
     <div class="container">
       <nav class="chip-nav">
-        <!-- WICHTIG: exakt die Keys, die auch die DB verwendet -->
-        <button class="chip is-active" data-key="video blog">Video Blog</button>
+        <!-- WICHTIG: data-key = video (nicht „video blog“) -->
+        <button class="chip is-active" data-key="video">Video Blog</button>
         <button class="chip" data-key="about">Über mich</button>
         <button class="chip" data-key="news">Neuigkeiten</button>
         <button class="chip" data-key="thoughts">Gedanken</button>
@@ -37,7 +37,7 @@
     <section id="posts" class="posts" aria-live="polite"></section>
   </main>
 
-  <!-- Template für Beiträge -->
+  <!-- Template: Post -->
   <template id="post-template">
     <article class="post-card">
       <div class="post-inner">
@@ -54,7 +54,7 @@
     </article>
   </template>
 
-  <!-- About-Template (Einspalter: Avatar oben, Text darunter) -->
+  <!-- Template: About (Einspalter, Avatar oben) -->
   <template id="about-template">
     <article class="post-card">
       <div class="post-inner about-inner">
@@ -63,7 +63,7 @@
           <img class="thumb-img" src="images/manuel.jpg" alt="Porträt von Manuel Storch" width="800" height="800" loading="lazy" style="object-position:center;">
         </div>
 
-        <!-- Text + Socials (unter dem Avatar) -->
+        <!-- Text + Socials -->
         <div class="post-meta">
           <time class="post-date" datetime=""></time>
           <h3 class="post-title">Über mich</h3>
@@ -84,7 +84,6 @@
             <em>Interessen:</em> Storytelling, Short-Form-Video, Productivity, Reisen, Kaffee ☕
           </p>
 
-          <!-- Warum ich das mache – Box -->
           <section class="why-box" aria-labelledby="why-title">
             <h4 id="why-title">Warum ich das mache</h4>
             <p>
@@ -126,7 +125,6 @@
     };
   </script>
 
-  <!-- App -->
-  <script type="module" src="app.js?v=rlb-works-video-blog-key"></script>
+  <script type="module" src="app.js?v=clean-classic"></script>
 </body>
 </html>
