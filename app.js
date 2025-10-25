@@ -14,9 +14,26 @@ if (!SUPABASE_URL || !SUPABASE_ANON) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// -------------------------------
+// ===============
+// CONFIG / MAPPING
+// ===============
+/*
+ UI-Keys (aus deinem HTML data-key)  ->  DB-Categories (Supabase)
+*/
+const UI_KEYS = ['video', 'about', 'news', 'thoughts'];
+const KEY_TO_DB = {
+  video: 'video blog',
+  about: 'about',
+  news: 'news',
+  thoughts: 'thoughts',
+};
+
+// umgekehrtes Mapping (nur falls irgendwann gebraucht)
+const DB_TO_KEY = Object.fromEntries(Object.entries(KEY_TO_DB).map(([k,v]) => [v,k]));
+
+// ===============
 // YouTube-ID Parser (unverändert)
-// -------------------------------
+// ===============
 function extractYouTubeId(input) {
   if (!input) return null;
   if (/^[0-9A-Za-z_-]{11}$/.test(input)) return input;
@@ -47,9 +64,9 @@ function extractYouTubeId(input) {
   return last ? last[1] : null;
 }
 
-// -------------------------------
+// ===============
 // Card-Renderer (unverändert)
-// -------------------------------
+// ===============
 function createPost({ title, description, youtube_url, image_url, published_at }) {
   const tpl = template.content.cloneNode(true);
 
@@ -92,90 +109,90 @@ function createPost({ title, description, youtube_url, image_url, published_at }
   return tpl;
 }
 
-// -------------------------------
+// ===============
 // Kategorien / Buttons / Hash
-// -------------------------------
-const ALLOWED = new Set(['video','about','news','thoughts']);
-
+// ===============
 function getKeyFromHash() {
   const key = (location.hash || '').replace('#', '').trim();
-  return ALLOWED.has(key) ? key : 'video';
+  return UI_KEYS.includes(key) ? key : 'video';
 }
-
 function setActiveButton(key) {
   document.querySelectorAll('.chip-nav .chip').forEach(b => {
     b.classList.toggle('is-active', b.dataset.key === key);
   });
 }
 
-// -------------------------------
-// Daten laden (robust, mit Fallback)
-// -------------------------------
-async function loadPosts(categoryKey) {
-  const key = ALLOWED.has(categoryKey) ? categoryKey : 'video';
+// ===============
+// Daten laden – bevorzugt serverseitig gefiltert, mit Fallback
+// ===============
+async function loadPosts(uiKey) {
+  const safeKey = UI_KEYS.includes(uiKey) ? uiKey : 'video';
+  const dbCategory = KEY_TO_DB[safeKey] || 'video blog';
+
   postsContainer.innerHTML = '<p style="opacity:.7">Lade Beiträge…</p>';
 
-  // Wir holen ALLE Posts (inkl. category), damit es auch funktioniert,
-  // wenn deine Tabelle die Spalte "category" noch nicht hat.
-  const { data, error } = await supabase
+  // 1) Serverseitig nach category filtern
+  let { data, error } = await supabase
     .from('posts')
     .select('title, description, youtube_url, image_url, published_at, created_at, category')
+    .eq('category', dbCategory)
     .order('published_at', { ascending: false })
     .order('created_at', { ascending: false });
 
-  if (error) {
+  // 2) Fallback, falls Spalte (noch) fehlt -> clientseitig filtern
+  const missingColumn =
+    error && (String(error.code) === '42703' || /column .*category.* does not exist/i.test(error.message));
+
+  if (missingColumn) {
+    ({ data, error } = await supabase
+      .from('posts')
+      .select('title, description, youtube_url, image_url, published_at, created_at, category')
+      .order('published_at', { ascending: false })
+      .order('created_at', { ascending: false }));
+
+    if (error) {
+      console.error(error);
+      postsContainer.innerHTML = '<p style="color:#c00">Fehler beim Laden der Beiträge.</p>';
+      return;
+    }
+    data = (data || []).filter(r => (r.category || 'video blog') === dbCategory);
+  } else if (error) {
     console.error(error);
     postsContainer.innerHTML = '<p style="color:#c00">Fehler beim Laden der Beiträge.</p>';
     return;
   }
 
-  // Clientseitig nach category filtern (failsafe, funktioniert auch ohne Spalte)
-  const rows = Array.isArray(data) ? data : [];
-  const filtered = rows.filter(r => (r.category || 'video') === key);
-
   postsContainer.innerHTML = '';
-  if (filtered.length === 0) {
-    postsContainer.innerHTML = `<p style="opacity:.7">Keine Beiträge in „${key}“ gefunden.</p>`;
+  if (!data || data.length === 0) {
+    postsContainer.innerHTML = `<p style="opacity:.7">Keine Beiträge in „${safeKey}“ gefunden.</p>`;
     return;
   }
 
-  filtered.forEach(row => postsContainer.appendChild(createPost(row)));
+  data.forEach(row => postsContainer.appendChild(createPost(row)));
 }
 
-// -------------------------------
-// Event-Bindings
-// -------------------------------
+// ===============
+// Events
+// ===============
 document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   btn.addEventListener('click', () => {
     const key = btn.dataset.key;
-    if (!ALLOWED.has(key)) return;
+    if (!UI_KEYS.includes(key)) return;
 
-    // Active-State
     setActiveButton(key);
-
-    // Hash setzen (teilbar/bookmarkbar) ohne Sprung nach oben
-    if (location.hash !== `#${key}`) {
-      history.replaceState(null, '', `#${key}`);
-    }
-
-    // Laden
+    if (location.hash !== `#${key}`) history.replaceState(null, '', `#${key}`);
     loadPosts(key);
-
-    // Optional: sanft nach oben
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 });
 
-// Hash-Navigation (Back/Forward)
 window.addEventListener('hashchange', () => {
   const key = getKeyFromHash();
   setActiveButton(key);
   loadPosts(key);
 });
 
-// -------------------------------
-// Initiale Ladung
-// -------------------------------
+// Init
 (function init() {
   const key = getKeyFromHash();
   setActiveButton(key);
