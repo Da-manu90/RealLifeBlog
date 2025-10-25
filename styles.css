@@ -656,3 +656,44 @@ main.container{
   padding-top: 0 !important;
   padding-bottom: 0 !important;
 }
+
+/* Seamless: Nav direkt an Header; Overlay als Gradient, kein PNG mehr */
+:root{
+  --overlay-strength: .45;     /* 45% Weiß wie gewünscht */
+}
+
+/* Nav sitzt direkt unter dem Header (ohne Minus/Plus-Rechnen) */
+.nav-strip{
+  position: fixed;
+  top: var(--header-h) !important;
+  left: 0; right: 0;
+  height: var(--nav-h);
+  z-index: 4;
+  background: transparent;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* EINZIGES Overlay: weicher Verlauf von Weiß -> transparent */
+.nav-strip::before{
+  content: "";
+  position: absolute;
+  inset: -8px 0 0 0;                 /* 8px nach oben überlappen, um jede Spalte zu killen */
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,var(--overlay-strength)) 0%,
+    rgba(255,255,255,0) 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Buttons liegen drüber; Abstand 10px bleibt */
+.chip-nav{
+  position: relative;
+  z-index: 1;
+  margin-top: 10px !important;
+}
+
+/* Alte PNG-Variante deaktivieren, falls noch vorhanden */
+.nav-overlay{ display:none !important; }
