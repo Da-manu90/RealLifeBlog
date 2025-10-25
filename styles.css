@@ -1,26 +1,24 @@
 :root{
-  --container: 1100px;
-  --container-pad: 24px;
-
+  --container: 1440px;
   --gap: 28px;
   --muted: #6b7280;
   --text: #0b1020;
-
   --card-radius: 28px;
   --card-border: 4px solid #000;
   --card-bg-rgba: rgba(255,255,255,0.55);
 
   /* feste Höhen für fixe Bereiche */
-  --header-h: 220px;  /* Höhe des Header.png (Desktop) */
-  --nav-h: 240px;     /* Höhe des Nav-Streifens/Overlays */
-  --nav-gap: 10px;    /* Abstand Header -> Nav */
+  --header-h: 220px;          /* Höhe des Header.png (Desktop) */
+  --nav-h: 240px;             /* Höhe des Nav-Streifens/Overlays */
+  --nav-gap: 10px;            /* Abstand Header -> Nav */
 
   /* Card-Breiten / Gutter */
-  --face-gutter-max: 320px;   /* Max-Gutter auf Desktop */
+  --face-gutter-max: 320px;   /* kompakter Max-Gutter auf Desktop */
   --gutter-min-phone: 100px;  /* min. linker Gutter ≤600px */
   --safe-gap: 24px;           /* Sicherheitsrand rechts (Container) */
   --edge-right: 10px;         /* 10px rechts gegen „Durchscheinen“ */
-  --card-max: 740px;          /* Desktop-Card-Max */
+  --container-pad: 24px;      /* Container padding desktop */
+  --card-max: 740px;          /* Desktop-Card-Max (breiter, +40px) */
   --posts-left: 0px;          /* wird über MQs gesetzt */
 
   /* Fallback-Farbe gegen iOS-Rubberband */
@@ -31,32 +29,31 @@
 
 /* Reset / Basics */
 *{ box-sizing: border-box; }
+
 html, body{
   margin:0;
   -webkit-font-smoothing:antialiased;
-  background: var(--bottom-fallback);
+  background: var(--bottom-fallback);  /* nie weiß blitzen lassen */
   height:100%;
   color: var(--text);
-  overscroll-behavior-y: none;
+  overscroll-behavior-y: none;         /* hartes Stoppen */
 }
+
+/* Body darf höher als der Screen werden (Scroll) */
 body{
   min-height:100%;
   overflow-x:hidden;
 }
 
-/* generischer Container (für Header/Nav/Footer) */
-.container{
-  max-width: var(--container);
-  margin: 0 auto;
-  padding: 0 var(--container-pad);
-}
-
 /* ===========================
-   Fester Hintergrund (fix)
+   Fester Hintergrund (fix, links ausgerichtet)
    =========================== */
 #bg{
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;                       /* volle Breite */
+  height: 100lvh;                     /* stabil gegen mobilen UI-Sprung */
   z-index: 0;
   pointer-events: none;
 
@@ -64,7 +61,7 @@ body{
     url('images/background.png'),
     linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
   background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;
+  background-size: cover, cover;      /* füllt Viewport */
   background-position: left top, left top;
 
   background-color: var(--bottom-fallback);
@@ -95,10 +92,10 @@ body{
   height: var(--header-h);
   z-index: 3;
   background: transparent;
-  pointer-events: none;
+  pointer-events: none;               /* Bild fängt keine Klicks */
 
-  border-radius: 40px 40px 0 0;
-  overflow: hidden;
+  border-radius: 40px 40px 0 0;       /* oben rund, unten eckig */
+  overflow: hidden;                   /* Bild exakt clippen */
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
 }
@@ -109,12 +106,12 @@ body{
   padding: 0;
 }
 .header-img{
-  display: block;
-  width: 100%;
+  display: block;                     /* Baseline-Gap entfernen */
+  width: 100%;                        /* keine Überbreite */
   height: 100%;
   object-fit: cover;
-  object-position: center top;
-  border-radius: 0;
+  object-position: center top;        /* Fokus oben */
+  border-radius: 0;                   /* Radius übernimmt .site-header */
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
 }
@@ -132,29 +129,31 @@ body{
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
 }
+
+/* Overlay füllt die Nav */
 .nav-overlay{
   position: absolute;
-  inset: 0;
+  inset: 0;                    /* oben/links/rechts/unten 0 */
   width: 100%;
   height: 100%;
   object-fit: cover;
   pointer-events: none;
-  z-index: 0;
+  z-index: 0;                  /* unter den Buttons */
 }
 
 /* Buttons – auf Desktop mittig */
 .chip-nav{
   position: relative;
-  z-index: 1;
+  z-index: 1;                  /* über dem Overlay */
   display: flex;
   flex-wrap: wrap;
   gap: 24px;
-  justify-content: center;
+  justify-content: center;     /* zentriert */
   align-items: flex-start;
 
-  width: max-content;
+  width: max-content;          /* nur so breit wie nötig */
   max-width: calc(100% - 2 * var(--container-pad));
-  margin: 12px auto 0;
+  margin: 12px auto 0;         /* echte Zentrierung */
   padding: 0;
 }
 @media (max-width: 600px){
@@ -184,12 +183,14 @@ body{
 .chip.is-active{ background: rgba(255,255,255,.95); border-color: rgba(0,0,0,.12); }
 
 /* ===========================
-   Content scrollt unter Header & Nav
+   Content scrollt unter Header & Nav durch
    =========================== */
 main{
   position: relative;
-  z-index: 2;
+  z-index: 2;                              /* über #bg */
 }
+
+/* Content-Offset: startet unter Header + Nav */
 main.container{
   max-width: var(--container);
   margin: 0 auto;
@@ -198,20 +199,31 @@ main.container{
     calc(var(--container-pad) + var(--edge-right))
     24px
     var(--container-pad);
+  position: relative;
+  z-index: 2;
+}
+@media (max-width: 900px){
+  main.container{
+    padding:
+      calc(var(--header-h) + var(--nav-gap) + var(--nav-h) + 12px)
+      calc(16px + var(--edge-right))
+      16px
+      16px;
+  }
 }
 
 /* ===========================
-   Post-Stream
+   Post-Stream (mit linkem Gutter)
    =========================== */
 .posts{
   display:flex;
   flex-direction:column;
-  align-items:flex-start;
+  align-items:flex-start;                   /* linker Gutter greift */
   gap: var(--gap);
   width:100%;
-  padding-left: var(--posts-left);
-  padding-right: var(--edge-right);
-  padding-bottom: 64px;
+  padding-left: var(--posts-left);         /* dynamischer linker Abstand */
+  padding-right: var(--edge-right);        /* 10px rechts */
+  padding-bottom: 64px;                    /* etwas Luft unten */
 }
 
 /* ===== Post-Card ===== */
@@ -272,7 +284,7 @@ main.container{
 .site-footer{ padding:40px 0; text-align:center; color:#000; }
 
 /* ===========================
-   Responsive Anpassungen
+   Responsive Layout-Anpassungen
    =========================== */
 @media (max-width: 900px){
   .post-card{ padding:16px; border-radius:22px; }
@@ -286,19 +298,19 @@ main.container{
    Dynamik: Card-Breite & linker Gutter
    =========================== */
 @media (max-width: 600px){
-  :root{ --card-max: 390px; }
+  :root{ --card-max: 390px; }   /* +40 ggü. 350 */
 }
 @media (min-width: 720px){
-  :root{ --card-max: 580px; }
+  :root{ --card-max: 580px; }   /* +40 ggü. 540 */
 }
 @media (min-width: 900px){
-  :root{ --card-max: 740px; }
+  :root{ --card-max: 740px; }   /* +40 ggü. 700 */
 }
 @media (max-width: 900px){
   :root{ --container-pad: 16px; }
 }
 
-/* Desktop/Tablet: linker Gutter */
+/* Desktop/Tablet: linker Gutter dynamisch */
 @media (min-width: 601px){
   :root{
     --posts-left: clamp(
@@ -308,7 +320,7 @@ main.container{
     );
   }
 }
-/* Phones (≤600px) */
+/* Phones (≤600px): MINDESTENS 100px links frei */
 @media (max-width: 600px){
   :root{
     --posts-left: min(
@@ -333,28 +345,31 @@ main.container{
    ABOUT – Einspalter
    =========================== */
 .about-inner{
-  grid-template-columns: 1fr !important;
+  grid-template-columns: 1fr !important;   /* Avatar oben, dann Text */
   align-items: start !important;
   row-gap: 16px;
 }
+
+/* Avatar: oben, zentriert, mit abgerundeten Ecken */
 .about-avatar{
   align-self: start !important;
   justify-self: center;
   width: 200px;
   max-width: 65%;
-  border-radius: 24px;
+  border-radius: 24px;      /* abgerundete Ecken (nicht kreisrund) */
   overflow: hidden;
   margin-top: 4px;
 }
 @media (max-width: 480px){
   .about-avatar{ width: 160px; max-width: 70%; }
 }
+
 .about-facts{
   margin: 12px 0 0;
   padding-left: 1.1em;
 }
 
-/* Social-Links */
+/* Social-Links (passt zu deinen Chips) */
 .about-social{
   display:flex;
   flex-wrap:wrap;
@@ -389,7 +404,9 @@ main.container{
 .why-box h4{ margin: 0 0 8px; font-size: 1.05rem; }
 .why-box p{ margin: 0; line-height: 1.55; }
 
-/* Share-Leiste */
+/* ===========================
+   Share-Leiste (Label + Icon)
+   =========================== */
 .share-bar{
   display:flex;
   flex-wrap:wrap;
@@ -407,20 +424,26 @@ main.container{
   cursor:pointer;
   text-decoration:none;
   color: inherit;
-  display:inline-flex;
+  display:inline-flex;           /* Icon + Label nebeneinander */
   align-items:center;
-  gap:8px;
+  gap:8px;                       /* Abstand Icon <-> Label */
   line-height:1;
   backdrop-filter:saturate(120%) blur(2px);
   transition: transform .06s ease, background .15s ease, border-color .15s ease;
 }
 .share-btn:hover, .share-chip:hover{ transform: translateY(1px); }
-.share-icon{ width:18px; height:18px; flex:0 0 18px; line-height:0; display:inline-block; }
+
+/* Einheitliche Icon-Größe in Buttons */
+.share-icon{
+  width: 18px !important;
+  height: 18px !important;
+  display: inline-block;
+  flex: 0 0 18px;
+  line-height: 0;
+}
 .share-btn svg, .share-chip svg{ width:18px; height:18px; flex:0 0 auto; }
 .share-btn img, .share-chip img{ width:18px; height:18px; display:inline-block; flex:0 0 auto; }
+
+/* Farbakzente */
 .share-fb{ border-color: rgba(24,119,242,.18); }
 .share-wa{ border-color: rgba(37,211,102,.18); }
-
-/* Stacking-Ordnung Nav (Overlay unter Buttons) */
-.nav-overlay{ z-index: 0; }
-.chip-nav{ z-index: 1; }
