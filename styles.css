@@ -8,11 +8,11 @@
   --card-bg-rgba: rgba(255,255,255,0.55);
 
   /* Card-Breiten / linker Gutter */
-  --face-gutter-max: 400px;   /* max. linker Abstand auf Desktop */
-  --safe-gap: 24px;           /* Sicherheitsrand rechts */
-  --container-pad: 24px;      /* Container padding desktop */
-  --card-max: 700px;          /* Card-Max Desktop/Tablet */
-  --posts-left: 0px;          /* wird über MQs gesetzt */
+  --face-gutter-max: 400px;    /* max. linker Abstand auf Desktop */
+  --safe-gap: 24px;            /* Sicherheitsrand rechts */
+  --container-pad: 24px;       /* Container padding desktop */
+  --card-max: 700px;           /* Card-Max Desktop/Tablet */
+  --posts-left: 0px;           /* wird über MQs gesetzt */
 
   font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 }
@@ -24,29 +24,34 @@ html, body{
   margin:0;
   color:var(--text);
   -webkit-font-smoothing:antialiased;
-  background: transparent;           /* wichtig: kein weißer Body-BG */
+  background: transparent;   /* wichtig: kein weißer Body-BG */
   height: 100%;
 }
 body{
-  min-height: 100dvh;                /* dynamischer Viewport (iOS/Android) */
-  overflow-x:hidden;
+  min-height: 100svh;        /* stabil auf iOS, nicht mitscrollend */
+  overflow-x: hidden;
 }
 
-/* Fixierter Seitenhintergrund: füllt den sichtbaren Viewport, scrollt NICHT mit */
-body::before{
-  content:"";
+/* ===== Fester Seitenhintergrund als echtes Element (kein ::before) ===== */
+#bg{
   position: fixed;
-  top:0; left:0; width:100%; height:100dvh;   /* exakt bis Unterkante des sichtbaren Bildschirms */
-  z-index: 0;                                  /* kein negativer Z-Index -> kein Weißblitzen */
+  inset: 0;                   /* top/right/bottom/left = 0 */
+  height: 100vh;
+  height: 100dvh;
+  height: 100svh;             /* best effort auf iOS/Android */
+  z-index: 0;                 /* liegt unter allem */
+  pointer-events: none;
+
+  /* Nur EIN Hintergrund: dein Farbverlauf + Hintergrundbild */
   background-image:
     url('images/background.png'),
     linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
   background-repeat: no-repeat, no-repeat;
   background-size: cover, cover;
   background-position: center top, center top;
-  pointer-events: none;
+
   will-change: transform;
-  transform: translateZ(0);                     /* iOS-Smoothness */
+  transform: translateZ(0);   /* Safari-Gewackel verhindern */
 }
 
 /* Layout-Helfer */
@@ -54,60 +59,69 @@ body::before{
   max-width: var(--container);
   margin: 0 auto;
   padding: 24px;
+  position: relative;         /* stacking context oberhalb #bg */
+  z-index: 1;
 }
 @media (max-width: 900px){
   .container{ padding: 16px; }
 }
 
-/* ===== Header (ohne Sticky, ohne Masken) ===== */
+/* ===== HEADER (PNG 220px hoch) ===== */
 .site-header{
   position: relative;
-  z-index: 3;                 /* über BG und Nav */
+  z-index: 2;                 /* über bg */
   background: transparent;
 }
 .site-header .container{
-  max-width:none;
+  max-width: none;
   padding: 0 24px;
 }
 @media (max-width: 900px){
   .site-header .container{ padding: 0 16px; }
 }
-
 .header-img{
   display:block;
   width:100%;
   height:auto;
   border-radius:40px;
-  box-shadow:none;
+  box-shadow:none;            /* kein extra Schatten -> keine „2. Overlay“-Optik */
 }
 
-/* ===== Nav-Strip mit PNG als Hintergrund ===== */
+/* ===== NAV-STREIFEN ===== */
 .nav-strip{
   position: relative;
-  z-index: 2;                              /* unter Header, über Content */
-  background: transparent;                 /* PNG hat Transparenzen */
-  background-image: url('images/nav-overlay.png');
-  background-repeat: no-repeat;
-  background-position: center top;
-  background-size: 100% auto;              /* skaliert in Breite, Höhe folgt */
-  min-height: 240px;                        /* kompakter */
-  padding: 12px 0 16px;                     /* weniger Luft */
+  z-index: 2;                 /* über bg */
+  background: transparent;    /* KEINE background-image hier -> sonst 2 Overlays! */
+  min-height: 240px;          /* kompakt; Höhe des Streifens */
+  padding: 12px 0 16px;       /* Innenabstand */
 }
+/* EINZIGES Overlay-Bild im Nav (45%->0% Weiß, von Header-Unterkante abwärts) */
+.nav-overlay{
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 0;                 /* unter den Buttons */
+}
+
 @media (min-width: 720px){  .nav-strip{ min-height: 260px; } }
 @media (min-width: 1100px){ .nav-strip{ min-height: 280px; } }
 
 /* Buttons im Strip */
 .chip-nav{
+  position: relative;
+  z-index: 1;                 /* über dem Overlay-Bild */
   display:flex;
   flex-wrap:wrap;
-  gap:24px;                                 /* kompakter als vorher */
+  gap:24px;
   justify-content:center;
   align-items:center;
-  margin: 0;                                /* bündig im Streifen */
+  margin:0;
   padding-left: clamp(140px, var(--posts-left), 300px);
-  padding-right: 16px;
+  padding-right:16px;
 }
-
 @media (max-width: 600px){
   .chip-nav{
     display:grid;
@@ -116,7 +130,6 @@ body::before{
     padding: 0 16px;
   }
 }
-
 .chip{
   border: 1px solid rgba(0,0,0,.08);
   background: rgba(255,255,255,.85);
@@ -133,26 +146,24 @@ body::before{
 .chip:hover{ transform: translateY(1px); }
 .chip.is-active{ background: rgba(255,255,255,.95); border-color: rgba(0,0,0,.12); }
 
-/* ===== MAIN + Posts ===== */
+/* ===== MAIN + Posts (scrollen über dem fixen BG) ===== */
 main{
   position: relative;
-  z-index: 1;
+  z-index: 2;                 /* über bg */
 }
-
-/* Post-Stream */
 .posts{
   display:flex;
   flex-direction:column;
-  align-items:flex-start;                    /* wichtig: linker Gutter wirkt */
+  align-items:flex-start;      /* damit linker Gutter greift */
   gap:var(--gap);
   width:100%;
   margin-top: 8px;
-  padding: 0 0 50px var(--posts-left);      /* dynamischer linker Abstand */
+  padding: 0 0 50px var(--posts-left);  /* dynamischer linker Abstand */
 }
 
 /* ===== Post-Card ===== */
 .post-card{
-  width: min(100%, var(--card-max));        /* nicht die komplette Containerbreite „fressen“ */
+  width: min(100%, var(--card-max));
   max-width: none;
   background: var(--card-bg-rgba);
   border: var(--card-border);
@@ -161,7 +172,6 @@ main{
   box-shadow: 0 12px 32px rgba(0,0,0,0.12);
   backdrop-filter: blur(6px);
 }
-
 .post-inner{
   display:grid;
   grid-template-columns: minmax(160px,25%) 1fr;
@@ -170,7 +180,6 @@ main{
   align-items:end;
 }
 .post-meta{ align-self:start; }
-
 .thumb{
   width:100%;
   aspect-ratio: 9/16;
@@ -187,7 +196,6 @@ main{
   object-fit:cover;
   display:block;
 }
-
 .play{
   position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
   width:44px; height:44px; border-radius:50%; border:0;
@@ -218,9 +226,7 @@ main{
   .thumb{ justify-self:stretch; align-self:start; aspect-ratio:9/16; }
 }
 
-/* =========================
-   Card-Breite & linker Gutter dynamisch
-   ========================= */
+/* ===== Dynamik: Card-Breite & linker Gutter ===== */
 @media (max-width: 600px){
   :root{ --card-max: 350px; }
 }
@@ -244,7 +250,6 @@ main{
     );
   }
 }
-
 /* Phones (≤600px): mindestens 140px links frei */
 @media (max-width: 600px){
   :root{

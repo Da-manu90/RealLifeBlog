@@ -5,18 +5,23 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>RealLifeBlog</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=fix-rlb-001">
+  <link rel="stylesheet" href="styles.css?v=rlb-fixed-bg-single-overlay">
 </head>
 <body>
-  <!-- Header mit Banner-Bild (ohne Sticky, ohne Masken) -->
+  <!-- FIXER HINTERGRUND – echtes DOM-Element, kein Pseudo -->
+  <div id="bg" aria-hidden="true"></div>
+
+  <!-- HEADER (220px hoch, rundes PNG) -->
   <header class="site-header">
     <div class="container">
       <img src="images/Header.png" alt="RealLifeBlog Banner" class="header-img">
     </div>
   </header>
 
-  <!-- Nav-Bereich: PNG-Hintergrund, Buttons sitzen darauf -->
+  <!-- NAV-STREIFEN mit EINEM Overlay-Bild (dein PNG mit 45%->0% Weißverlauf) -->
   <section class="nav-strip" aria-label="Navigation">
+    <!-- Das Overlay liegt absolut im Streifen, Buttons liegen darüber -->
+    <img src="images/nav-overlay.png" alt="" aria-hidden="true" class="nav-overlay">
     <div class="container">
       <nav class="chip-nav">
         <button class="chip is-active" data-key="video">Video Blog</button>
@@ -61,6 +66,6 @@
     };
   </script>
 
-  <script type="module" src="app.js?v=fix-rlb-001"></script>
+  <script type="module" src="app.js?v=rlb-fixed-bg-single-overlay"></script>
 </body>
 </html>

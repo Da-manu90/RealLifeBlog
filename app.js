@@ -108,12 +108,10 @@ async function loadPosts() {
 
 loadPosts();
 
-// Optional: Active-State der Navigation
+// Active-State der Navigation
 document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.chip-nav .chip').forEach(b => b.classList.remove('is-active'));
     btn.classList.add('is-active');
   });
 });
-
-/* WICHTIG: Keinerlei Mess-/Mask-/Overlay-Logik – Layout ist rein per CSS gelöst. */
