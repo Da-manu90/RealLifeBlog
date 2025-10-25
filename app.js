@@ -14,43 +14,31 @@ if (!SUPABASE_URL || !SUPABASE_ANON) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// Robust: YouTube-ID aus watch-, youtu.be-, shorts-, embed- und nackter ID ziehen
+// YouTube-ID Parser
 function extractYouTubeId(input) {
   if (!input) return null;
 
-  // nackte ID?
   if (/^[0-9A-Za-z_-]{11}$/.test(input)) return input;
 
   try {
     const u = new URL(input);
-
-    // ?v=VIDEOID
     const v = u.searchParams.get('v');
     if (v && /^[0-9A-Za-z_-]{11}$/.test(v)) return v;
-
-    // youtu.be/VIDEOID
     if (u.hostname.endsWith('youtu.be')) {
       const id = u.pathname.slice(1).split('/')[0];
       if (/^[0-9A-Za-z_-]{11}$/.test(id)) return id;
     }
-
-    // /shorts/VIDEOID
     if (u.pathname.startsWith('/shorts/')) {
       const id = u.pathname.split('/shorts/')[1].split('/')[0];
       const clean = id.split(/[?&]/)[0];
       if (/^[0-9A-Za-z_-]{11}$/.test(clean)) return clean;
     }
-
-    // /embed/VIDEOID
     const m = u.pathname.match(/\/embed\/([0-9A-Za-z_-]{11})/);
     if (m) return m[1];
-
   } catch (_) {
-    // war keine URL; vielleicht ist es doch eine ID
     if (/^[0-9A-Za-z_-]{11}$/.test(input)) return input;
   }
 
-  // Rückfall: letztes 11er-Token nehmen
   const last = String(input).match(/([0-9A-Za-z_-]{11})(?!.*[0-9A-Za-z_-]{11})/);
   return last ? last[1] : null;
 }
@@ -73,12 +61,15 @@ function createPost({ title, description, youtube_url, image_url, published_at }
         window.open(clickHref, '_blank', 'noopener');
       });
     } else {
-      // Fallback: wenn keine ID erkannt wurde, zeig kein leeres Thumbnail
       thumb.remove();
     }
+  } else if (image_url) {
+    img.src = image_url;
+    img.alt = title || 'Bild';
+  } else {
+    thumb.remove();
   }
 
-  // Datum
   const timeEl = tpl.querySelector('.post-date');
   if (published_at) {
     const d = new Date(published_at);
@@ -115,7 +106,7 @@ async function loadPosts() {
 
 loadPosts();
 
-// Active-State der Navigation
+// Optional: Active-State der Navigation
 document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.chip-nav .chip').forEach(b => b.classList.remove('is-active'));
@@ -123,44 +114,8 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-/* ===== Hintergrund startgenau unter dem Header ausrichten =====
-   Wir messen die Unterkante des Headers und setzen --bg-top.
-   Keine Masken, keine Overlays – nur eine fixe Hintergrundebene. */
-(function syncBackgroundStart(){
-  const header = document.querySelector('.site-header');
-  if (!header) return;
-
-  const root = document.documentElement;
-
-  function update(){
-    // Header-Höhe = Unterkante relativ zum Viewport (sticky → stabil)
-    const h = Math.round(header.getBoundingClientRect().bottom);
-    root.style.setProperty('--bg-top', h + 'px');
-  }
-
-  let ticking = false;
-  function onScrollResize(){
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => {
-      update();
-      ticking = false;
-    });
-  }
-
-  // Events
-  window.addEventListener('load', update, { passive: true });
-  window.addEventListener('resize', onScrollResize, { passive: true });
-  window.addEventListener('orientationchange', onScrollResize, { passive: true });
-  if (window.visualViewport){
-    visualViewport.addEventListener('resize', onScrollResize, { passive: true });
-    visualViewport.addEventListener('scroll', onScrollResize, { passive: true });
-  }
-
-  // kleine Nachstabilisierungen (Fonts etc.)
-  window.addEventListener('load', () => {
-    setTimeout(update, 50);
-    setTimeout(update, 250);
-    setTimeout(update, 800);
-  });
-})();
+/* WICHTIG:
+   Keine Masken, keine Overlays, keine Mess-Listener.
+   Es existiert KEIN Code mehr, der Header-/Nav-Höhen misst
+   oder Clip-/Mask-Styles setzt.
+*/

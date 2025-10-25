@@ -5,35 +5,40 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>RealLifeBlog</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=bg-start-under-header">
+  <link rel="stylesheet" href="styles.css?v=clean0">
 </head>
 <body>
-  <!-- Header mit Banner-Bild (voll sichtbar, nichts schneidet) -->
+  <!-- Header (voll sichtbar, keinerlei Masken/Overlays) -->
   <header class="site-header">
     <div class="container">
       <img src="images/Header.png" alt="RealLifeBlog Banner" class="header-img">
     </div>
   </header>
 
-  <!-- Feste Seiten-Hintergrundebene: beginnt GENAU an der Header-Unterkante -->
-  <div class="page-bg" aria-hidden="true"></div>
-
-  <!-- NAV-AREA: PNG-Aufhellung als Hintergrund + Buttons darauf -->
-  <section class="nav-hero" aria-label="Navigation">
-    <nav class="chip-nav" aria-label="Hauptnavigation">
-      <button class="chip is-active" data-key="video">Video Blog</button>
-      <button class="chip" data-key="about">Über mich</button>
-      <button class="chip" data-key="news">Neuigkeiten</button>
-      <button class="chip" data-key="thoughts">Gedanken</button>
-    </nav>
+  <!-- Navigation (eigener Block unter dem Header) -->
+  <section class="nav-section" aria-label="Navigation">
+    <div class="container">
+      <nav class="chip-nav" aria-label="Hauptnavigation">
+        <button class="chip is-active" data-key="video">Video Blog</button>
+        <button class="chip" data-key="about">Über mich</button>
+        <button class="chip" data-key="news">Neuigkeiten</button>
+        <button class="chip" data-key="thoughts">Gedanken</button>
+      </nav>
+    </div>
   </section>
 
-  <main class="container">
-    <!-- Posts -->
-    <section id="posts" class="posts" aria-live="polite"></section>
-  </main>
+  <!-- Ab hier: Seiten-Content mit einfachem Hintergrundbild -->
+  <div class="content-wrap">
+    <main class="container">
+      <section id="posts" class="posts" aria-live="polite"></section>
+    </main>
 
-  <!-- Template -->
+    <footer class="site-footer">
+      <div class="container">© RealLifeBlog</div>
+    </footer>
+  </div>
+
+  <!-- Template für Posts -->
   <template id="post-template">
     <article class="post-card">
       <div class="post-inner">
@@ -50,10 +55,6 @@
     </article>
   </template>
 
-  <footer class="site-footer">
-    <div class="container">© RealLifeBlog</div>
-  </footer>
-
   <!-- Supabase ENV -->
   <script>
     window.env = {
@@ -63,6 +64,6 @@
   </script>
 
   <!-- App -->
-  <script type="module" src="app.js?v=bg-start-under-header"></script>
+  <script type="module" src="app.js?v=clean0"></script>
 </body>
 </html>

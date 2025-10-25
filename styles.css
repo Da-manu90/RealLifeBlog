@@ -1,68 +1,36 @@
 :root{
-  --page-bg-image: url('images/background.png'); /* prüfe den Pfad im Projekt */
-  --nav-hero-image: url('images/nav-overlay.png'); /* dein PNG mit Alpha */
-
-  --card-radius: 28px;
-  --card-border: 4px solid #000;
-  --card-bg-rgba: rgba(255,255,255,0.55);
+  /* Layout */
   --container: 1440px;
   --gap: 28px;
+
+  /* Typo/Farben */
   --muted: #6b7280;
   --text: #0b1020;
   font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 
-  /* Layout-Dynamik */
-  --face-gutter-max: 400px;
-  --safe-gap: 24px;
-  --container-pad: 24px;
-  --card-max: 820px;
-  --posts-left: 0px;
+  /* Cards */
+  --card-radius: 28px;
+  --card-border: 4px solid #000;
+  --card-bg-rgba: rgba(255,255,255,0.55);
 
-  /* Startposition des Seitenhintergrunds (JS setzt das live) */
-  --bg-top: 220px; /* Fallback: falls JS mal nicht greift */
+  /* Content-Hintergrund */
+  --page-bg-image: url('images/background.png');
+
+  /* Card-Breiten */
+  --card-max: 860px; /* etwas breiter, wie gewünscht */
 }
 
 /* Reset / Basics */
 *{ box-sizing: border-box; }
 html, body{ height:100%; margin:0; color:var(--text); -webkit-font-smoothing:antialiased; }
 html, body{ overflow-x: hidden; }
-
-/* Wir nutzen KEINE body-Hintergrundgrafik mehr,
-   sondern eine separate Ebene .page-bg */
-body{
-  background: transparent;
-  position: relative;
-}
-
-/* ===== Feste Hintergrundebene ab Header-Unterkante ===== */
-.page-bg{
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: var(--bg-top);
-  bottom: 0;
-  z-index: 0;                /* hinter allem anderen */
-
-  /* Stretch bis Seitenende */
-  background-image:
-    var(--page-bg-image),
-    linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
-  background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;
-  background-position: left center, left center;
-}
+body{ background: #fff; } /* kein globales Pseudo-BG, alles simpel */
 
 /* Container */
 .container{ max-width: var(--container); margin: 0 auto; padding: 24px; }
 
-/* ===== Header (voll sichtbar, nix schneidet) ===== */
-.site-header{
-  position: sticky;  /* bleibt oben beim Scrollen */
-  top: 0;
-  z-index: 10;
-  padding: 0;
-  background: transparent;
-}
+/* ===== Header (statisch, keine Masken/Overlays) ===== */
+.site-header{ position: relative; padding: 0; background: transparent; }
 .site-header .container{ max-width: none; padding: 0; }
 .header-img{
   display: block;
@@ -74,57 +42,36 @@ body{
   border-radius: 40px;
   box-shadow: none;
 
-  /* Sicherheitsabschaltung alter Effekte */
+  /* harte Abschaltung etwaiger Alt-Styles */
   -webkit-mask-image: none !important;
           mask-image: none !important;
   -webkit-clip-path: none !important;
           clip-path: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
 }
 
-/* ===== NAV-HERO: PNG als Background + Buttons darauf ===== */
-.nav-hero{
-  position: relative;
-  z-index: 1;                 /* über .page-bg */
-  width: 100%;
-  /* Die PNG als Hintergrund, transparenter Teil zeigt .page-bg */
-  background-image: var(--nav-hero-image);
-  background-repeat: no-repeat;
-  background-size: cover;     /* streckt auf gesamte Breite */
-  background-position: center;
-
-  /* Höhe des PNG-Bereichs – fein einstellbar */
-  --nav-hero-height: 260px;
-  height: var(--nav-hero-height);
-
-  /* Full-Bleed ohne Seiteneinzug */
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-
-  /* gegen versehentliche Lücken */
-  line-height: 0;
+/* ===== Navigation (eigener Block unter dem Header) ===== */
+.nav-section{
+  background: transparent;       /* keine Aufhellung, kein Overlay */
+  padding: 12px 0 28px;          /* Abstände Header ↔ Buttons ↔ Content */
 }
 
-/* Buttons liegen in der Mitte der PNG-Fläche */
 .chip-nav{
-  position: absolute;
-  inset: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 64px;
   flex-wrap: wrap;
-  padding: 0 24px;
 }
 
-/* Mobile: 2×2 Grid auf der PNG */
+/* Mobile: 2×2 Grid */
 @media (max-width: 600px){
   .chip-nav{
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px 16px;
-    padding: 16px;
+    padding: 0 8px;
     place-items: center;
   }
 }
@@ -132,7 +79,7 @@ body{
 /* Buttons */
 .chip{
   border: 1px solid rgba(0,0,0,.08);
-  background: rgba(255,255,255,.85);
+  background: #ffffff;
   padding: 10px 18px;
   border-radius: 999px;
   cursor: pointer;
@@ -141,21 +88,28 @@ body{
   min-width: 150px;
   text-align: center;
   white-space: nowrap;
-  backdrop-filter: saturate(120%) blur(2px);
 }
 .chip:hover{ transform: translateY(1px); }
-.chip.is-active{ background: rgba(255,255,255,.98); border-color: rgba(0,0,0,.12); }
+.chip.is-active{ background: #fff; border-color: rgba(0,0,0,.2); }
+
+/* ===== Content-Bereich: einfacher Hintergrund bis Seitenende ===== */
+.content-wrap{
+  background-image:
+    var(--page-bg-image),
+    linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
+  background-repeat: no-repeat, no-repeat;
+  background-size: cover, cover;          /* gestretched bis unten */
+  background-position: left center, left center;
+}
 
 /* ===== MAIN + Posts ===== */
-main{ position: relative; z-index: 2; }  /* über PNG und BG */
 .posts{
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--gap);
-  padding-bottom: 50px;
-  margin-top: 12px;
-  padding-left: var(--posts-left);
+  padding-bottom: 60px;
+  margin-top: 8px;
 }
 
 /* ===== Post-Card ===== */
@@ -167,7 +121,6 @@ main{ position: relative; z-index: 2; }  /* über PNG und BG */
   border-radius: var(--card-radius);
   padding: 20px;
   box-shadow: 0 12px 32px rgba(0,0,0,0.12);
-  backdrop-filter: blur(6px);
 }
 
 /* Layout in der Card */
@@ -195,7 +148,7 @@ main{ position: relative; z-index: 2; }  /* über PNG und BG */
 .play{
   position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
   width: 44px; height: 44px; border-radius: 50%; border: 0;
-  background: rgba(255,255,255,0.95);
+  background: #fff;
   display: inline-grid; place-items: center; cursor: pointer;
   box-shadow: 0 6px 18px rgba(0,0,0,0.16);
 }
@@ -214,45 +167,17 @@ main{ position: relative; z-index: 2; }  /* über PNG und BG */
 /* Footer */
 .site-footer{ padding: 40px 0; text-align: center; color: #000; }
 
-/* Responsive */
-@media (max-width: 900px){
-  .container{ padding: 16px; }
-  .post-card{ width: 100%; padding: 16px; border-radius: 22px; }
-}
-@media (max-width: 720px){
-  .post-inner{ grid-template-columns: 1fr; align-items: start; }
-  .thumb{ justify-self: stretch; align-self: start; aspect-ratio: 9 / 16; }
-}
+/* Responsive Card-Breiten */
+@media (max-width: 600px){ :root{ --card-max: 360px; } }
+@media (min-width: 720px){ :root{ --card-max: 560px; } }
+@media (min-width: 900px){ :root{ --card-max: 860px; } }
 
-/* =========================
-   Card-Breite & linker Gutter dynamisch
-   ========================= */
-@media (max-width: 600px){
-  :root{ --card-max: 360px; }
-}
-@media (min-width: 720px){
-  :root{ --card-max: 560px; }
-}
-@media (min-width: 900px){
-  :root{ --card-max: 820px; }
-}
-@media (max-width: 900px){
-  :root{ --container-pad: 16px; }
-}
-@media (min-width: 601px){
-  :root{
-    --posts-left: clamp(
-      0px,
-      calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)),
-      var(--face-gutter-max)
-    );
-  }
-}
-@media (max-width: 600px){
-  :root{
-    --posts-left: min(
-      var(--face-gutter-max),
-      max(140px, calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)))
-    );
-  }
+/* Zusätzliche harte Abschaltungen alter Techniken GLOBAL */
+*{
+  -webkit-mask-image: none !important;
+          mask-image: none !important;
+  -webkit-clip-path: none !important;
+          clip-path: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
 }
