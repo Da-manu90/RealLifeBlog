@@ -148,9 +148,7 @@ function createPost(row) {
       </button>
 
       <a class="share-btn share-fb" href="#" target="_blank" rel="noopener" aria-label="Auf Facebook teilen">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M13.5 22v-8h2.6l.4-3h-3V9.1c0-.9.3-1.5 1.6-1.5H16V5.1c-.3 0-1.2-.1-2.3-.1-2.3 0-3.7 1.2-3.7 3.9V11H7v3h3v8h3.5z"/>
-        </svg>
+        <img src="images/fb.svg" alt="" aria-hidden="true">
         <span>Facebook</span>
       </a>
 
