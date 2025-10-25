@@ -493,3 +493,29 @@ main.container{
   height: 100% !important;
   display: block;
 }
+
+/* Einspalter für die About-Card: Avatar oben, dann Content */
+.about-inner{
+  grid-template-columns: 1fr !important;   /* erzwingt eine Spalte */
+  align-items: start !important;
+  row-gap: 16px;
+}
+
+/* Avatar: oben, zentriert, mit abgerundeten Ecken */
+.about-avatar{
+  align-self: start !important;
+  justify-self: center;     /* mittig in der Card */
+  width: 200px;             /* angenehme Breite */
+  max-width: 65%;           /* Sicherheitsgrenze auf schmalen Screens */
+  border-radius: 24px;      /* abgerundete Ecken (nicht kreisrund) */
+  overflow: hidden;
+  margin-top: 4px;          /* kleine Luft nach oben */
+}
+
+/* Mobile: etwas kleiner */
+@media (max-width: 480px){
+  .about-avatar{
+    width: 160px;
+    max-width: 70%;
+  }
+}

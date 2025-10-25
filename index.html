@@ -55,16 +55,16 @@
   </template>
 
 <!-- About-Template (statisch, 2-Spalten, Avatar + Feature-Liste + Social + Why-Box) -->
+<!-- About-Template (Einspalter: Avatar oben, Text darunter) -->
 <template id="about-template">
     <article class="post-card">
-      <div class="post-inner" style="grid-template-columns:minmax(180px,28%) 1fr;align-items:start;">
-        <!-- Avatar / Bild -->
+      <div class="post-inner about-inner">
+        <!-- Avatar / Bild (oben) -->
         <div class="thumb about-avatar" aria-hidden="true" style="aspect-ratio:1/1;">
-          <!-- ersetze images/manuel.jpg durch dein Bild -->
           <img class="thumb-img" src="images/manuel.jpg" alt="Porträt von Manuel Storch" width="800" height="800" loading="lazy" style="object-position:center;">
         </div>
   
-        <!-- Text + Socials -->
+        <!-- Text + Socials (unter dem Avatar) -->
         <div class="post-meta">
           <time class="post-date" datetime=""></time>
           <h3 class="post-title">Über mich</h3>
@@ -75,7 +75,6 @@
             Kein Hochglanz, sondern echte Stories aus dem echten Leben.
           </p>
   
-          <!-- Feature-Liste / Fakten -->
           <ul class="post-desc about-facts">
             <li>35 Jahre, hauptberuflich Krankenpfleger</li>
             <li>Echte Höhen & Tiefen – dokumentiert & reflektiert</li>
@@ -86,7 +85,6 @@
             <em>Interessen:</em> Storytelling, Short-Form-Video, Productivity, Reisen, Kaffee ☕
           </p>
   
-          <!-- Warum ich das mache – Box -->
           <section class="why-box" aria-labelledby="why-title">
             <h4 id="why-title">Warum ich das mache</h4>
             <p>
@@ -96,22 +94,21 @@
             </p>
           </section>
   
-          <!-- Social-Links -->
+          <!-- Social-Links (Icons + Label) -->
           <nav class="about-social" aria-label="Social Links">
             <a class="share-chip" href="https://www.instagram.com/reallife_podcast_2o25/" target="_blank" rel="noopener">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6.5-.9a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2zM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true" class="share-icon"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6.5-.9a1.1 1.1 0 1 0 0 2.2 1.1 1.1 0 0 0 0-2.2zM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg>
               <span>Instagram</span>
             </a>
             <a class="share-chip" href="https://www.youtube.com/@manuelstorch" target="_blank" rel="noopener">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.7 3.5 12 3.5 12 3.5s-7.7 0-9.4.6A3 3 0 0 0 .5 6.2C0 7.9 0 12 0 12s0 4.1.5 5.8a3 3 0 0 0 2.1 2.1c1.7.6 9.4.6 9.4.6s7.7 0 9.4-.6a3 3 0 0 0 2.1-2.1c.5-1.7.5-5.8.5-5.8s0-4.1-.5-5.8zM9.8 15.5V8.5L15.5 12l-5.7 3.5z"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true" class="share-icon"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.7 3.5 12 3.5 12 3.5s-7.7 0-9.4.6A3 3 0 0 0 .5 6.2C0 7.9 0 12 0 12s0 4.1.5 5.8a3 3 0 0 0 2.1 2.1c1.7.6 9.4.6 9.4.6s7.7 0 9.4-.6a3 3 0 0 0 2.1-2.1c.5-1.7.5-5.8.5-5.8s0-4.1-.5-5.8zM9.8 15.5V8.5L15.5 12l-5.7 3.5z"/></svg>
               <span>YouTube</span>
             </a>
             <a class="share-chip" href="mailto:storch.manuel@gmx.de">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v.5l-10 6-10-6V6zm0 3.3V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9.3l-9.3 5.6a2 2 0 0 1-2.1 0L2 9.3z"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true" class="share-icon"><path d="M2 6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v.5l-10 6-10-6V6zm0 3.3V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9.3l-9.3 5.6a2 2 0 0 1-2.1 0L2 9.3z"/></svg>
               <span>Kontakt</span>
             </a>
           </nav>
-          
         </div>
       </div>
     </article>
