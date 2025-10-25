@@ -54,14 +54,13 @@ body{
   z-index: 0;
   pointer-events: none;
 
-  background-image:
-    url('images/background.png'),
-    linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
-  background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;
-  background-position: left top, left top;
-  background-color: var(--bottom-fallback);
-  transform: translateZ(0);
+  #bg{
+    background-image: url('images/background.png'); /* nur noch das PNG */
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: left top;
+    background-color: #fd5525; /* oder var(--bottom-fallback) */
+  }
 }
 
 /* Desktop: Hintergrundbild in voller Höhe zeigen (Gesicht komplett sichtbar) */
