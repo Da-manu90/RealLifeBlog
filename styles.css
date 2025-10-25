@@ -13,15 +13,15 @@
   --nav-gap: 10px;            /* Abstand Header -> Nav */
 
   /* Card-Breiten / linker Gutter */
-  --face-gutter-max: 320px;   /* ↓ kompakter: max. linker Abstand auf Desktop (vorher 400) */
-  --gutter-min-phone: 100px;  /* ↓ kompakter: minimaler linker Gutter ≤600px (vorher 140) */
+  --face-gutter-max: 320px;   /* max. linker Abstand auf Desktop (kompakter) */
+  --gutter-min-phone: 100px;  /* minimaler linker Gutter ≤600px */
   --safe-gap: 24px;           /* Sicherheitsrand rechts */
   --container-pad: 24px;      /* Container padding desktop */
   --card-max: 700px;          /* Basiswert, wird per MQ überschrieben */
   --posts-left: 0px;          /* wird über MQs gesetzt */
 
-  /* Fallback-Farbe (untere Gradient-Farbe) gegen iOS-Rubberband */
-  --bottom-fallback: #b59eff;
+  /* Fallback-Farbe gegen iOS-Rubberband (vom User gewünscht) */
+  --bottom-fallback: #c03268;
 
   font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 }
@@ -46,12 +46,15 @@ body{
 }
 
 /* ===========================
-   Fester Hintergrund (fix, links ausgerichtet)
+   Fester Hintergrund (fix, links ausgerichtet, konstante Höhe)
    =========================== */
 #bg{
   position: fixed;
-  inset: 0;                                /* top/right/bottom/left = 0 */
-  z-index: 0;                              /* liegt unter allem */
+  top: 0;
+  left: 0;
+  width: 100vw;                         /* volle Breite */
+  height: 100svh;                       /* konstante Höhe: reagiert NICHT auf UI-Leiste */
+  z-index: 0;                           /* liegt unter allem */
   pointer-events: none;
 
   /* Linksbündig: linker Bildrand klebt am linken Screenrand */
@@ -59,14 +62,14 @@ body{
     url('images/background.png'),
     linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
   background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;           /* füllt den sichtbaren Viewport */
-  background-position: left top, left top; /* Anker links/oben */
+  background-size: cover, cover;        /* füllt den sichtbaren Screen */
+  background-position: left top, left top;
 
-  background-color: var(--bottom-fallback);/* Fallback falls Bild kurz fehlt */
-  transform: translateZ(0);                /* iOS Stabilisierung */
+  background-color: var(--bottom-fallback); /* Fallback falls Bild kurz fehlt */
+  transform: translateZ(0);                 /* iOS Stabilisierung */
 }
 
-/* Safe-Area-Füller (iOS) gegen weiße Kante unten */
+/* Safe-Area-Füller (iOS) – optional, tut nicht weh */
 @supports (bottom: env(safe-area-inset-bottom)) {
   #bg::after{
     content:"";
@@ -283,17 +286,16 @@ main.container{
 }
 
 /* ===========================
-   Dynamik: Card-Breite & linker Gutter
-   (Cards optional breiter +40 px – kannst du lassen oder anpassen)
+   Dynamik: Card-Breite & linker Gutter (+40 px Breite)
    =========================== */
 @media (max-width: 600px){
-  :root{ --card-max: 390px; }   /* vorher 350 -> +40 */
+  :root{ --card-max: 390px; }   /* +40 gegenüber 350 */
 }
 @media (min-width: 720px){
-  :root{ --card-max: 580px; }   /* vorher 540 -> +40 */
+  :root{ --card-max: 580px; }   /* +40 gegenüber 540 */
 }
 @media (min-width: 900px){
-  :root{ --card-max: 740px; }   /* vorher 700 -> +40 */
+  :root{ --card-max: 740px; }   /* +40 gegenüber 700 */
 }
 @media (max-width: 900px){
   :root{ --container-pad: 16px; }
@@ -305,11 +307,11 @@ main.container{
     --posts-left: clamp(
       0px,
       calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)),
-      var(--face-gutter-max)             /* jetzt 320px → kompakter */
+      var(--face-gutter-max)             /* jetzt kompakter (320px) */
     );
   }
 }
-/* Phones (≤600px): MINDESTENS 100px links frei (statt 140px) */
+/* Phones (≤600px): MINDESTENS 100px links frei */
 @media (max-width: 600px){
   :root{
     --posts-left: min(
