@@ -356,10 +356,19 @@ main.container{
   -webkit-backface-visibility: hidden;
 }
 
-/* About: Avatar-Optik (optional rund) */
+/* About: Avatar ganz oben positionieren (statt unten) */
 .about-avatar{
-  border-radius: 50%;             /*rund */
-  overflow: hidden;
+  align-self: start !important;    /* übersteuert .thumb { align-self:end } */
+  justify-self: start;             /* linksbündig in der Spalte */
+}
+
+/* Optional: Auf Mobile oben, zentriert und in angenehmer Größe */
+@media (max-width: 720px){
+  .about-avatar{
+    justify-self: center;          /* mittig im 1-Spalten-Layout */
+    width: 180px;                  /* feste, freundliche Breite */
+    max-width: 60vw;               /* Sicherheitslimit bei sehr kleinen Screens */
+  }
 }
 
 .about-facts{
