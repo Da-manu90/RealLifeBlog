@@ -447,3 +447,30 @@ main.container{
 /* Farbakzente */
 .share-fb{ border-color: rgba(24,119,242,.18); }
 .share-wa{ border-color: rgba(37,211,102,.18); }
+
+/* NAV – sicheres Stacking */
+.nav-strip{
+  position: fixed;
+  top: calc(var(--header-h) + var(--nav-gap));
+  left: 0; right: 0;
+  height: var(--nav-h);
+  z-index: 4;
+  background: transparent;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+.nav-overlay{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 1; /* unter Buttons */
+}
+
+.chip-nav{
+  position: relative;
+  z-index: 2; /* über Overlay */
+}
