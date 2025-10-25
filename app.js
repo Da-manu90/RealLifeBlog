@@ -141,9 +141,7 @@ function createPost(row) {
     shareBar.setAttribute('aria-label', 'Beitrag teilen');
     shareBar.innerHTML = `
       <button class="share-btn share-native" type="button" aria-label="Teilen">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M18 8a3 3 0 1 0-2.82-4H15a3 3 0 0 0 0 6h.18A3 3 0 0 0 18 8ZM6 14a3 3 0 1 0-2.83 2H3a3 3 0 0 0 0-6h.17A3 3 0 0 0 6 14Zm12 0a3 3 0 1 0-2.83 2H15a3 3 0 0 0 0-6h.17A3 3 0 0 0 18 14ZM8.59 13l6.12-3.06-.9-1.8L7.7 11.2l.89 1.8Zm6.12 1.06L8.59 17l-.9-1.8 6.12-3.06.9 1.92Z"/>
-        </svg>
+        <img src="images/share.png" alt="" aria-hidden="true">
         <span>Teilen</span>
       </button>
 
