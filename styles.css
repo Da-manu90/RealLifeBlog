@@ -463,3 +463,33 @@ main.container{
   display:inline-block;
   flex:0 0 auto;
 }
+
+/* Einheitliche Icon-Größe in Buttons (SVG, IMG, PICTURE) */
+.share-icon{
+  width: 18px !important;
+  height: 18px !important;
+  display: inline-block;
+  flex: 0 0 18px;          /* fixe Breite im Flex-Button */
+  line-height: 0;          /* keine zusätzliche Zeilenhöhe */
+}
+
+/* Falls das Icon ein <img> oder <svg> ist */
+.share-icon img,
+.share-icon svg{
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  object-fit: contain;
+}
+
+/* Falls du ein <picture> benutzt */
+.share-icon picture{
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+.share-icon picture > img{
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}

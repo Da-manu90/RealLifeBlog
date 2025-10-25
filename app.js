@@ -179,13 +179,15 @@ function createPost(row) {
     aWA.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
   }
 
-  btnNative?.addEventListener('click', async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: shareText, url: shareUrl, text: shareText });
-      } catch { /* user canceled */ }
-    } else {
-      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank', 'noopener');
+  btnCopy?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      const labelEl = btnCopy.querySelector('span');
+      const oldText = labelEl ? labelEl.textContent : 'Link kopieren';
+      if (labelEl) labelEl.textContent = 'Kopiert!';
+      setTimeout(() => { if (labelEl) labelEl.textContent = oldText; }, 1400);
+    } catch {
+      window.prompt('Link kopieren:', shareUrl);
     }
   });
 
