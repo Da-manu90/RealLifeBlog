@@ -5,19 +5,21 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>RealLifeBlog</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=nav-static-01">
+  <link rel="stylesheet" href="styles.css?v=bg-start-under-header">
 </head>
 <body>
-  <!-- Header mit Banner-Bild -->
+  <!-- Header mit Banner-Bild (voll sichtbar, nichts schneidet) -->
   <header class="site-header">
     <div class="container">
       <img src="images/Header.png" alt="RealLifeBlog Banner" class="header-img">
     </div>
   </header>
 
-  <!-- NAV-AREA: PNG-Aufhellung + Buttons darauf (ohne JS) -->
+  <!-- Feste Seiten-Hintergrundebene: beginnt GENAU an der Header-Unterkante -->
+  <div class="page-bg" aria-hidden="true"></div>
+
+  <!-- NAV-AREA: PNG-Aufhellung als Hintergrund + Buttons darauf -->
   <section class="nav-hero" aria-label="Navigation">
-    <img src="images/nav-overlay.png" alt="" class="nav-hero-img" aria-hidden="true">
     <nav class="chip-nav" aria-label="Hauptnavigation">
       <button class="chip is-active" data-key="video">Video Blog</button>
       <button class="chip" data-key="about">Über mich</button>
@@ -61,6 +63,6 @@
   </script>
 
   <!-- App -->
-  <script type="module" src="app.js?v=nav-static-01"></script>
+  <script type="module" src="app.js?v=bg-start-under-header"></script>
 </body>
 </html>

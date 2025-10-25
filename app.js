@@ -115,7 +115,7 @@ async function loadPosts() {
 
 loadPosts();
 
-// (Optional) Active-State der Navigation
+// Active-State der Navigation
 document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.chip-nav .chip').forEach(b => b.classList.remove('is-active'));
@@ -123,4 +123,44 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-// KEIN Overlay-/Mask-/Clip-JS mehr.
+/* ===== Hintergrund startgenau unter dem Header ausrichten =====
+   Wir messen die Unterkante des Headers und setzen --bg-top.
+   Keine Masken, keine Overlays – nur eine fixe Hintergrundebene. */
+(function syncBackgroundStart(){
+  const header = document.querySelector('.site-header');
+  if (!header) return;
+
+  const root = document.documentElement;
+
+  function update(){
+    // Header-Höhe = Unterkante relativ zum Viewport (sticky → stabil)
+    const h = Math.round(header.getBoundingClientRect().bottom);
+    root.style.setProperty('--bg-top', h + 'px');
+  }
+
+  let ticking = false;
+  function onScrollResize(){
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      update();
+      ticking = false;
+    });
+  }
+
+  // Events
+  window.addEventListener('load', update, { passive: true });
+  window.addEventListener('resize', onScrollResize, { passive: true });
+  window.addEventListener('orientationchange', onScrollResize, { passive: true });
+  if (window.visualViewport){
+    visualViewport.addEventListener('resize', onScrollResize, { passive: true });
+    visualViewport.addEventListener('scroll', onScrollResize, { passive: true });
+  }
+
+  // kleine Nachstabilisierungen (Fonts etc.)
+  window.addEventListener('load', () => {
+    setTimeout(update, 50);
+    setTimeout(update, 250);
+    setTimeout(update, 800);
+  });
+})();

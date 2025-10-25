@@ -1,5 +1,7 @@
 :root{
-  --page-bg-image: url('images/background.png'); /* kleinschreibung */
+  --page-bg-image: url('images/background.png'); /* prüfe den Pfad im Projekt */
+  --nav-hero-image: url('images/nav-overlay.png'); /* dein PNG mit Alpha */
+
   --card-radius: 28px;
   --card-border: 4px solid #000;
   --card-bg-rgba: rgba(255,255,255,0.55);
@@ -10,15 +12,14 @@
   font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 
   /* Layout-Dynamik */
-  --face-gutter-max: 400px;   /* max. linker Abstand (Desktop) */
-  --safe-gap: 24px;           /* Sicherheitsrand rechts */
-  --container-pad: 24px;      /* Container padding desktop */
-  --card-max: 820px;          /* Cards auf Desktop etwas breiter */
-  --posts-left: 0px;          /* wird unten per MQ bestimmt */
+  --face-gutter-max: 400px;
+  --safe-gap: 24px;
+  --container-pad: 24px;
+  --card-max: 820px;
+  --posts-left: 0px;
 
-  /* Position der Buttons innerhalb der PNG */
-  --nav-hero-pad-top: clamp(24px, 6vw, 56px);
-  --nav-hero-pad-bottom: clamp(16px, 4vw, 40px);
+  /* Startposition des Seitenhintergrunds (JS setzt das live) */
+  --bg-top: 220px; /* Fallback: falls JS mal nicht greift */
 }
 
 /* Reset / Basics */
@@ -26,83 +27,86 @@
 html, body{ height:100%; margin:0; color:var(--text); -webkit-font-smoothing:antialiased; }
 html, body{ overflow-x: hidden; }
 
-/* ===== Hintergrund wieder global (damit PNG-Transparenz sichtbar ist) ===== */
-body{ background: none; min-height: 100vh; }
-body::before{
-  content:"";
+/* Wir nutzen KEINE body-Hintergrundgrafik mehr,
+   sondern eine separate Ebene .page-bg */
+body{
+  background: transparent;
+  position: relative;
+}
+
+/* ===== Feste Hintergrundebene ab Header-Unterkante ===== */
+.page-bg{
   position: fixed;
-  inset: 0;
-  z-index: -1;
+  left: 0;
+  right: 0;
+  top: var(--bg-top);
+  bottom: 0;
+  z-index: 0;                /* hinter allem anderen */
+
+  /* Stretch bis Seitenende */
   background-image:
     var(--page-bg-image),
     linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
   background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;      /* bis zum Seitenende „gestretched“ */
+  background-size: cover, cover;
   background-position: left center, left center;
-  /* auf iOS ist fixed ok, falls du Parallax willst; sonst auf 'scroll' ändern */
-  background-attachment: fixed, fixed;
-  pointer-events: none;
 }
 
 /* Container */
 .container{ max-width: var(--container); margin: 0 auto; padding: 24px; }
 
-/* ===== Header (keine Masken) ===== */
-.site-header,
-.site-header::before,
-.site-header::after{
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: none !important;
-  content: none !important;
-}
+/* ===== Header (voll sichtbar, nix schneidet) ===== */
 .site-header{
-  position: relative; /* kein sticky nötig – sauberer Flow */
-  z-index: 20;
+  position: sticky;  /* bleibt oben beim Scrollen */
+  top: 0;
+  z-index: 10;
   padding: 0;
   background: transparent;
-  isolation: isolate;
 }
 .site-header .container{ max-width: none; padding: 0; }
-
 .header-img{
   display: block;
-  width: 100vw;  max-width: 100vw;
+  width: 100vw;
+  max-width: 100vw;
   height: auto;
   margin-left: 50%;
   transform: translateX(-50%);
   border-radius: 40px;
   box-shadow: none;
 
+  /* Sicherheitsabschaltung alter Effekte */
   -webkit-mask-image: none !important;
           mask-image: none !important;
   -webkit-clip-path: none !important;
           clip-path: none !important;
 }
 
-/* ===== NAV-HERO: deine PNG + Buttons ===== */
+/* ===== NAV-HERO: PNG als Background + Buttons darauf ===== */
 .nav-hero{
   position: relative;
-  z-index: 21;
-  width: 100vw;
-  max-width: 100vw;
-  margin-left: 50%;
-  transform: translateX(-50%);
-  margin-top: 0;           /* direkt unter dem Header */
-  margin-bottom: 12px;
-}
-.nav-hero-img{
-  display: block;
+  z-index: 1;                 /* über .page-bg */
   width: 100%;
-  height: auto;
-  object-fit: cover;
-  pointer-events: none;     /* nur Deko */
-  user-select: none;
-  /* Wichtig: KEIN Hintergrund auf .nav-hero – PNG-Transparenz lässt
-     das body::before durchscheinen */
+  /* Die PNG als Hintergrund, transparenter Teil zeigt .page-bg */
+  background-image: var(--nav-hero-image);
+  background-repeat: no-repeat;
+  background-size: cover;     /* streckt auf gesamte Breite */
+  background-position: center;
+
+  /* Höhe des PNG-Bereichs – fein einstellbar */
+  --nav-hero-height: 260px;
+  height: var(--nav-hero-height);
+
+  /* Full-Bleed ohne Seiteneinzug */
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+
+  /* gegen versehentliche Lücken */
+  line-height: 0;
 }
 
-/* Buttons auf dem PNG ausrichten */
+/* Buttons liegen in der Mitte der PNG-Fläche */
 .chip-nav{
   position: absolute;
   inset: 0;
@@ -111,17 +115,16 @@ body::before{
   align-items: center;
   gap: 64px;
   flex-wrap: wrap;
-  padding: var(--nav-hero-pad-top) 24px var(--nav-hero-pad-bottom);
-  z-index: 1;
+  padding: 0 24px;
 }
 
-/* Mobile: 2×2 Grid */
+/* Mobile: 2×2 Grid auf der PNG */
 @media (max-width: 600px){
   .chip-nav{
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px 16px;
-    padding: 20px 16px;
+    padding: 16px;
     place-items: center;
   }
 }
@@ -141,24 +144,17 @@ body::before{
   backdrop-filter: saturate(120%) blur(2px);
 }
 .chip:hover{ transform: translateY(1px); }
-.chip.is-active{
-  background: rgba(255,255,255,.98);
-  border-color: rgba(0,0,0,.12);
-}
+.chip.is-active{ background: rgba(255,255,255,.98); border-color: rgba(0,0,0,.12); }
 
 /* ===== MAIN + Posts ===== */
-main{
-  position: relative; /* nur für stacking – Background kommt vom Body */
-  z-index: 10;
-}
-
+main{ position: relative; z-index: 2; }  /* über PNG und BG */
 .posts{
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--gap);
   padding-bottom: 50px;
-  margin-top: 8px;
+  margin-top: 12px;
   padding-left: var(--posts-left);
 }
 
@@ -195,12 +191,7 @@ main{
   justify-self: start;
   align-self: end;
 }
-.thumb img{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
+.thumb img{ width: 100%; height: 100%; object-fit: cover; display: block; }
 .play{
   position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
   width: 44px; height: 44px; border-radius: 50%; border: 0;
@@ -229,15 +220,8 @@ main{
   .post-card{ width: 100%; padding: 16px; border-radius: 22px; }
 }
 @media (max-width: 720px){
-  .post-inner{
-    grid-template-columns: 1fr;
-    align-items: start;
-  }
-  .thumb{
-    justify-self: stretch;
-    align-self: start;
-    aspect-ratio: 9 / 16;
-  }
+  .post-inner{ grid-template-columns: 1fr; align-items: start; }
+  .thumb{ justify-self: stretch; align-self: start; aspect-ratio: 9 / 16; }
 }
 
 /* =========================
