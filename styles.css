@@ -338,3 +338,26 @@ main.container{
 .share-btn img, .share-chip img{ width:18px; height:18px; display:inline-block; flex:0 0 auto; }
 .share-fb{ border-color: rgba(24,119,242,.18); }
 .share-wa{ border-color: rgba(37,211,102,.18); }
+
+@media (max-width: 768px){
+  :root{
+    --header-h: 120px !important;        /* steuert alle Offsets/Layouts */
+  }
+  .site-header{
+    height: var(--header-h) !important;  /* Header wirklich auf 120px zwingen */
+  }
+  .nav-strip{
+    top: calc(var(--header-h) + var(--nav-gap)) !important;  /* Nav korrekt nachziehen */
+  }
+  main.container{
+    /* Content-Start unter Header + Nav neu berechnen */
+    padding-top: calc(var(--header-h) + var(--nav-gap) + var(--nav-h) + 16px) !important;
+  }
+  /* nur zur Sicherheit: Bild füllt den kleineren Header sauber */
+  .header-img{
+    height: 100% !important;
+    width: 100% !important;
+    object-fit: cover;
+    object-position: center top;
+  }
+}
