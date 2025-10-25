@@ -697,3 +697,51 @@ main.container{
 
 /* Alte PNG-Variante deaktivieren, falls noch vorhanden */
 .nav-overlay{ display:none !important; }
+
+/* Gemeinsamer fixed-Wrap: Header + Nav in EINEM Layer */
+.fixed-hero{
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: calc(var(--header-h) + var(--nav-h));
+  z-index: 4;
+  pointer-events: none;   /* verhindert Click-Blocker – Buttons setzen wir aktiv */
+}
+
+/* Header bleibt wie zuvor, aber relativ im Wrap */
+.fixed-hero .site-header{
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  pointer-events: none;
+}
+
+/* Nav direkt darunter, ohne irgendeinen Spalt */
+.fixed-hero .nav-strip{
+  position: absolute !important;
+  top: var(--header-h);
+  left: 0; right: 0;
+  height: var(--nav-h);
+  background: transparent;
+  pointer-events: none; /* Overlay fängt keine Klicks */
+}
+
+/* Overlay als Pseudo-Element der Nav (kein IMG) */
+.fixed-hero .nav-strip::before{
+  content:"";
+  position:absolute;
+  inset: -8px 0 0 0; /* 8px Überlappung über den Header */
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,.45) 0%,
+    rgba(255,255,255,0) 100%
+  );
+  pointer-events:none;
+}
+
+/* Buttons innerhalb der Nav klickbar machen */
+.fixed-hero .chip-nav{
+  position: relative;
+  z-index: 1;
+  margin-top: 10px;
+  pointer-events: auto; /* Buttons wieder aktiv */
+}
