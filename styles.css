@@ -48,37 +48,48 @@ body{
 /* ===========================
    Fester Hintergrund (fix, links ausgerichtet, konstante Höhe)
    =========================== */
+/* Fixer Hintergrund: immer so groß wie der größte sichtbare Viewport */
 #bg{
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;                         /* volle Breite */
-  height: 100svh;                       /* konstante Höhe: reagiert NICHT auf UI-Leiste */
-  z-index: 0;                           /* liegt unter allem */
+  width: 100vw;
+  height: 100lvh; /* <- wichtig: "Large Viewport Height" */
+  z-index: 0;
   pointer-events: none;
 
-  /* Linksbündig: linker Bildrand klebt am linken Screenrand */
   background-image:
     url('images/background.png'),
     linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
   background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;        /* füllt den sichtbaren Screen */
+  background-size: cover, cover;
   background-position: left top, left top;
 
-  background-color: var(--bottom-fallback); /* Fallback falls Bild kurz fehlt */
-  transform: translateZ(0);                 /* iOS Stabilisierung */
+  background-color: #c03268; /* dein Wunsch-Fallback */
+  transform: translateZ(0);
 }
 
-/* Safe-Area-Füller (iOS) – optional, tut nicht weh */
+/* iOS-Safe-Areas zuverlässig abdecken (nur wenn viewport-fit=cover aktiv ist) */
 @supports (bottom: env(safe-area-inset-bottom)) {
+  #bg::before,
   #bg::after{
     content:"";
     position: fixed;
-    left: 0; right: 0; bottom: 0;
-    height: env(safe-area-inset-bottom);
-    background: var(--bottom-fallback);
+    left: 0;
+    right: 0;
     pointer-events: none;
     z-index: 0;
+    background: #c03268; /* Fallback-Farbe */
+  }
+  /* oben */
+  #bg::before{
+    top: 0;
+    height: env(safe-area-inset-top);
+  }
+  /* unten */
+  #bg::after{
+    bottom: 0;
+    height: env(safe-area-inset-bottom);
   }
 }
 
