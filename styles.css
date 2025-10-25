@@ -7,21 +7,21 @@
   --card-border: 4px solid #000;
   --card-bg-rgba: rgba(255,255,255,0.55);
 
-  /* feste Höhen für fixe Bereiche */
-  --header-h: 220px;          /* Höhe des Header.png (Desktop) */
-  --nav-h: 240px;             /* Höhe des Nav-Streifens/Overlays */
-  --nav-gap: 10px;            /* Abstand Header -> Nav */
+  /* feste Höhen */
+  --header-h: 220px;          /* Höhe Header.png (Desktop) */
+  --nav-h: 240px;             /* Höhe Nav-Streifen/Overlay */
+  --nav-gap: 10px;            /* Abstand Header → Nav */
 
   /* Card-Breiten / Gutter */
-  --face-gutter-max: 320px;   /* kompakter Max-Gutter auf Desktop */
+  --face-gutter-max: 320px;   /* Max-Gutter Desktop */
   --gutter-min-phone: 100px;  /* min. linker Gutter ≤600px */
-  --safe-gap: 24px;           /* Sicherheitsrand rechts (Container) */
-  --edge-right: 10px;         /* 10px rechts gegen „Durchscheinen“ */
-  --container-pad: 24px;      /* Container padding desktop */
-  --card-max: 740px;          /* Desktop-Card-Max (breiter, +40px) */
-  --posts-left: 0px;          /* wird über MQs gesetzt */
+  --safe-gap: 24px;           /* Sicherheitsrand rechts im Container */
+  --edge-right: 10px;         /* 10px rechts gegen Durchscheinen */
+  --container-pad: 24px;      /* Padding im Container (Desktop) */
+  --card-max: 740px;          /* Card-Max (breiter, +40px) */
+  --posts-left: 0px;          /* dynamisch über MQs */
 
-  /* Fallback-Farbe gegen iOS-Rubberband */
+  /* Fallback-Farbe */
   --bottom-fallback: #c03268;
 
   font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
@@ -33,27 +33,25 @@
 html, body{
   margin:0;
   -webkit-font-smoothing:antialiased;
-  background: var(--bottom-fallback);  /* nie weiß blitzen lassen */
+  background: var(--bottom-fallback);
   height:100%;
   color: var(--text);
-  overscroll-behavior-y: none;         /* hartes Stoppen */
+  overscroll-behavior-y: none;
 }
 
-/* Body darf höher als der Screen werden (Scroll) */
 body{
   min-height:100%;
   overflow-x:hidden;
 }
 
 /* ===========================
-   Fester Hintergrund (fix, links ausgerichtet)
+   Fester Hintergrund (fix)
    =========================== */
 #bg{
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;                       /* volle Breite */
-  height: 100lvh;                     /* stabil gegen mobilen UI-Sprung */
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;                     /* bewusst vh, stabil auf Desktop */
   z-index: 0;
   pointer-events: none;
 
@@ -61,26 +59,11 @@ body{
     url('images/background.png'),
     linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
   background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;      /* füllt Viewport */
+  background-size: cover, cover;
   background-position: left top, left top;
 
   background-color: var(--bottom-fallback);
   transform: translateZ(0);
-}
-
-/* Safe-Area-Füller (iOS) */
-@supports (bottom: env(safe-area-inset-bottom)) {
-  #bg::before,
-  #bg::after{
-    content:"";
-    position: fixed;
-    left: 0; right: 0;
-    pointer-events: none;
-    z-index: 0;
-    background: var(--bottom-fallback);
-  }
-  #bg::before{ top: 0; height: env(safe-area-inset-top); }
-  #bg::after{ bottom: 0; height: env(safe-area-inset-bottom); }
 }
 
 /* ===========================
@@ -92,10 +75,10 @@ body{
   height: var(--header-h);
   z-index: 3;
   background: transparent;
-  pointer-events: none;               /* Bild fängt keine Klicks */
+  pointer-events: none;
 
-  border-radius: 40px 40px 0 0;       /* oben rund, unten eckig */
-  overflow: hidden;                   /* Bild exakt clippen */
+  border-radius: 40px 40px 0 0;
+  overflow: hidden;
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
 }
@@ -106,12 +89,12 @@ body{
   padding: 0;
 }
 .header-img{
-  display: block;                     /* Baseline-Gap entfernen */
-  width: 100%;                        /* keine Überbreite */
+  display: block;
+  width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;        /* Fokus oben */
-  border-radius: 0;                   /* Radius übernimmt .site-header */
+  object-position: center top;
+  border-radius: 0;
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
 }
@@ -130,36 +113,30 @@ body{
   transform: translateZ(0);
 }
 
-/* WICHTIG: Container füllt den Streifen und dient als Stacking-Referenz */
-.nav-strip .container{
-  position: relative;
-  height: 100%;
-}
-
-/* Overlay füllt die Nav */
+/* Overlay-Bild füllt den Streifen */
 .nav-overlay{
   position: absolute;
-  inset: 0;                    /* oben/links/rechts/unten 0 */
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   pointer-events: none;
-  z-index: 1;                  /* unter Buttons */
+  z-index: 0;                /* unter Buttons */
 }
 
-/* Buttons – auf Desktop mittig */
+/* Buttons – mittig */
 .chip-nav{
   position: relative;
-  z-index: 2;                  /* über Overlay */
+  z-index: 1;                /* über Overlay */
   display: flex;
   flex-wrap: wrap;
   gap: 24px;
-  justify-content: center;     /* zentriert */
+  justify-content: center;
   align-items: flex-start;
 
-  width: max-content;          /* nur so breit wie nötig */
+  width: max-content;
   max-width: calc(100% - 2 * var(--container-pad));
-  margin: 12px auto 0;         /* echte Zentrierung */
+  margin: 12px auto 0;
   padding: 0;
 }
 @media (max-width: 600px){
@@ -189,14 +166,12 @@ body{
 .chip.is-active{ background: rgba(255,255,255,.95); border-color: rgba(0,0,0,.12); }
 
 /* ===========================
-   Content scrollt unter Header & Nav durch
+   Content (unter fixed Header+Nav)
    =========================== */
 main{
   position: relative;
-  z-index: 2;                              /* über #bg */
+  z-index: 2;
 }
-
-/* Content-Offset: startet unter Header + Nav */
 main.container{
   max-width: var(--container);
   margin: 0 auto;
@@ -205,8 +180,6 @@ main.container{
     calc(var(--container-pad) + var(--edge-right))
     24px
     var(--container-pad);
-  position: relative;
-  z-index: 2;
 }
 @media (max-width: 900px){
   main.container{
@@ -219,7 +192,7 @@ main.container{
 }
 
 /* ===========================
-   Post-Stream (mit linkem Gutter)
+   Posts
    =========================== */
 .posts{
   display:flex;
@@ -227,15 +200,13 @@ main.container{
   align-items:flex-start;
   gap: var(--gap);
   width:100%;
-  padding-left: var(--posts-left);         /* dynamischer linker Abstand */
-  padding-right: var(--edge-right);        /* 10px rechts */
-  padding-bottom: 64px;                    /* etwas Luft unten */
+  padding-left: var(--posts-left);
+  padding-right: var(--edge-right);
+  padding-bottom: 64px;
 }
 
-/* ===== Post-Card ===== */
 .post-card{
   width: min(100%, var(--card-max));
-  max-width: none;
   background: var(--card-bg-rgba);
   border: var(--card-border);
   border-radius: var(--card-radius);
@@ -290,7 +261,7 @@ main.container{
 .site-footer{ padding:40px 0; text-align:center; color:#000; }
 
 /* ===========================
-   Responsive Layout-Anpassungen
+   Responsive
    =========================== */
 @media (max-width: 900px){
   .post-card{ padding:16px; border-radius:22px; }
@@ -300,23 +271,21 @@ main.container{
   .thumb{ justify-self:stretch; align-self:start; aspect-ratio:9/16; }
 }
 
-/* ===========================
-   Dynamik: Card-Breite & linker Gutter
-   =========================== */
+/* Card-Breite */
 @media (max-width: 600px){
-  :root{ --card-max: 390px; }   /* +40 ggü. 350 */
+  :root{ --card-max: 390px; }
 }
 @media (min-width: 720px){
-  :root{ --card-max: 580px; }   /* +40 ggü. 540 */
+  :root{ --card-max: 580px; }
 }
 @media (min-width: 900px){
-  :root{ --card-max: 740px; }   /* +40 ggü. 700 */
+  :root{ --card-max: 740px; }
 }
 @media (max-width: 900px){
   :root{ --container-pad: 16px; }
 }
 
-/* Desktop/Tablet: linker Gutter dynamisch */
+/* Linker Gutter dynamisch */
 @media (min-width: 601px){
   :root{
     --posts-left: clamp(
@@ -326,7 +295,6 @@ main.container{
     );
   }
 }
-/* Phones (≤600px): MINDESTENS 100px links frei */
 @media (max-width: 600px){
   :root{
     --posts-left: min(
@@ -336,7 +304,7 @@ main.container{
   }
 }
 
-/* === Responsive Header-Höhe (kleiner auf Phones) === */
+/* Header-Höhe auf Phones */
 @media (max-width: 600px){
   :root{ --header-h: 120px; }
 }
@@ -344,38 +312,38 @@ main.container{
   :root{ --header-h: 120px; }
 }
 
-/* iOS/HiDPI-Glättung */
-#bg, .site-header, .nav-strip { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+/* Schärfe */
+#bg, .site-header, .nav-strip {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
 
 /* ===========================
-   ABOUT – Einspalter
+   ABOUT (Einspalter, Avatar oben)
    =========================== */
 .about-inner{
-  grid-template-columns: 1fr !important;   /* Avatar oben, dann Text */
+  grid-template-columns: 1fr !important;
   align-items: start !important;
   row-gap: 16px;
 }
-
-/* Avatar: oben, zentriert, mit abgerundeten Ecken */
 .about-avatar{
   align-self: start !important;
   justify-self: center;
   width: 200px;
   max-width: 65%;
-  border-radius: 24px;      /* abgerundete Ecken (nicht kreisrund) */
+  border-radius: 24px;
   overflow: hidden;
   margin-top: 4px;
 }
 @media (max-width: 480px){
   .about-avatar{ width: 160px; max-width: 70%; }
 }
-
 .about-facts{
   margin: 12px 0 0;
   padding-left: 1.1em;
 }
 
-/* Social-Links (passt zu deinen Chips) */
+/* Social-Links */
 .about-social{
   display:flex;
   flex-wrap:wrap;
@@ -398,21 +366,7 @@ main.container{
 }
 .share-chip:hover{ transform: translateY(1px); }
 
-/* „Warum ich das mache“-Box */
-.why-box{
-  margin-top:16px;
-  padding:14px 16px;
-  border: 1px solid rgba(0,0,0,.08);
-  border-radius: 16px;
-  background: rgba(255,255,255,.70);
-  backdrop-filter: blur(3px);
-}
-.why-box h4{ margin: 0 0 8px; font-size: 1.05rem; }
-.why-box p{ margin: 0; line-height: 1.55; }
-
-/* ===========================
-   Share-Leiste (Label + Icon)
-   =========================== */
+/* Share-Leiste */
 .share-bar{
   display:flex;
   flex-wrap:wrap;
@@ -420,6 +374,9 @@ main.container{
   margin-top:12px;
 }
 .share-btn, .share-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
   appearance:none;
   border:1px solid rgba(0,0,0,.08);
   background: rgba(255,255,255,.85);
@@ -430,134 +387,15 @@ main.container{
   cursor:pointer;
   text-decoration:none;
   color: inherit;
-  display:inline-flex;           /* Icon + Label nebeneinander */
-  align-items:center;
-  gap:8px;                       /* Abstand Icon <-> Label */
   line-height:1;
   backdrop-filter:saturate(120%) blur(2px);
   transition: transform .06s ease, background .15s ease, border-color .15s ease;
 }
 .share-btn:hover, .share-chip:hover{ transform: translateY(1px); }
-
-/* Einheitliche Icon-Größe in Buttons */
-.share-icon{
-  width: 18px !important;
-  height: 18px !important;
-  display: inline-block;
-  flex: 0 0 18px;
-  line-height: 0;
+.share-icon,
+.share-btn svg, .share-chip svg,
+.share-btn img, .share-chip img{
+  width:18px; height:18px; flex:0 0 18px;
 }
-.share-btn svg, .share-chip svg{ width:18px; height:18px; flex:0 0 auto; }
-.share-btn img, .share-chip img{ width:18px; height:18px; display:inline-block; flex:0 0 auto; }
-
-/* Farbakzente */
 .share-fb{ border-color: rgba(24,119,242,.18); }
 .share-wa{ border-color: rgba(37,211,102,.18); }
-
-
-/* Der Container füllt die ganze Nav-Höhe und dient als Positionierungs-Referenz */
-.nav-strip .container{
-  position: relative;
-  height: 100%;
-}
-
-/* Das PNG-Overlay liegt flächig unter den Buttons */
-.nav-overlay{
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  pointer-events: none;
-  z-index: 0;         /* UNTER den Buttons */
-}
-
-/* Die Button-Leiste sitzt oben im Streifen und liegt über dem Overlay */
-.chip-nav{
-  position: absolute; /* innerhalb .nav-strip .container */
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%); /* echte Zentrierung */
-  z-index: 1;         /* ÜBER dem Overlay */
-  margin: 0;          /* Margin aus dem alten Flow rausnehmen */
-  padding: 0;
-  width: max-content;
-  max-width: calc(100% - 2 * var(--container-pad));
-}
-
-/* Mobile-Layout beibehalten (Grid, 2 Spalten) */
-@media (max-width: 600px){
-  .chip-nav{
-    position: absolute;
-    top: 12px;
-    left: 16px;
-    right: 16px;
-    transform: none;         /* zentrieren über left/right */
-    width: auto;
-    max-width: none;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0,1fr));
-    gap: 12px;
-  }
-}
-
-.nav-strip{
-  position: fixed !important;
-  top: calc(var(--header-h) + var(--nav-gap)) !important;
-  left: 0 !important;
-  right: 0 !important;
-  height: var(--nav-h) !important;
-  z-index: 5 !important;
-  background: transparent !important;
-
-  /* hilft bei Rendering/Alignment */
-  display: flex !important;
-  align-items: flex-start !important;
-  justify-content: center !important;
-}
-
-/* Der innere Container füllt die volle Höhe, dient als
-   Positionierungs-Referenz */
-.nav-strip .container{
-  position: relative !important;
-  width: 100% !important;
-  height: 100% !important;
-  padding: 0 !important;
-}
-
-/* PNG-Overlay: flächig hinten, nimmt keine Klicks weg */
-.nav-overlay{
-  position: absolute !important;
-  inset: 0 !important;
-  display: block !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  pointer-events: none !important;
-  z-index: 0 !important;   /* HINTEN */
-}
-
-/* Button-Leiste: vorne, zentriert */
-.chip-nav{
-  position: relative !important;
-  z-index: 1 !important;   /* VORNE über dem Overlay */
-  margin: 12px auto 0 !important;
-  padding: 0 !important;
-  width: max-content !important;
-  max-width: calc(100% - 2 * var(--container-pad)) !important;
-  transform: none !important; /* falls woanders gesetzt */
-}
-
-/* Mobile: 2-Spalten-Grid innerhalb der gleichen Bühne */
-@media (max-width: 600px){
-  .chip-nav{
-    width: auto !important;
-    max-width: none !important;
-    margin: 12px 16px 0 !important;
-    left: auto !important; right: auto !important;
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0,1fr)) !important;
-    gap: 12px !important;
-  }
-}
