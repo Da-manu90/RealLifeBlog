@@ -14,7 +14,9 @@ if (!SUPABASE_URL || !SUPABASE_ANON) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// YouTube-ID Parser
+// -------------------------------
+// YouTube-ID Parser (unverändert)
+// -------------------------------
 function extractYouTubeId(input) {
   if (!input) return null;
   if (/^[0-9A-Za-z_-]{11}$/.test(input)) return input;
@@ -45,6 +47,9 @@ function extractYouTubeId(input) {
   return last ? last[1] : null;
 }
 
+// -------------------------------
+// Card-Renderer (unverändert)
+// -------------------------------
 function createPost({ title, description, youtube_url, image_url, published_at }) {
   const tpl = template.content.cloneNode(true);
 
@@ -87,12 +92,34 @@ function createPost({ title, description, youtube_url, image_url, published_at }
   return tpl;
 }
 
-async function loadPosts() {
+// -------------------------------
+// Kategorien / Buttons / Hash
+// -------------------------------
+const ALLOWED = new Set(['video','about','news','thoughts']);
+
+function getKeyFromHash() {
+  const key = (location.hash || '').replace('#', '').trim();
+  return ALLOWED.has(key) ? key : 'video';
+}
+
+function setActiveButton(key) {
+  document.querySelectorAll('.chip-nav .chip').forEach(b => {
+    b.classList.toggle('is-active', b.dataset.key === key);
+  });
+}
+
+// -------------------------------
+// Daten laden (robust, mit Fallback)
+// -------------------------------
+async function loadPosts(categoryKey) {
+  const key = ALLOWED.has(categoryKey) ? categoryKey : 'video';
   postsContainer.innerHTML = '<p style="opacity:.7">Lade Beiträge…</p>';
 
+  // Wir holen ALLE Posts (inkl. category), damit es auch funktioniert,
+  // wenn deine Tabelle die Spalte "category" noch nicht hat.
   const { data, error } = await supabase
     .from('posts')
-    .select('title, description, youtube_url, image_url, published_at, created_at')
+    .select('title, description, youtube_url, image_url, published_at, created_at, category')
     .order('published_at', { ascending: false })
     .order('created_at', { ascending: false });
 
@@ -102,16 +129,55 @@ async function loadPosts() {
     return;
   }
 
+  // Clientseitig nach category filtern (failsafe, funktioniert auch ohne Spalte)
+  const rows = Array.isArray(data) ? data : [];
+  const filtered = rows.filter(r => (r.category || 'video') === key);
+
   postsContainer.innerHTML = '';
-  data.forEach(row => postsContainer.appendChild(createPost(row)));
+  if (filtered.length === 0) {
+    postsContainer.innerHTML = `<p style="opacity:.7">Keine Beiträge in „${key}“ gefunden.</p>`;
+    return;
+  }
+
+  filtered.forEach(row => postsContainer.appendChild(createPost(row)));
 }
 
-loadPosts();
-
-// Active-State der Navigation
+// -------------------------------
+// Event-Bindings
+// -------------------------------
 document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.chip-nav .chip').forEach(b => b.classList.remove('is-active'));
-    btn.classList.add('is-active');
+    const key = btn.dataset.key;
+    if (!ALLOWED.has(key)) return;
+
+    // Active-State
+    setActiveButton(key);
+
+    // Hash setzen (teilbar/bookmarkbar) ohne Sprung nach oben
+    if (location.hash !== `#${key}`) {
+      history.replaceState(null, '', `#${key}`);
+    }
+
+    // Laden
+    loadPosts(key);
+
+    // Optional: sanft nach oben
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 });
+
+// Hash-Navigation (Back/Forward)
+window.addEventListener('hashchange', () => {
+  const key = getKeyFromHash();
+  setActiveButton(key);
+  loadPosts(key);
+});
+
+// -------------------------------
+// Initiale Ladung
+// -------------------------------
+(function init() {
+  const key = getKeyFromHash();
+  setActiveButton(key);
+  loadPosts(key);
+})();
