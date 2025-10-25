@@ -374,3 +374,25 @@ main.container{
 
 html, body{ background: var(--bottom-fallback); }
 #bg{ background-color: var(--bottom-fallback); }
+
+.share-bar {
+  display: flex;
+  gap: .6rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: .5rem;
+}
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  border: 1px solid #0001;
+  padding: .35rem .6rem;
+  border-radius: .5rem;
+  font-size: .9rem;
+  line-height: 1;
+  cursor: pointer;
+  background: #fff8;
+  backdrop-filter: blur(4px);
+}
+.share-btn img { width: 18px; height: 18px; }
