@@ -519,3 +519,45 @@ main.container{
     max-width: 70%;
   }
 }
+
+/* Nahtloser Übergang Header → Nav-Overlay */
+.site-header{
+  margin: 0;                 /* sicherheitshalber */
+  border-bottom: 0;          /* keine Linie unten */
+}
+
+.nav-strip{
+  /* die Nav sitzt exakt unter dem Header – ohne Kommastellen */
+  top: calc(var(--header-h) + var(--nav-gap));
+}
+
+/* Overlay minimal überlappen lassen (oben/unten) */
+.nav-overlay{
+  top: -3px;                         /* 3px über Header legen */
+  height: calc(100% + 6px);          /* oben + unten je 3px Überlappung */
+  pointer-events: none;
+  will-change: transform;            /* gegen iOS-Shrinking/Seams */
+}
+
+/* Bei sehr hohen DPRs (Retina) noch einen Tick mehr */
+@media (min-resolution: 2dppx){
+  .nav-overlay{
+    top: -4px;
+    height: calc(100% + 8px);
+  }
+}
+
+/* Zusatznetz – falls manche Browser trotzdem 1px blitzen lassen */
+.site-header,
+.nav-strip{
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Keine ungewollten Abstände im Container auf Desktop */
+.nav-strip .container{
+  padding-top: 0;
+  padding-bottom: 0;
+}
