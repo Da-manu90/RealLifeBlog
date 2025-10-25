@@ -571,3 +571,38 @@ main.container{
   background: linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0));
   pointer-events:none;
 }
+
+/* ===== Seamless Header ↔︎ Nav (harte Überlappung) ===== */
+:root{
+  /* wie viel die Nav den Header überdecken darf */
+  --nav-overlap: 6px;   /* bei Bedarf auf 8–10px erhöhen */
+}
+
+/* Nav-Streifen weiter nach oben ziehen (überlappt den Header) */
+.nav-strip{
+  top: calc(var(--header-h) - var(--nav-overlap)) !important;
+}
+
+/* Overlay im Nav-Streifen bis an die Stoßkante ziehen */
+.nav-overlay{
+  top: 0 !important;
+  height: calc(100% + var(--nav-overlap)) !important;
+  pointer-events: none;
+}
+
+/* Header bekommt KEINE zusätzliche Linie/Abstand unten */
+.site-header{
+  margin: 0 !important;
+  border: 0 !important;
+}
+
+/* Die 10px Luft sollen NUR über den Buttons entstehen, nicht zwischen Header/Overlay */
+.chip-nav{
+  margin-top: 10px !important;   /* Dein gewünschter Abstand */
+}
+
+/* Sicherheit: im Nav-Container keine vertikalen Paddings */
+.nav-strip .container{
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
