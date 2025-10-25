@@ -35,23 +35,25 @@ body{
 /* ===== Fester Seitenhintergrund als echtes Element (kein ::before) ===== */
 #bg{
   position: fixed;
-  inset: 0;                   /* top/right/bottom/left = 0 */
-  height: 100vh;
-  height: 100dvh;
-  height: 100svh;             /* best effort auf iOS/Android */
-  z-index: 0;                 /* liegt unter allem */
+  top: 0;
+  left: 0;
+  width: 100vw;               /* exakt Viewport-Breite */
+  height: 100vh;              /* fix bis Unterkante Bildschirm */
+  height: 100dvh;             /* stabil auf iOS Safari (dynamische Leiste) */
+  height: 100svh;             /* Fallback für neuere Browser */
+  z-index: 0;                 /* unter allem */
   pointer-events: none;
 
-  /* Nur EIN Hintergrund: dein Farbverlauf + Hintergrundbild */
+  /* Linksbündig: linker Bildrand klebt am linken Bildschirmrand */
   background-image:
     url('images/background.png'),
     linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
   background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;
-  background-position: center top, center top;
+  background-size: cover, cover;          /* füllt den gesamten Viewport */
+  background-position: left top, left top;/* Anker links (statt center) */
 
   will-change: transform;
-  transform: translateZ(0);   /* Safari-Gewackel verhindern */
+  transform: translateZ(0);               /* verhindert iOS-Jitter */
 }
 
 /* Layout-Helfer */
@@ -66,25 +68,29 @@ body{
   .container{ padding: 16px; }
 }
 
-/* ===== HEADER (PNG 220px hoch) ===== */
+/* ===== HEADER (full-bleed, PNG 220px hoch) ===== */
 .site-header{
   position: relative;
   z-index: 2;                 /* über bg */
   background: transparent;
+  margin: 0;
 }
+
+/* Container im Header NICHT begrenzen und ohne Innenabstand,
+   damit das Bild wirklich bis an den Viewport-Rand reicht */
 .site-header .container{
   max-width: none;
-  padding: 0 24px;
+  width: 100%;
+  padding: 0;                 /* <— wichtig: KEIN Padding im Header */
 }
-@media (max-width: 900px){
-  .site-header .container{ padding: 0 16px; }
-}
+
+/* Bild über komplette Breite, ohne abgerundete Ecken */
 .header-img{
-  display:block;
-  width:100%;
-  height:auto;
-  border-radius:40px;
-  box-shadow:none;            /* kein extra Schatten -> keine „2. Overlay“-Optik */
+  display: block;
+  width: 100vw;               /* echte Viewport-Breite */
+  max-width: none;            /* nicht vom .container limitieren lassen */
+  height: auto;
+  border-radius: 0;           /* keine Rundung, damit es an den Rand „pusht“ */
 }
 
 /* ===== NAV-STREIFEN ===== */
