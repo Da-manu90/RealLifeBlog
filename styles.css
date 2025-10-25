@@ -318,10 +318,10 @@ main.container{
 
 /* === Responsive Header-Höhe === */
 @media (max-width: 600px){
-  :root{ --header-h: 170px; }   /* vorher 220px */
+  :root{ --header-h: 150px; }   /* vorher 220px */
 }
 @media (max-width: 400px){
-  :root{ --header-h: 160px; }
+  :root{ --header-h: 150px; }
 }
 
 /* Bild oben ausrichten, minimal weniger Crop sichtbar */
