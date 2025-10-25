@@ -22,7 +22,7 @@
   --card-max: 740px;
   --posts-left: 0px;
 
-  --bottom-fallback: #c03268;
+  --bottom-fallback: #fd5525;
 
   font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 }
@@ -371,3 +371,6 @@ main.container{
     object-position: center top;
   }
 }
+
+html, body{ background: var(--bottom-fallback); }
+#bg{ background-color: var(--bottom-fallback); }
