@@ -5,35 +5,39 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>RealLifeBlog</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=clean0">
+  <link rel="stylesheet" href="styles.css?v=clean1">
 </head>
 <body>
-  <!-- Header (voll sichtbar, keinerlei Masken/Overlays) -->
-  <header class="site-header">
-    <div class="container">
+  <!-- Header: 100% sichtbar, keine Masken/Sticky -->
+  <header class="site-header" role="banner">
+    <div class="container header-container">
       <img src="images/Header.png" alt="RealLifeBlog Banner" class="header-img">
     </div>
   </header>
 
-  <!-- Navigation (eigener Block unter dem Header) -->
-  <section class="nav-section" aria-label="Navigation">
-    <div class="container">
-      <nav class="chip-nav" aria-label="Hauptnavigation">
-        <button class="chip is-active" data-key="video">Video Blog</button>
-        <button class="chip" data-key="about">Über mich</button>
-        <button class="chip" data-key="news">Neuigkeiten</button>
-        <button class="chip" data-key="thoughts">Gedanken</button>
-      </nav>
-    </div>
-  </section>
+  <!-- Ab hier beginnt die Sektion unterhalb des Headers:
+       - Der Bereich .below-hero hat die Background-Grafik (nur 100vh hoch via ::before)
+       - Der Nav-Bereich nutzt nav-overlay.png (PNG-Transparenz über dem Background)
+  -->
+  <div class="below-hero">
+    <!-- Nav-Band mit PNG-Hintergrund -->
+    <section class="nav-band" aria-label="Navigation">
+      <div class="container">
+        <nav class="chip-nav" aria-label="Hauptnavigation">
+          <button class="chip is-active" data-key="video">Video Blog</button>
+          <button class="chip" data-key="about">Über mich</button>
+          <button class="chip" data-key="news">Neuigkeiten</button>
+          <button class="chip" data-key="thoughts">Gedanken</button>
+        </nav>
+      </div>
+    </section>
 
-  <!-- Ab hier: Seiten-Content mit einfachem Hintergrundbild -->
-  <div class="content-wrap">
-    <main class="container">
+    <!-- Content -->
+    <main class="container" role="main">
       <section id="posts" class="posts" aria-live="polite"></section>
     </main>
 
-    <footer class="site-footer">
+    <footer class="site-footer" role="contentinfo">
       <div class="container">© RealLifeBlog</div>
     </footer>
   </div>
@@ -64,6 +68,6 @@
   </script>
 
   <!-- App -->
-  <script type="module" src="app.js?v=clean0"></script>
+  <script type="module" src="app.js?v=clean1"></script>
 </body>
 </html>

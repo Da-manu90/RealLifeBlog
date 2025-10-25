@@ -17,22 +17,24 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 // YouTube-ID Parser
 function extractYouTubeId(input) {
   if (!input) return null;
-
   if (/^[0-9A-Za-z_-]{11}$/.test(input)) return input;
 
   try {
     const u = new URL(input);
     const v = u.searchParams.get('v');
     if (v && /^[0-9A-Za-z_-]{11}$/.test(v)) return v;
+
     if (u.hostname.endsWith('youtu.be')) {
       const id = u.pathname.slice(1).split('/')[0];
       if (/^[0-9A-Za-z_-]{11}$/.test(id)) return id;
     }
+
     if (u.pathname.startsWith('/shorts/')) {
       const id = u.pathname.split('/shorts/')[1].split('/')[0];
       const clean = id.split(/[?&]/)[0];
       if (/^[0-9A-Za-z_-]{11}$/.test(clean)) return clean;
     }
+
     const m = u.pathname.match(/\/embed\/([0-9A-Za-z_-]{11})/);
     if (m) return m[1];
   } catch (_) {
@@ -114,8 +116,4 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-/* WICHTIG:
-   Keine Masken, keine Overlays, keine Mess-Listener.
-   Es existiert KEIN Code mehr, der Header-/Nav-Höhen misst
-   oder Clip-/Mask-Styles setzt.
-*/
+/* WICHTIG: Keinerlei Mess-/Mask-/Overlay-Logik mehr vorhanden. */

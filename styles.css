@@ -1,78 +1,105 @@
+/* ===== Root-Variablen ===== */
 :root{
-  /* Layout */
   --container: 1440px;
   --gap: 28px;
 
-  /* Typo/Farben */
-  --muted: #6b7280;
   --text: #0b1020;
-  font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --muted: #6b7280;
 
-  /* Cards */
   --card-radius: 28px;
   --card-border: 4px solid #000;
   --card-bg-rgba: rgba(255,255,255,0.55);
 
-  /* Content-Hintergrund */
-  --page-bg-image: url('images/background.png');
+  /* Hintergrund-Grafiken */
+  --bg-image: url('images/background.png');       /* hinter Nav/Content */
+  --nav-overlay: url('images/nav-overlay.png');   /* PNG mit Transparenz */
 
-  /* Card-Breiten */
-  --card-max: 860px; /* etwas breiter, wie gewünscht */
+  /* Größen */
+  --nav-band-height: 360px;  /* Höhe deines PNG-Bandes (anpassbar) */
+  --card-max: 860px;
 }
 
-/* Reset / Basics */
+/* ===== Reset / Basics ===== */
 *{ box-sizing: border-box; }
-html, body{ height:100%; margin:0; color:var(--text); -webkit-font-smoothing:antialiased; }
-html, body{ overflow-x: hidden; }
-body{ background: #fff; } /* kein globales Pseudo-BG, alles simpel */
+html, body{ margin:0; padding:0; color:var(--text); -webkit-font-smoothing:antialiased; }
+html{ height:100%; }
+body{ min-height:100%; background:#fff; overflow-x:hidden; }
 
-/* Container */
+/* ===== Container ===== */
 .container{ max-width: var(--container); margin: 0 auto; padding: 24px; }
 
-/* ===== Header (statisch, keine Masken/Overlays) ===== */
-.site-header{ position: relative; padding: 0; background: transparent; }
-.site-header .container{ max-width: none; padding: 0; }
+/* ===== Header: nichts wird abgeschnitten ===== */
+.site-header{ position: relative; background: transparent; }
+.header-container{ max-width: none; padding: 0; }
 .header-img{
-  display: block;
-  width: 100vw;
-  max-width: 100vw;
-  height: auto;
-  margin-left: 50%;
-  transform: translateX(-50%);
-  border-radius: 40px;
-  box-shadow: none;
+  display:block;
+  width:100vw;
+  max-width:100vw;
+  height:auto;
+  margin-left:50%;
+  transform:translateX(-50%);
+  border-radius:40px;
+  box-shadow:none;
 
-  /* harte Abschaltung etwaiger Alt-Styles */
+  /* HARTE Abschaltung irgendwelcher Alt-Reste */
   -webkit-mask-image: none !important;
           mask-image: none !important;
   -webkit-clip-path: none !important;
           clip-path: none !important;
-  filter: none !important;
-  backdrop-filter: none !important;
+  filter:none !important;
+  backdrop-filter:none !important;
 }
 
-/* ===== Navigation (eigener Block unter dem Header) ===== */
-.nav-section{
-  background: transparent;       /* keine Aufhellung, kein Overlay */
-  padding: 12px 0 28px;          /* Abstände Header ↔ Buttons ↔ Content */
+/* ===== Bereich unter dem Header ===== */
+.below-hero{
+  position: relative;
+  /* keine fixed/pseudo-overlays mehr, nur ein pseudo-bg für die ersten 100vh */
 }
 
-.chip-nav{
+/* Das Hintergrundbild beginnt GENAU unter dem Header und geht nur bis zum unteren Bildschirmrand */
+.below-hero::before{
+  content:"";
+  position:absolute;
+  left:0; top:0;
+  width:100%;
+  height:100vh;                   /* nur 1 Viewport-Höhe */
+  z-index:-1;                     /* hinter allem */
+  pointer-events:none;
+  background-image: var(--bg-image);
+  background-repeat: no-repeat;
+  background-size: cover;         /* gestretched bis Bildschirmrand */
+  background-position: left center;
+}
+
+/* ===== Nav-Bereich mit deinem PNG (Transparenz wirkt über dem Background) ===== */
+.nav-band{
+  position: relative;
+  min-height: var(--nav-band-height);
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 64px;
-  flex-wrap: wrap;
+  align-items: center;            /* Buttons vertikal mittig im Band */
+  background-image: var(--nav-overlay); /* PNG mit Alpha */
+  background-repeat: no-repeat;
+  background-size: cover;         /* füllt die Band-Höhe */
+  background-position: center top;
+  padding: 16px 0;                /* etwas Innenabstand */
 }
 
-/* Mobile: 2×2 Grid */
+/* Navigation */
+.chip-nav{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:64px;
+  flex-wrap:wrap;
+}
+
+/* Mobile: 2×2-Grid */
 @media (max-width: 600px){
   .chip-nav{
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px 16px;
-    padding: 0 8px;
-    place-items: center;
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap:16px 16px;
+    place-items:center;
   }
 }
 
@@ -90,67 +117,51 @@ body{ background: #fff; } /* kein globales Pseudo-BG, alles simpel */
   white-space: nowrap;
 }
 .chip:hover{ transform: translateY(1px); }
-.chip.is-active{ background: #fff; border-color: rgba(0,0,0,.2); }
+.chip.is-active{ background:#fff; border-color: rgba(0,0,0,.2); }
 
-/* ===== Content-Bereich: einfacher Hintergrund bis Seitenende ===== */
-.content-wrap{
-  background-image:
-    var(--page-bg-image),
-    linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
-  background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;          /* gestretched bis unten */
-  background-position: left center, left center;
-}
-
-/* ===== MAIN + Posts ===== */
+/* ===== Posts / Main ===== */
 .posts{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--gap);
-  padding-bottom: 60px;
-  margin-top: 8px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:var(--gap);
+  padding-bottom:60px;
+  margin-top: 16px;
 }
 
-/* ===== Post-Card ===== */
+/* Post-Karte */
 .post-card{
-  width: 100%;
-  max-width: var(--card-max);
-  background: var(--card-bg-rgba);
-  border: var(--card-border);
-  border-radius: var(--card-radius);
-  padding: 20px;
-  box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+  width:100%;
+  max-width:var(--card-max);
+  background:var(--card-bg-rgba);
+  border:var(--card-border);
+  border-radius:var(--card-radius);
+  padding:20px;
+  box-shadow:0 12px 32px rgba(0,0,0,0.12);
 }
-
-/* Layout in der Card */
 .post-inner{
-  display: grid;
-  grid-template-columns: minmax(160px, 25%) 1fr;
-  column-gap: 18px;
-  row-gap: 12px;
-  align-items: end;
+  display:grid;
+  grid-template-columns:minmax(160px, 25%) 1fr;
+  column-gap:18px;
+  row-gap:12px;
+  align-items:end;
 }
-.post-meta{ align-self: start; }
+.post-meta{ align-self:start; }
 
 .thumb{
-  width: 100%;
-  height: auto;
-  aspect-ratio: 9 / 16;
-  border-radius: calc(var(--card-radius) - 6px);
-  overflow: hidden;
-  background: #fff;
-  position: relative;
-  justify-self: start;
-  align-self: end;
+  width:100%;
+  aspect-ratio:9/16;
+  border-radius:calc(var(--card-radius) - 6px);
+  overflow:hidden;
+  background:#fff;
+  position:relative;
 }
-.thumb img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
 .play{
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
-  width: 44px; height: 44px; border-radius: 50%; border: 0;
-  background: #fff;
-  display: inline-grid; place-items: center; cursor: pointer;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.16);
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:44px; height:44px; border-radius:50%; border:0;
+  background:#fff; display:inline-grid; place-items:center; cursor:pointer;
+  box-shadow:0 6px 18px rgba(0,0,0,0.16);
 }
 .play::after{
   content:""; display:inline-block; margin-left:3px; width:12px; height:12px;
@@ -158,21 +169,20 @@ body{ background: #fff; } /* kein globales Pseudo-BG, alles simpel */
   transform: translateX(2px);
 }
 
-/* Typo rechts */
-.post-meta{ display:block; }
+/* Typo */
 .post-date{ display:block; color:var(--muted); font-size:0.92rem; margin-bottom:6px; }
 .post-title{ margin:0 0 8px; font-size:1.2rem; }
 .post-desc{ margin:0; line-height:1.55; white-space: pre-wrap; }
 
 /* Footer */
-.site-footer{ padding: 40px 0; text-align: center; color: #000; }
+.site-footer{ padding:40px 0; text-align:center; color:#000; }
 
 /* Responsive Card-Breiten */
 @media (max-width: 600px){ :root{ --card-max: 360px; } }
 @media (min-width: 720px){ :root{ --card-max: 560px; } }
 @media (min-width: 900px){ :root{ --card-max: 860px; } }
 
-/* Zusätzliche harte Abschaltungen alter Techniken GLOBAL */
+/* ==== Globale harte Abschaltung aller Mask-/Clip-Reste ==== */
 *{
   -webkit-mask-image: none !important;
           mask-image: none !important;
