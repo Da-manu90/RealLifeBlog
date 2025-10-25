@@ -8,12 +8,13 @@
   --card-bg-rgba: rgba(255,255,255,0.55);
 
   /* feste Höhen für fixe Bereiche */
-  --header-h: 220px;     /* Höhe deines Header.png (Desktop) */
-  --nav-h: 240px;        /* Höhe des Nav-Streifens/Overlays */
-  --nav-gap: 10px;       /* Abstand Header -> Nav */
+  --header-h: 220px;          /* Höhe des Header.png (Desktop) */
+  --nav-h: 240px;             /* Höhe des Nav-Streifens/Overlays */
+  --nav-gap: 10px;            /* Abstand Header -> Nav */
 
   /* Card-Breiten / linker Gutter */
-  --face-gutter-max: 400px;   /* max. linker Abstand auf Desktop */
+  --face-gutter-max: 320px;   /* ↓ kompakter: max. linker Abstand auf Desktop (vorher 400) */
+  --gutter-min-phone: 100px;  /* ↓ kompakter: minimaler linker Gutter ≤600px (vorher 140) */
   --safe-gap: 24px;           /* Sicherheitsrand rechts */
   --container-pad: 24px;      /* Container padding desktop */
   --card-max: 700px;          /* Basiswert, wird per MQ überschrieben */
@@ -136,7 +137,7 @@ body{
   z-index: 0;
 }
 
-/* Buttons: exakt über der Post-Spalte (gleiche Breite & linker Gutter) */
+/* Buttons: exakt über der Post-Spalte (gleiche Breite & linker Offset) */
 .chip-nav{
   position: relative;
   z-index: 1;
@@ -145,9 +146,11 @@ body{
   gap: 24px;
   justify-content: center;
   align-items: flex-start;
+
   width: min(100%, var(--card-max));
-  margin-left: var(--posts-left);
-  margin-right: var(--safe-gap);
+  /* gleicher linker Startpunkt wie die Cards: Container-Padding + posts-left */
+  margin-left: calc(var(--container-pad) + var(--posts-left));
+  margin-right: var(--container-pad);
   padding: 12px 0;
 }
 @media (max-width: 600px){
@@ -207,7 +210,7 @@ main.container{
   align-items:flex-start;                   /* linker Gutter greift */
   gap: var(--gap);
   width:100%;
-  padding-left: var(--posts-left);         /* 140px auf Phones, s. MQs unten */
+  padding-left: var(--posts-left);         /* dynamischer linker Abstand */
   padding-bottom: 64px;                    /* etwas Luft unten */
 }
 
@@ -281,37 +284,37 @@ main.container{
 
 /* ===========================
    Dynamik: Card-Breite & linker Gutter
-   (Cards überall +30px breiter)
+   (Cards optional breiter +40 px – kannst du lassen oder anpassen)
    =========================== */
 @media (max-width: 600px){
-  :root{ --card-max: 380px; }   /* vorher 350 */
+  :root{ --card-max: 390px; }   /* vorher 350 -> +40 */
 }
 @media (min-width: 720px){
-  :root{ --card-max: 570px; }   /* vorher 540 */
+  :root{ --card-max: 580px; }   /* vorher 540 -> +40 */
 }
 @media (min-width: 900px){
-  :root{ --card-max: 730px; }   /* vorher 700 */
+  :root{ --card-max: 740px; }   /* vorher 700 -> +40 */
 }
 @media (max-width: 900px){
   :root{ --container-pad: 16px; }
 }
 
-/* Desktop/Tablet: linker Gutter so groß wie möglich, max 400px */
+/* Desktop/Tablet: linker Gutter dynamisch, mit geringerem Max */
 @media (min-width: 601px){
   :root{
     --posts-left: clamp(
       0px,
       calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)),
-      var(--face-gutter-max)
+      var(--face-gutter-max)             /* jetzt 320px → kompakter */
     );
   }
 }
-/* Phones (≤600px): mindestens 140px links frei */
+/* Phones (≤600px): MINDESTENS 100px links frei (statt 140px) */
 @media (max-width: 600px){
   :root{
     --posts-left: min(
       var(--face-gutter-max),
-      max(140px, calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)))
+      max(var(--gutter-min-phone), calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)))
     );
   }
 }
@@ -328,19 +331,4 @@ main.container{
 #bg, .site-header, .nav-strip {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-}
-
-/* Phones */
-@media (max-width: 600px){
-  :root{ --card-max: 390px; }   /* vorher 350/380 */
-}
-
-/* Tablet */
-@media (min-width: 720px){
-  :root{ --card-max: 580px; }   /* vorher 540/570 */
-}
-
-/* Desktop */
-@media (min-width: 900px){
-  :root{ --card-max: 740px; }   /* vorher 700/730 */
 }
