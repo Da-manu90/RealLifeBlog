@@ -6,6 +6,8 @@
   --card-radius: 28px;
   --card-border: 4px solid #000;
   --card-bg-rgba: rgba(255,255,255,0.55);
+  --header-h: 220px;   /* Höhe deines Header.png */
+  --nav-h: 240px;      /* Höhe des Nav-Streifens (Overlay-Bild-Höhe) */
 
   /* Card-Breiten / linker Gutter */
   --face-gutter-max: 400px;    /* max. linker Abstand auf Desktop */
@@ -20,40 +22,37 @@
 /* Reset / Basics */
 *{ box-sizing: border-box; }
 
+/* Basis – kein weißer Body-Hintergrund */
 html, body{
   margin:0;
-  color:var(--text);
   -webkit-font-smoothing:antialiased;
-  background: transparent;   /* wichtig: kein weißer Body-BG */
-  height: 100%;
+  background: transparent;
+  height:100%;
 }
-body{
-  min-height: 100svh;        /* stabil auf iOS, nicht mitscrollend */
-  overflow-x: hidden;
-}
+/* Body darf höher als der Screen werden (für Scroll),
+   X-Scroll verhindern, Y-Scroll erlaubt */
+   body{
+    min-height:100%;
+    overflow-x:hidden;
+  }
 
-/* ===== Fester Seitenhintergrund als echtes Element (kein ::before) ===== */
+/* Fester Hintergrund als echtes Element – NICHT scrollbar */
 #bg{
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;               /* exakt Viewport-Breite */
-  height: 100vh;              /* fix bis Unterkante Bildschirm */
-  height: 100dvh;             /* stabil auf iOS Safari (dynamische Leiste) */
-  height: 100svh;             /* Fallback für neuere Browser */
-  z-index: 0;                 /* unter allem */
+  inset: 0;                         /* top:0; right:0; bottom:0; left:0 */
+  z-index: 0;
   pointer-events: none;
 
-  /* Linksbündig: linker Bildrand klebt am linken Bildschirmrand */
+  /* Links ausrichten: linker Bildrand am linken Screenrand */
   background-image:
     url('images/background.png'),
     linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
   background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;          /* füllt den gesamten Viewport */
-  background-position: left top, left top;/* Anker links (statt center) */
+  background-size: cover, cover;    /* füllt den sichtbaren Viewport */
+  background-position: left top, left top;
 
-  will-change: transform;
-  transform: translateZ(0);               /* verhindert iOS-Jitter */
+  /* Safari/iOS Stabilisierung gegen Rubberband-Gap */
+  transform: translateZ(0);
 }
 
 /* Layout-Helfer */
@@ -68,62 +67,61 @@ body{
   .container{ padding: 16px; }
 }
 
-/* ===== HEADER (full-bleed, PNG 220px hoch) ===== */
+/* FIXED Header full-bleed über gesamte Breite */
 .site-header{
-  position: relative;
-  z-index: 2;                 /* über bg */
-  background: transparent;
-  margin: 0;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  z-index: 3;                 /* über dem BG und über den Cards */
+  background: transparent;    /* kein eigener BG */
+  pointer-events: none;       /* Header-Bild fängt keine Klicks */
 }
-
-/* Container im Header NICHT begrenzen und ohne Innenabstand,
-   damit das Bild wirklich bis an den Viewport-Rand reicht */
 .site-header .container{
   max-width: none;
   width: 100%;
-  padding: 0;                 /* <— wichtig: KEIN Padding im Header */
+  height: 100%;
+  padding: 0;
 }
-
-/* Bild über komplette Breite, ohne abgerundete Ecken */
 .header-img{
-  display: block;
-  width: 100vw;               /* echte Viewport-Breite */
-  max-width: none;            /* nicht vom .container limitieren lassen */
-  height: auto;
-  border-radius: 0;           /* keine Rundung, damit es an den Rand „pusht“ */
+  display:block;
+  width: 100vw;               /* wirklich bis an beide Ränder */
+  height: 100%;
+  object-fit: cover;          /* falls nötig, skaliert korrekt */
+  border-radius: 0;           /* full-bleed – ohne Rundung */
+  pointer-events: none;
 }
 
-/* ===== NAV-STREIFEN ===== */
+/* FIXED Nav-Streifen direkt unter dem Header */
 .nav-strip{
-  position: relative;
-  z-index: 2;                 /* über bg */
-  background: transparent;    /* KEINE background-image hier -> sonst 2 Overlays! */
-  min-height: 240px;          /* kompakt; Höhe des Streifens */
-  padding: 12px 0 16px;       /* Innenabstand */
+  position: fixed;
+  top: var(--header-h);
+  left: 0; right: 0;
+  height: var(--nav-h);
+  z-index: 4;                  /* über Header-Bild, damit Buttons vorne liegen */
+  background: transparent;     /* KEIN background-image hier! */
 }
-/* EINZIGES Overlay-Bild im Nav (45%->0% Weiß, von Header-Unterkante abwärts) */
+
+/* Das EINZIGE Overlay-Bild für den Streifen (45%->0% Weißverlauf) */
 .nav-overlay{
   position: absolute;
-  left: 0; right: 0; top: 0;
-  height: 100%;
+  inset: 0;
   width: 100%;
-  object-fit: cover;
-  pointer-events: none;
-  z-index: 0;                 /* unter den Buttons */
+  height: 100%;
+  object-fit: cover;           /* streckt das PNG auf die Streifenfläche */
+  pointer-events: none;        /* klickt nicht */
+  z-index: 0;
 }
 
-@media (min-width: 720px){  .nav-strip{ min-height: 260px; } }
-@media (min-width: 1100px){ .nav-strip{ min-height: 280px; } }
-
-/* Buttons im Strip */
+/* Buttons liegen über dem Overlay und sind klickbar */
 .chip-nav{
   position: relative;
-  z-index: 1;                 /* über dem Overlay-Bild */
+  z-index: 1;
   display:flex;
   flex-wrap:wrap;
   gap:24px;
   justify-content:center;
   align-items:center;
+  height: 100%;
   margin:0;
   padding-left: clamp(140px, var(--posts-left), 300px);
   padding-right:16px;
@@ -132,7 +130,7 @@ body{
   .chip-nav{
     display:grid;
     grid-template-columns: repeat(2, minmax(0,1fr));
-    gap:12px 12px;
+    gap:12px;
     padding: 0 16px;
   }
 }
@@ -141,9 +139,7 @@ body{
   background: rgba(255,255,255,.85);
   padding: 10px 18px;
   border-radius: 999px;
-  cursor: pointer;
   font-weight: 600;
-  transition: transform .06s ease, background .15s ease, border-color .15s ease;
   min-width: 150px;
   text-align: center;
   white-space: nowrap;
@@ -152,19 +148,34 @@ body{
 .chip:hover{ transform: translateY(1px); }
 .chip.is-active{ background: rgba(255,255,255,.95); border-color: rgba(0,0,0,.12); }
 
-/* ===== MAIN + Posts (scrollen über dem fixen BG) ===== */
+/* Content-Ebene über dem BG, unter Header/Nav sichtbar scrollend */
 main{
   position: relative;
-  z-index: 2;                 /* über bg */
+  z-index: 2;                        /* über #bg, unter Nav/Header */
 }
+
+/* Abstand, damit die erste Card knapp unter dem Nav sichtbar wird.
+   Wenn du „komplett drunter durch“ willst, setze die nächste Zeile auf 0. */
+   .container{
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: calc(var(--header-h) + var(--nav-h) + 16px) 24px 24px; 
+    position: relative;
+    z-index: 2;
+  }
+  @media (max-width: 900px){
+    .container{ padding: calc(var(--header-h) + var(--nav-h) + 12px) 16px 16px; }
+  }
+
+/* Cards mit linkem Gutter, scrollen ganz normal */
 .posts{
   display:flex;
   flex-direction:column;
-  align-items:flex-start;      /* damit linker Gutter greift */
-  gap:var(--gap);
+  align-items:flex-start;
+  gap: var(--gap);
   width:100%;
-  margin-top: 8px;
-  padding: 0 0 50px var(--posts-left);  /* dynamischer linker Abstand */
+  padding-left: var(--posts-left);          /* 140px auf Phones bleibt */
+  padding-bottom: 64px;                     /* etwas Luft unten */
 }
 
 /* ===== Post-Card ===== */
