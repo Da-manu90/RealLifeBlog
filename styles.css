@@ -12,15 +12,16 @@
   --nav-h: 240px;             /* Höhe des Nav-Streifens/Overlays */
   --nav-gap: 10px;            /* Abstand Header -> Nav */
 
-  /* Card-Breiten / linker Gutter */
-  --face-gutter-max: 320px;   /* max. linker Abstand auf Desktop (kompakter) */
-  --gutter-min-phone: 100px;  /* minimaler linker Gutter ≤600px */
-  --safe-gap: 24px;           /* Sicherheitsrand rechts */
+  /* Card-Breiten / Gutter */
+  --face-gutter-max: 320px;   /* kompakter Max-Gutter auf Desktop */
+  --gutter-min-phone: 100px;  /* min. linker Gutter ≤600px */
+  --safe-gap: 24px;           /* Sicherheitsrand rechts (Container) */
+  --edge-right: 10px;         /* NEU: 10px Abstand zum rechten Rand gegen „Durchscheinen“ */
   --container-pad: 24px;      /* Container padding desktop */
-  --card-max: 700px;          /* Basiswert, wird per MQ überschrieben */
+  --card-max: 740px;          /* Desktop-Card-Max (breiter, zuvor +40px) */
   --posts-left: 0px;          /* wird über MQs gesetzt */
 
-  /* Fallback-Farbe gegen iOS-Rubberband (vom User gewünscht) */
+  /* Fallback-Farbe (gewünscht) gegen iOS-Rubberband */
   --bottom-fallback: #c03268;
 
   font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
@@ -35,7 +36,7 @@ html, body{
   background: var(--bottom-fallback);  /* nie weiß blitzen lassen */
   height:100%;
   color: var(--text);
-  overscroll-behavior-y: contain;      /* Rubberband minimieren */
+  overscroll-behavior-y: none;         /* hartes Stoppen, minimiert „Gleiten“ */
 }
 
 /* Body darf höher als der Screen werden (Scroll),
@@ -48,38 +49,37 @@ body{
 /* ===========================
    Fester Hintergrund (fix, links ausgerichtet, konstante Höhe)
    =========================== */
-/* Fixer Hintergrund: immer so groß wie der größte sichtbare Viewport */
 #bg{
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100lvh; /* <- wichtig: "Large Viewport Height" */
-  z-index: 0;
+  width: 100vw;                         /* volle Breite */
+  height: 100lvh;                       /* konstante Höhe: keine UI-Leisten-Pumpe */
+  z-index: 0;                           /* liegt unter allem */
   pointer-events: none;
 
+  /* Linksbündig: linker Bildrand klebt am linken Screenrand */
   background-image:
     url('images/background.png'),
     linear-gradient(180deg,#7bd389 0%, #b59eff 100%);
   background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;
+  background-size: cover, cover;        /* füllt den sichtbaren Screen */
   background-position: left top, left top;
 
-  background-color: #c03268; /* dein Wunsch-Fallback */
-  transform: translateZ(0);
+  background-color: var(--bottom-fallback); /* Fallback falls Bild kurz fehlt */
+  transform: translateZ(0);                 /* iOS Stabilisierung */
 }
 
-/* iOS-Safe-Areas zuverlässig abdecken (nur wenn viewport-fit=cover aktiv ist) */
+/* Safe-Area-Füller (iOS) */
 @supports (bottom: env(safe-area-inset-bottom)) {
   #bg::before,
   #bg::after{
     content:"";
     position: fixed;
-    left: 0;
-    right: 0;
+    left: 0; right: 0;
     pointer-events: none;
     z-index: 0;
-    background: #c03268; /* Fallback-Farbe */
+    background: var(--bottom-fallback);
   }
   /* oben */
   #bg::before{
@@ -151,30 +151,31 @@ body{
   z-index: 0;
 }
 
-/* Buttons: exakt über der Post-Spalte (gleiche Breite & linker Offset) */
+/* ===========================
+   Buttons – auf Desktop wirklich mittig im Viewport
+   =========================== */
 .chip-nav{
   position: relative;
   z-index: 1;
   display: flex;
   flex-wrap: wrap;
   gap: 24px;
-  justify-content: center;
+  justify-content: center;       /* zentriert */
   align-items: flex-start;
 
-  width: min(100%, var(--card-max));
-  /* gleicher linker Startpunkt wie die Cards: Container-Padding + posts-left */
-  margin-left: calc(var(--container-pad) + var(--posts-left));
-  margin-right: var(--container-pad);
-  padding: 12px 0;
+  width: max-content;            /* nur so breit wie nötig */
+  max-width: calc(100% - 2 * var(--container-pad));
+  margin: 12px auto 0;           /* echte Zentrierung im Viewport */
+  padding: 0;                    /* keine Seiten-Offsets (Desktop) */
 }
 @media (max-width: 600px){
   .chip-nav{
-    width: auto;                      /* auf Phones normal zentrieren */
-    margin: 0;
+    width: auto;                      /* auf Phones normal */
+    margin: 12px 16px 0;              /* seitliche Luft */
     display: grid;
     grid-template-columns: repeat(2, minmax(0,1fr));
     gap: 12px;
-    padding: 12px 16px;
+    padding: 0;
   }
 }
 .chip{
@@ -205,13 +206,21 @@ main{
 main.container{
   max-width: var(--container);
   margin: 0 auto;
-  padding: calc(var(--header-h) + var(--nav-gap) + var(--nav-h) + 16px) 24px 24px;
+  padding:
+    calc(var(--header-h) + var(--nav-gap) + var(--nav-h) + 16px)
+    calc(var(--container-pad) + var(--edge-right))
+    24px
+    var(--container-pad);
   position: relative;
   z-index: 2;
 }
 @media (max-width: 900px){
   main.container{
-    padding: calc(var(--header-h) + var(--nav-gap) + var(--nav-h) + 12px) 16px 16px;
+    padding:
+      calc(var(--header-h) + var(--nav-gap) + var(--nav-h) + 12px)
+      calc(16px + var(--edge-right))
+      16px
+      16px;
   }
 }
 
@@ -225,6 +234,7 @@ main.container{
   gap: var(--gap);
   width:100%;
   padding-left: var(--posts-left);         /* dynamischer linker Abstand */
+  padding-right: var(--edge-right);        /* NEU: 10px rechts gegen „Durchscheinen“ */
   padding-bottom: 64px;                    /* etwas Luft unten */
 }
 
@@ -297,16 +307,16 @@ main.container{
 }
 
 /* ===========================
-   Dynamik: Card-Breite & linker Gutter (+40 px Breite)
+   Dynamik: Card-Breite & linker Gutter
    =========================== */
 @media (max-width: 600px){
-  :root{ --card-max: 390px; }   /* +40 gegenüber 350 */
+  :root{ --card-max: 390px; }   /* +40 ggü. 350 */
 }
 @media (min-width: 720px){
-  :root{ --card-max: 580px; }   /* +40 gegenüber 540 */
+  :root{ --card-max: 580px; }   /* +40 ggü. 540 */
 }
 @media (min-width: 900px){
-  :root{ --card-max: 740px; }   /* +40 gegenüber 700 */
+  :root{ --card-max: 740px; }   /* +40 ggü. 700 */
 }
 @media (max-width: 900px){
   :root{ --container-pad: 16px; }
@@ -318,7 +328,7 @@ main.container{
     --posts-left: clamp(
       0px,
       calc(100vw - var(--container-pad) - var(--card-max) - var(--safe-gap)),
-      var(--face-gutter-max)             /* jetzt kompakter (320px) */
+      var(--face-gutter-max)             /* kompakt (320px) */
     );
   }
 }
@@ -334,7 +344,7 @@ main.container{
 
 /* === Responsive Header-Höhe (kleiner auf Phones) === */
 @media (max-width: 600px){
-  :root{ --header-h: 120px; }   /* statt 220px */
+  :root{ --header-h: 120px; }
 }
 @media (max-width: 400px){
   :root{ --header-h: 120px; }
