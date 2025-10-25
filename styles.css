@@ -315,3 +315,16 @@ main.container{
     );
   }
 }
+
+/* === Responsive Header-Höhe === */
+@media (max-width: 600px){
+  :root{ --header-h: 170px; }   /* vorher 220px */
+}
+@media (max-width: 400px){
+  :root{ --header-h: 160px; }
+}
+
+/* Bild oben ausrichten, minimal weniger Crop sichtbar */
+.header-img{
+  object-position: center top;
+}
