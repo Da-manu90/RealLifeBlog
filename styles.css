@@ -54,13 +54,14 @@ body{
   z-index: 0;
   pointer-events: none;
 
-  #bg{
-    background-image: url('images/background.png'); /* nur noch das PNG */
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: left top;
-    background-color: #fd5525; /* oder var(--bottom-fallback) */
-  }
+  background-image:
+    url('images/background.png'),
+    linear-gradient(180deg,#fd5525 0%, #fd5525 100%); /* „Gradient“ in Uni-Farbe */
+  background-repeat: no-repeat, no-repeat;
+  background-size: cover, cover;
+  background-position: left top, left top;
+  background-color: var(--bottom-fallback);
+  transform: translateZ(0);
 }
 
 /* Desktop: Hintergrundbild in voller Höhe zeigen (Gesicht komplett sichtbar) */
