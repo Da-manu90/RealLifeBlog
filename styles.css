@@ -358,12 +358,9 @@ main.container{
 
 /* About: Avatar-Optik (optional rund) */
 .about-avatar{
-  border-radius: 24px;             /* eckig-rund */
+  border-radius: 50%;             /*rund */
   overflow: hidden;
 }
-/* Runde Variante aktivieren:
-.about-avatar{ border-radius: 50%; }
-*/
 
 .about-facts{
   margin: 12px 0 0;
@@ -410,3 +407,42 @@ main.container{
   margin: 0;
   line-height: 1.55;
 }
+
+/* Share-Leiste (mit Icons) */
+.share-bar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:12px;
+}
+.share-btn, .share-chip{
+  appearance:none;
+  border:1px solid rgba(0,0,0,.08);
+  background: rgba(255,255,255,.85);
+  border-radius:999px;
+  padding:8px 14px;
+  font: inherit;
+  font-weight:600;
+  cursor:pointer;
+  text-decoration:none;
+  color: inherit;
+  display:inline-flex;           /* Icon + Label nebeneinander */
+  align-items:center;
+  gap:8px;                       /* Abstand Icon <-> Label */
+  line-height:1;
+  backdrop-filter:saturate(120%) blur(2px);
+  transition: transform .06s ease, background .15s ease, border-color .15s ease;
+}
+.share-btn:hover, .share-chip:hover{ transform: translateY(1px); }
+
+/* SVG-Icons in Buttons */
+.share-btn svg,
+.share-chip svg{
+  width:18px;
+  height:18px;
+  flex: 0 0 auto;
+}
+
+/* leichte Farbakzente (optional) */
+.share-fb{ border-color: rgba(24,119,242,.18); }
+.share-wa{ border-color: rgba(37,211,102,.18); }

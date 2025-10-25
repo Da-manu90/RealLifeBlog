@@ -16,14 +16,36 @@ if (!SUPABASE_URL || !SUPABASE_ANON) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 /* ===========================
-   UI <-> DB Mapping
+   UI <-> DB Mappings / Labels
    =========================== */
-const UI_KEYS = ['video', 'about', 'news', 'thoughts'];
+// Akzeptiere beide Varianten als UI-Key
+const UI_KEYS = ['video', 'video blog', 'about', 'news', 'thoughts'];
+
+// Für die DB: beides mappt auf 'video blog'
 const KEY_TO_DB = {
-  video: 'video blog',
-  about: 'about',
-  news: 'news',
-  thoughts: 'thoughts',
+  'video': 'video blog',
+  'video blog': 'video blog',
+  'about': 'about',
+  'news': 'news',
+  'thoughts': 'thoughts',
+};
+
+// Menschliche Labels für Meldungen
+const KEY_LABEL = {
+  'video': 'Video Blog',
+  'video blog': 'Video Blog',
+  'about': 'Über mich',
+  'news': 'Neuigkeiten',
+  'thoughts': 'Gedanken',
+};
+
+// Gleichbedeutende Keys (für Active-State)
+const UI_ALIASES = {
+  'video': ['video', 'video blog'],
+  'video blog': ['video', 'video blog'],
+  'about': ['about'],
+  'news': ['news'],
+  'thoughts': ['thoughts'],
 };
 
 /* ===========================
@@ -60,7 +82,7 @@ function extractYouTubeId(input) {
 }
 
 /* ===========================
-   Card Renderer
+   Card Renderer (mit Share-Buttons)
    =========================== */
 function createPost(row) {
   const { title, description, youtube_url, image_url, published_at } = row;
@@ -69,15 +91,16 @@ function createPost(row) {
   const thumb = tpl.querySelector('.thumb');
   const img = tpl.querySelector('.thumb-img');
 
+  // Share-URL/Share-Text bestimmen
   let shareUrl = window.location.origin + window.location.pathname + window.location.hash;
   let shareText = title || 'Beitrag';
-  // Wenn ein YouTube-Link existiert, ist das meist der sinnvollste Share-Link
   if (youtube_url && /^https?:\/\//i.test(youtube_url)) {
     shareUrl = youtube_url;
   } else if (image_url && /^https?:\/\//i.test(image_url)) {
     shareUrl = image_url;
   }
 
+  // Thumbnail
   if (youtube_url) {
     const id = extractYouTubeId(youtube_url);
     if (id) {
@@ -86,9 +109,7 @@ function createPost(row) {
       const clickHref = youtube_url.startsWith('http')
         ? youtube_url
         : `https://www.youtube.com/watch?v=${id}`;
-      thumb?.addEventListener('click', () => {
-        window.open(clickHref, '_blank', 'noopener');
-      });
+      thumb?.addEventListener('click', () => window.open(clickHref, '_blank', 'noopener'));
     } else {
       thumb?.remove();
     }
@@ -99,6 +120,7 @@ function createPost(row) {
     thumb?.remove();
   }
 
+  // Datum
   const timeEl = tpl.querySelector('.post-date');
   if (published_at) {
     const d = new Date(published_at);
@@ -111,54 +133,75 @@ function createPost(row) {
   tpl.querySelector('.post-title').textContent = title || '';
   tpl.querySelector('.post-desc').innerHTML = (description || '').replace(/\n/g, '<br>');
 
-  // Share-Leiste verdrahten (funktioniert auch, wenn du sie nicht im Template hast)
+  // --- Share-Leiste (Label + Icon) ---------------------------------
   let shareBar = tpl.querySelector('.share-bar');
   if (!shareBar) {
     shareBar = document.createElement('nav');
     shareBar.className = 'share-bar';
     shareBar.setAttribute('aria-label', 'Beitrag teilen');
     shareBar.innerHTML = `
-      <button class="share-btn share-native" type="button">Teilen</button>
-      <a class="share-btn share-fb" href="#" target="_blank" rel="noopener">Facebook</a>
-      <a class="share-btn share-wa" href="#" target="_blank" rel="noopener">WhatsApp</a>
-      <button class="share-btn share-copy" type="button">Link kopieren</button>
+      <button class="share-btn share-native" type="button" aria-label="Teilen">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M18 8a3 3 0 1 0-2.82-4H15a3 3 0 0 0 0 6h.18A3 3 0 0 0 18 8ZM6 14a3 3 0 1 0-2.83 2H3a3 3 0 0 0 0-6h.17A3 3 0 0 0 6 14Zm12 0a3 3 0 1 0-2.83 2H15a3 3 0 0 0 0-6h.17A3 3 0 0 0 18 14ZM8.59 13l6.12-3.06-.9-1.8L7.7 11.2l.89 1.8Zm6.12 1.06L8.59 17l-.9-1.8 6.12-3.06.9 1.92Z"/>
+        </svg>
+        <span>Teilen</span>
+      </button>
+
+      <a class="share-btn share-fb" href="#" target="_blank" rel="noopener" aria-label="Auf Facebook teilen">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M13.5 22v-8h2.6l.4-3h-3V9.1c0-.9.3-1.5 1.6-1.5H16V5.1c-.3 0-1.2-.1-2.3-.1-2.3 0-3.7 1.2-3.7 3.9V11H7v3h3v8h3.5z"/>
+        </svg>
+        <span>Facebook</span>
+      </a>
+
+      <a class="share-btn share-wa" href="#" target="_blank" rel="noopener" aria-label="Per WhatsApp teilen">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M.5 23.5 2.3 18A10 10 0 1 1 18 21.7L12.5 23.5 7 22A10 10 0 0 1 2.3 18L.5 23.5zM12 4a8 8 0 0 0-6.8 12.2l-.5 1.4 1.5-.5A8 8 0 1 0 12 4zm4.6 9.8c-.2-.1-1.3-.6-1.5-.7s-.3-.1-.5.1-.6.7-.8.9-.3.2-.5.1a6.8 6.8 0 0 1-2-1.2 7.6 7.6 0 0 1-1.4-1.8c-.1-.2 0-.3.1-.4l.4-.4.2-.3c.1-.1.1-.3 0-.4l-.7-1.6c-.2-.4-.4-.3-.5-.3h-.4a.8.8 0 0 0-.6.3c-.2.3-.9.9-.9 2.2s.9 2.6 1 2.7a8.8 8.8 0 0 0 3.3 3c.4.2.8.4 1.1.5a2.7 2.7 0 0 0 1.2.1c.4-.1 1.3-.5 1.5-1s.2-.9.1-1c0-.1-.2-.1-.4-.2z"/>
+        </svg>
+        <span>WhatsApp</span>
+      </a>
+
+      <button class="share-btn share-copy" type="button" aria-label="Link kopieren">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9 7h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm-3 0V5a2 2 0 0 1 2-2h8v2H8v2H6Z"/>
+        </svg>
+        <span>Link kopieren</span>
+      </button>
     `;
     tpl.querySelector('.post-meta')?.appendChild(shareBar);
   }
 
-  // Handler
+  // Links/Handler verdrahten
   const btnNative = shareBar.querySelector('.share-native');
   const aFB = shareBar.querySelector('.share-fb');
   const aWA = shareBar.querySelector('.share-wa');
   const btnCopy = shareBar.querySelector('.share-copy');
 
-  btnNative?.addEventListener('click', async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: shareText, url: shareUrl, text: shareText });
-      } catch (e) {
-        // abgebrochen – nichts tun
-      }
-    } else {
-      // Fallback: Facebook auf
-      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank', 'noopener');
-    }
-  });
-
-  if (aFB) {
-    aFB.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
-  }
+  if (aFB) aFB.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
   if (aWA) {
     const msg = `${shareText} ${shareUrl}`;
     aWA.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
   }
+
+  btnNative?.addEventListener('click', async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: shareText, url: shareUrl, text: shareText });
+      } catch { /* user canceled */ }
+    } else {
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank', 'noopener');
+    }
+  });
+
   btnCopy?.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
-      btnCopy.textContent = 'Kopiert!';
-      setTimeout(() => (btnCopy.textContent = 'Link kopieren'), 1500);
+      const old = btnCopy.innerHTML;
+      btnCopy.innerHTML = `
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm-3 0V5a2 2 0 0 1 2-2h8v2H8v2H6Z"/></svg>
+        <span>Kopiert!</span>`;
+      setTimeout(() => (btnCopy.innerHTML = old), 1400);
     } catch {
-      // Fallback: prompt
       window.prompt('Link kopieren:', shareUrl);
     }
   });
@@ -177,7 +220,6 @@ function renderAbout() {
   }
   const node = aboutTemplate.content.cloneNode(true);
 
-  // Datum „aktualisiert am …“
   const timeEl = node.querySelector('.post-date');
   if (timeEl) {
     const d = new Date();
@@ -191,13 +233,31 @@ function renderAbout() {
 /* ===========================
    Helpers
    =========================== */
-function getKeyFromHash() {
-  const key = (location.hash || '').replace('#', '').trim();
-  return UI_KEYS.includes(key) ? key : 'video';
+function resolveAliasMatch(a, b) {
+  // true, wenn a und b alias-gleich sind (z.B. "video" ~ "video blog")
+  const listA = UI_ALIASES[a] || [a];
+  const listB = UI_ALIASES[b] || [b];
+  return listA.some(x => listB.includes(x));
 }
+
+function getDefaultUiKey() {
+  // 1) aktiven Button lesen
+  const active = document.querySelector('.chip-nav .chip.is-active')?.dataset?.key;
+  if (active && UI_KEYS.includes(active)) return active;
+  // 2) sonst 'video blog' als Start
+  return 'video blog';
+}
+
+function getKeyFromHash() {
+  const raw = (location.hash || '').replace('#', '').trim();
+  if (!raw) return getDefaultUiKey();
+  return UI_KEYS.includes(raw) ? raw : getDefaultUiKey();
+}
+
 function setActiveButton(key) {
   document.querySelectorAll('.chip-nav .chip').forEach(b => {
-    b.classList.toggle('is-active', b.dataset.key === key);
+    const k = b.dataset.key;
+    b.classList.toggle('is-active', resolveAliasMatch(k, key));
   });
 }
 
@@ -205,9 +265,9 @@ function setActiveButton(key) {
    Daten laden (Posts)
    =========================== */
 async function loadPosts(uiKey) {
-  const safeKey = UI_KEYS.includes(uiKey) ? uiKey : 'video';
+  const safeKey = UI_KEYS.includes(uiKey) ? uiKey : getDefaultUiKey();
 
-  if (safeKey === 'about') {
+  if (UI_ALIASES['about'].includes(safeKey)) {
     renderAbout();
     return;
   }
@@ -222,7 +282,6 @@ async function loadPosts(uiKey) {
     .order('published_at', { ascending: false })
     .order('created_at', { ascending: false });
 
-  // Fallback, falls 'category' (noch) fehlt
   const missingColumn =
     error && (String(error.code) === '42703' || /column .*category.* does not exist/i.test(error.message));
 
@@ -247,7 +306,11 @@ async function loadPosts(uiKey) {
 
   postsContainer.innerHTML = '';
   if (!data || data.length === 0) {
-    postsContainer.innerHTML = `<p style="opacity:.7">Keine Beiträge in „${safeKey}“ gefunden.</p>`;
+    const label = KEY_LABEL[safeKey] || safeKey;
+    postsContainer.innerHTML = `<p style="opacity:.7">Keine Beiträge in „${label}“ gefunden.</p>`;
+    // Debug-Hinweis in Konsole: hilft bei Migration
+    console.warn(`Tipp: Führe aus, um Daten sichtbar zu machen:
+UPDATE posts SET category='${dbCategory}' WHERE category IS NULL OR category='video';`);
     return;
   }
 
