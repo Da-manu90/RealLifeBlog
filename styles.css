@@ -329,3 +329,18 @@ main.container{
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
+
+/* Phones */
+@media (max-width: 600px){
+  :root{ --card-max: 390px; }   /* vorher 350/380 */
+}
+
+/* Tablet */
+@media (min-width: 720px){
+  :root{ --card-max: 580px; }   /* vorher 540/570 */
+}
+
+/* Desktop */
+@media (min-width: 900px){
+  :root{ --card-max: 740px; }   /* vorher 700/730 */
+}
