@@ -97,7 +97,7 @@ body{
   width: 100vw;                            /* wirklich bis an beide Ränder */
   height: 100%;
   object-fit: cover;                       /* saubere Skalierung */
-  border-radius: 0;                        /* full-bleed – ohne Rundung */
+  border-radius:40px;                        /* full-bleed – ohne Rundung */
   pointer-events: none;
 }
 
