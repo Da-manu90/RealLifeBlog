@@ -2,11 +2,11 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const postsContainer = document.getElementById('posts');
-const postTemplate = document.getElementById('post-template');
-const aboutTemplate = document.getElementById('about-template');
+const postTemplate   = document.getElementById('post-template');
+const aboutTemplate  = document.getElementById('about-template');
 
 // ENV aus index.html
-const SUPABASE_URL = window.env?.SUPABASE_URL;
+const SUPABASE_URL  = window.env?.SUPABASE_URL;
 const SUPABASE_ANON = window.env?.SUPABASE_ANON;
 
 if (!SUPABASE_URL || !SUPABASE_ANON) {
@@ -16,36 +16,16 @@ if (!SUPABASE_URL || !SUPABASE_ANON) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 /* ===========================
-   UI <-> DB Mappings / Labels
+   UI <-> DB Mapping
+   (Wir verwenden EXAKT die Keys, die du im HTML nutzt.)
    =========================== */
-// Akzeptiere beide Varianten als UI-Key
-const UI_KEYS = ['video', 'video blog', 'about', 'news', 'thoughts'];
-
-// Für die DB: beides mappt auf 'video blog'
+const UI_KEYS  = ['video blog', 'about', 'news', 'thoughts'];
+// DB-Kategorie = UI-Key (1:1)
 const KEY_TO_DB = {
-  'video': 'video blog',
   'video blog': 'video blog',
   'about': 'about',
   'news': 'news',
   'thoughts': 'thoughts',
-};
-
-// Menschliche Labels für Meldungen
-const KEY_LABEL = {
-  'video': 'Video Blog',
-  'video blog': 'Video Blog',
-  'about': 'Über mich',
-  'news': 'Neuigkeiten',
-  'thoughts': 'Gedanken',
-};
-
-// Gleichbedeutende Keys (für Active-State)
-const UI_ALIASES = {
-  'video': ['video', 'video blog'],
-  'video blog': ['video', 'video blog'],
-  'about': ['about'],
-  'news': ['news'],
-  'thoughts': ['thoughts'],
 };
 
 /* ===========================
@@ -82,14 +62,14 @@ function extractYouTubeId(input) {
 }
 
 /* ===========================
-   Card Renderer (mit Share-Buttons)
+   Card Renderer
    =========================== */
 function createPost(row) {
   const { title, description, youtube_url, image_url, published_at } = row;
   const tpl = postTemplate.content.cloneNode(true);
 
   const thumb = tpl.querySelector('.thumb');
-  const img = tpl.querySelector('.thumb-img');
+  const img   = tpl.querySelector('.thumb-img');
 
   // Share-URL/Share-Text bestimmen
   let shareUrl = window.location.origin + window.location.pathname + window.location.hash;
@@ -133,7 +113,7 @@ function createPost(row) {
   tpl.querySelector('.post-title').textContent = title || '';
   tpl.querySelector('.post-desc').innerHTML = (description || '').replace(/\n/g, '<br>');
 
-  // --- Share-Leiste (Label + Icon) ---------------------------------
+  // --- Share-Leiste (Label + Icon) --------------------------
   let shareBar = tpl.querySelector('.share-bar');
   if (!shareBar) {
     shareBar = document.createElement('nav');
@@ -141,59 +121,62 @@ function createPost(row) {
     shareBar.setAttribute('aria-label', 'Beitrag teilen');
     shareBar.innerHTML = `
       <button class="share-btn share-native" type="button" aria-label="Teilen">
-        <img src="images/share.png" alt="" aria-hidden="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M18 8a3 3 0 1 0-2.82-4H15a3 3 0 0 0 0 6h.18A3 3 0 0 0 18 8ZM6 14a3 3 0 1 0-2.83 2H3a3 3 0 0 0 0-6h.17A3 3 0 0 0 6 14Zm12 0a3 3 0 1 0-2.83 2H15a3 3 0 0 0 0-6h.17A3 3 0 0 0 18 14ZM8.59 13l6.12-3.06-.9-1.8L7.7 11.2l.89 1.8Zm6.12 1.06L8.59 17l-.9-1.8 6.12-3.06.9 1.92Z"/>
+        </svg>
         <span>Teilen</span>
       </button>
 
       <a class="share-btn share-fb" href="#" target="_blank" rel="noopener" aria-label="Auf Facebook teilen">
-        <img src="images/fb.png" alt="" aria-hidden="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M13.5 22v-8h2.6l.4-3h-3V9.1c0-.9.3-1.5 1.6-1.5H16V5.1c-.3 0-1.2-.1-2.3-.1-2.3 0-3.7 1.2-3.7 3.9V11H7v3h3v8h3.5z"/>
+        </svg>
         <span>Facebook</span>
       </a>
 
- <a class="share-btn share-wa" href="#" target="_blank" rel="noopener" aria-label="Per WhatsApp teilen">
-  <img src="images/whatsapp.svg" alt="" aria-hidden="true">
-  <span>WhatsApp</span>
-</a>
+      <a class="share-btn share-wa" href="#" target="_blank" rel="noopener" aria-label="Per WhatsApp teilen">
+        <img src="images/whatsapp.svg" alt="" class="share-icon">
+        <span>WhatsApp</span>
+      </a>
 
-<button class="share-btn share-copy" type="button" aria-label="Link kopieren">
-  <img src="images/copy-link.png" alt="" />
-  <span>Link kopieren</span>
-</button>
+      <button class="share-btn share-copy" type="button" aria-label="Link kopieren">
+        <img src="images/iconmonstr-link-1.png" alt="" class="share-icon">
+        <span>Link kopieren</span>
+      </button>
     `;
     tpl.querySelector('.post-meta')?.appendChild(shareBar);
   }
 
   // Links/Handler verdrahten
   const btnNative = shareBar.querySelector('.share-native');
-  const aFB = shareBar.querySelector('.share-fb');
-  const aWA = shareBar.querySelector('.share-wa');
-  const btnCopy = shareBar.querySelector('.share-copy');
+  const aFB      = shareBar.querySelector('.share-fb');
+  const aWA      = shareBar.querySelector('.share-wa');
+  const btnCopy  = shareBar.querySelector('.share-copy');
 
+  // Facebook & WhatsApp-URLs
   if (aFB) aFB.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
   if (aWA) {
     const msg = `${shareText} ${shareUrl}`;
     aWA.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
   }
 
-  btnCopy?.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      const labelEl = btnCopy.querySelector('span');
-      const oldText = labelEl ? labelEl.textContent : 'Link kopieren';
-      if (labelEl) labelEl.textContent = 'Kopiert!';
-      setTimeout(() => { if (labelEl) labelEl.textContent = oldText; }, 1400);
-    } catch {
-      window.prompt('Link kopieren:', shareUrl);
+  // Native Share (mit Fallback)
+  btnNative?.addEventListener('click', async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: shareText, url: shareUrl, text: shareText });
+      } catch { /* user canceled */ }
+    } else {
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank', 'noopener');
     }
   });
 
+  // Copy Link
   btnCopy?.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
       const old = btnCopy.innerHTML;
-      btnCopy.innerHTML = `
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm-3 0V5a2 2 0 0 1 2-2h8v2H8v2H6Z"/></svg>
-        <span>Kopiert!</span>`;
+      btnCopy.innerHTML = `<img src="images/iconmonstr-link-1.png" alt="" class="share-icon"><span>Kopiert!</span>`;
       setTimeout(() => (btnCopy.innerHTML = old), 1400);
     } catch {
       window.prompt('Link kopieren:', shareUrl);
@@ -214,6 +197,7 @@ function renderAbout() {
   }
   const node = aboutTemplate.content.cloneNode(true);
 
+  // Datum „aktualisiert am …“
   const timeEl = node.querySelector('.post-date');
   if (timeEl) {
     const d = new Date();
@@ -227,31 +211,14 @@ function renderAbout() {
 /* ===========================
    Helpers
    =========================== */
-function resolveAliasMatch(a, b) {
-  // true, wenn a und b alias-gleich sind (z.B. "video" ~ "video blog")
-  const listA = UI_ALIASES[a] || [a];
-  const listB = UI_ALIASES[b] || [b];
-  return listA.some(x => listB.includes(x));
-}
-
-function getDefaultUiKey() {
-  // 1) aktiven Button lesen
-  const active = document.querySelector('.chip-nav .chip.is-active')?.dataset?.key;
-  if (active && UI_KEYS.includes(active)) return active;
-  // 2) sonst 'video blog' als Start
-  return 'video blog';
-}
-
 function getKeyFromHash() {
-  const raw = (location.hash || '').replace('#', '').trim();
-  if (!raw) return getDefaultUiKey();
-  return UI_KEYS.includes(raw) ? raw : getDefaultUiKey();
+  const raw = (location.hash || '').slice(1);
+  const key = decodeURIComponent(raw || '').trim();
+  return UI_KEYS.includes(key) ? key : 'video blog';
 }
-
 function setActiveButton(key) {
   document.querySelectorAll('.chip-nav .chip').forEach(b => {
-    const k = b.dataset.key;
-    b.classList.toggle('is-active', resolveAliasMatch(k, key));
+    b.classList.toggle('is-active', (b.dataset.key || '') === key);
   });
 }
 
@@ -259,9 +226,9 @@ function setActiveButton(key) {
    Daten laden (Posts)
    =========================== */
 async function loadPosts(uiKey) {
-  const safeKey = UI_KEYS.includes(uiKey) ? uiKey : getDefaultUiKey();
+  const safeKey = UI_KEYS.includes(uiKey) ? uiKey : 'video blog';
 
-  if (UI_ALIASES['about'].includes(safeKey)) {
+  if (safeKey === 'about') {
     renderAbout();
     return;
   }
@@ -276,6 +243,7 @@ async function loadPosts(uiKey) {
     .order('published_at', { ascending: false })
     .order('created_at', { ascending: false });
 
+  // Fallback, falls 'category' noch nicht existiert
   const missingColumn =
     error && (String(error.code) === '42703' || /column .*category.* does not exist/i.test(error.message));
 
@@ -300,11 +268,7 @@ async function loadPosts(uiKey) {
 
   postsContainer.innerHTML = '';
   if (!data || data.length === 0) {
-    const label = KEY_LABEL[safeKey] || safeKey;
-    postsContainer.innerHTML = `<p style="opacity:.7">Keine Beiträge in „${label}“ gefunden.</p>`;
-    // Debug-Hinweis in Konsole: hilft bei Migration
-    console.warn(`Tipp: Führe aus, um Daten sichtbar zu machen:
-UPDATE posts SET category='${dbCategory}' WHERE category IS NULL OR category='video';`);
+    postsContainer.innerHTML = `<p style="opacity:.7">Keine Beiträge in „${safeKey}“ gefunden.</p>`;
     return;
   }
 
@@ -316,11 +280,12 @@ UPDATE posts SET category='${dbCategory}' WHERE category IS NULL OR category='vi
    =========================== */
 document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   btn.addEventListener('click', () => {
-    const key = btn.dataset.key;
+    const key = btn.dataset.key || '';
     if (!UI_KEYS.includes(key)) return;
 
     setActiveButton(key);
-    if (location.hash !== `#${key}`) history.replaceState(null, '', `#${key}`);
+    const hash = `#${encodeURIComponent(key)}`;
+    if (location.hash !== hash) history.replaceState(null, '', hash);
     loadPosts(key);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });

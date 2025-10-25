@@ -130,7 +130,7 @@ body{
   transform: translateZ(0);
 }
 
-/* Dein PNG-Overlay füllt die Nav, ohne Overlap-/Spalt-Tricks */
+/* Dein PNG-Overlay füllt die Nav */
 .nav-overlay{
   position: absolute;
   inset: 0;                    /* links/rechts/oben/unten 0 */
