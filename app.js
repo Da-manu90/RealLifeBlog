@@ -155,7 +155,7 @@ function createPost(row) {
       </a>
 
  <a class="share-btn share-wa" href="#" target="_blank" rel="noopener" aria-label="Per WhatsApp teilen">
-  <img src="images/whatsapp.svg.webp" alt="" aria-hidden="true">
+  <img src="images/whatsapp.svg" alt="" aria-hidden="true">
   <span>WhatsApp</span>
 </a>
 
