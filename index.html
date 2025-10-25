@@ -5,44 +5,34 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>RealLifeBlog</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=clean1">
+  <link rel="stylesheet" href="styles.css?v=fix-rlb-001">
 </head>
 <body>
-  <!-- Header: 100% sichtbar, keine Masken/Sticky -->
-  <header class="site-header" role="banner">
-    <div class="container header-container">
+  <!-- Header mit Banner-Bild (ohne Sticky, ohne Masken) -->
+  <header class="site-header">
+    <div class="container">
       <img src="images/Header.png" alt="RealLifeBlog Banner" class="header-img">
     </div>
   </header>
 
-  <!-- Ab hier beginnt die Sektion unterhalb des Headers:
-       - Der Bereich .below-hero hat die Background-Grafik (nur 100vh hoch via ::before)
-       - Der Nav-Bereich nutzt nav-overlay.png (PNG-Transparenz über dem Background)
-  -->
-  <div class="below-hero">
-    <!-- Nav-Band mit PNG-Hintergrund -->
-    <section class="nav-band" aria-label="Navigation">
-      <div class="container">
-        <nav class="chip-nav" aria-label="Hauptnavigation">
-          <button class="chip is-active" data-key="video">Video Blog</button>
-          <button class="chip" data-key="about">Über mich</button>
-          <button class="chip" data-key="news">Neuigkeiten</button>
-          <button class="chip" data-key="thoughts">Gedanken</button>
-        </nav>
-      </div>
-    </section>
+  <!-- Nav-Bereich: PNG-Hintergrund, Buttons sitzen darauf -->
+  <section class="nav-strip" aria-label="Navigation">
+    <div class="container">
+      <nav class="chip-nav">
+        <button class="chip is-active" data-key="video">Video Blog</button>
+        <button class="chip" data-key="about">Über mich</button>
+        <button class="chip" data-key="news">Neuigkeiten</button>
+        <button class="chip" data-key="thoughts">Gedanken</button>
+      </nav>
+    </div>
+  </section>
 
-    <!-- Content -->
-    <main class="container" role="main">
-      <section id="posts" class="posts" aria-live="polite"></section>
-    </main>
+  <main class="container">
+    <!-- Posts -->
+    <section id="posts" class="posts" aria-live="polite"></section>
+  </main>
 
-    <footer class="site-footer" role="contentinfo">
-      <div class="container">© RealLifeBlog</div>
-    </footer>
-  </div>
-
-  <!-- Template für Posts -->
+  <!-- Template -->
   <template id="post-template">
     <article class="post-card">
       <div class="post-inner">
@@ -59,6 +49,10 @@
     </article>
   </template>
 
+  <footer class="site-footer">
+    <div class="container">© RealLifeBlog</div>
+  </footer>
+
   <!-- Supabase ENV -->
   <script>
     window.env = {
@@ -67,7 +61,6 @@
     };
   </script>
 
-  <!-- App -->
-  <script type="module" src="app.js?v=clean1"></script>
+  <script type="module" src="app.js?v=fix-rlb-001"></script>
 </body>
 </html>

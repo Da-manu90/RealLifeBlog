@@ -116,4 +116,4 @@ document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   });
 });
 
-/* WICHTIG: Keinerlei Mess-/Mask-/Overlay-Logik mehr vorhanden. */
+/* WICHTIG: Keinerlei Mess-/Mask-/Overlay-Logik – Layout ist rein per CSS gelöst. */
