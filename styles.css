@@ -355,3 +355,58 @@ main.container{
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
+
+/* About: Avatar-Optik (optional rund) */
+.about-avatar{
+  border-radius: 24px;             /* eckig-rund */
+  overflow: hidden;
+}
+/* Runde Variante aktivieren:
+.about-avatar{ border-radius: 50%; }
+*/
+
+.about-facts{
+  margin: 12px 0 0;
+  padding-left: 1.1em;
+}
+
+/* Social-Links (passt zu deinen Chips) */
+.about-social{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:14px;
+}
+.share-chip{
+  appearance:none;
+  border:1px solid rgba(0,0,0,.08);
+  background: rgba(255,255,255,.85);
+  border-radius:999px;
+  padding:8px 14px;
+  font: inherit;
+  font-weight:600;
+  cursor:pointer;
+  text-decoration:none;
+  color: inherit;
+  backdrop-filter:saturate(120%) blur(2px);
+  transition: transform .06s ease, background .15s ease, border-color .15s ease;
+}
+.share-chip:hover{ transform: translateY(1px); }
+
+/* „Warum ich das mache“-Box */
+.why-box{
+  margin-top:16px;
+  padding:14px 16px;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 16px;
+  background: rgba(255,255,255,.70);
+  backdrop-filter: blur(3px);
+}
+.why-box h4{
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+}
+.why-box p{
+  margin: 0;
+  line-height: 1.55;
+}

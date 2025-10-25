@@ -54,6 +54,61 @@
     </article>
   </template>
 
+<!-- About-Template (statisch, 2-Spalten, Avatar + Feature-Liste + Social + Why-Box) -->
+<template id="about-template">
+    <article class="post-card">
+      <div class="post-inner" style="grid-template-columns:minmax(180px,28%) 1fr;align-items:start;">
+        <!-- Avatar / Bild -->
+        <div class="thumb about-avatar" aria-hidden="true" style="aspect-ratio:1/1;">
+          <!-- ersetze images/manuel.jpg durch dein Bild -->
+          <img class="thumb-img" src="images/manuel.jpg" alt="Porträt von Manuel Storch" width="800" height="800" loading="lazy" style="object-position:center;">
+        </div>
+  
+        <!-- Text + Socials -->
+        <div class="post-meta">
+          <time class="post-date" datetime=""></time>
+          <h3 class="post-title">Über mich</h3>
+  
+          <p class="post-desc">
+            Hey! Ich bin <strong>Manuel Storch</strong> – Creator, der echte Momente teilt.
+            In meinem RealLifeBlog findest du Videos, Gedanken und News aus meinem Alltag.
+            Kein Hochglanz, sondern echte Stories aus dem echten Leben.
+          </p>
+  
+          <!-- Feature-Liste / Fakten -->
+          <ul class="post-desc about-facts">
+            <li>35 Jahre, hauptberuflich Krankenpfleger</li>
+            <li>Echte Höhen & Tiefen – dokumentiert & reflektiert</li>
+            <li>Kreativität als Ausdruck von Lebensumständen</li>
+          </ul>
+  
+          <p class="post-desc" style="margin-top:10px;">
+            <em>Interessen:</em> Storytelling, Short-Form-Video, Productivity, Reisen, Kaffee ☕
+          </p>
+  
+          <!-- Warum ich das mache – Box -->
+          <section class="why-box" aria-labelledby="why-title">
+            <h4 id="why-title">Warum ich das mache</h4>
+            <p>
+              Ich möchte zeigen, dass das Leben aus mehr besteht als perfekten Momenten.
+              Durch authentische Einblicke und Kreativität will ich andere Menschen ermutigen,
+              über das Leben zu reflektieren und ihren eigenen Weg zu gehen.
+            </p>
+          </section>
+  
+          <!-- Social-Links -->
+          <nav class="about-social" aria-label="Social Links">
+            <!-- Links anpassen -->
+            <a class="share-chip" href="https://www.instagram.com/DEIN_HANDLE" target="_blank" rel="noopener">Instagram</a>
+            <a class="share-chip" href="https://www.youtube.com/@DEIN_KANAL" target="_blank" rel="noopener">YouTube</a>
+            <a class="share-chip" href="mailto:mail@deinedomain.tld">Kontakt</a>
+          </nav>
+        </div>
+      </div>
+    </article>
+  </template>
+  
+
   <footer class="site-footer">
     <div class="container">© RealLifeBlog</div>
   </footer>

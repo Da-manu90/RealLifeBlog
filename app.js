@@ -2,7 +2,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const postsContainer = document.getElementById('posts');
-const template = document.getElementById('post-template');
+const postTemplate = document.getElementById('post-template');
+const aboutTemplate = document.getElementById('about-template');
 
 // ENV aus index.html
 const SUPABASE_URL = window.env?.SUPABASE_URL;
@@ -14,12 +15,9 @@ if (!SUPABASE_URL || !SUPABASE_ANON) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-// ===============
-// CONFIG / MAPPING
-// ===============
-/*
- UI-Keys (aus deinem HTML data-key)  ->  DB-Categories (Supabase)
-*/
+/* ===========================
+   UI <-> DB Mapping
+   =========================== */
 const UI_KEYS = ['video', 'about', 'news', 'thoughts'];
 const KEY_TO_DB = {
   video: 'video blog',
@@ -28,12 +26,9 @@ const KEY_TO_DB = {
   thoughts: 'thoughts',
 };
 
-// umgekehrtes Mapping (nur falls irgendwann gebraucht)
-const DB_TO_KEY = Object.fromEntries(Object.entries(KEY_TO_DB).map(([k,v]) => [v,k]));
-
-// ===============
-// YouTube-ID Parser (unverändert)
-// ===============
+/* ===========================
+   YouTube-ID Parser
+   =========================== */
 function extractYouTubeId(input) {
   if (!input) return null;
   if (/^[0-9A-Za-z_-]{11}$/.test(input)) return input;
@@ -64,14 +59,24 @@ function extractYouTubeId(input) {
   return last ? last[1] : null;
 }
 
-// ===============
-// Card-Renderer (unverändert)
-// ===============
-function createPost({ title, description, youtube_url, image_url, published_at }) {
-  const tpl = template.content.cloneNode(true);
+/* ===========================
+   Card Renderer
+   =========================== */
+function createPost(row) {
+  const { title, description, youtube_url, image_url, published_at } = row;
+  const tpl = postTemplate.content.cloneNode(true);
 
   const thumb = tpl.querySelector('.thumb');
   const img = tpl.querySelector('.thumb-img');
+
+  let shareUrl = window.location.origin + window.location.pathname + window.location.hash;
+  let shareText = title || 'Beitrag';
+  // Wenn ein YouTube-Link existiert, ist das meist der sinnvollste Share-Link
+  if (youtube_url && /^https?:\/\//i.test(youtube_url)) {
+    shareUrl = youtube_url;
+  } else if (image_url && /^https?:\/\//i.test(image_url)) {
+    shareUrl = image_url;
+  }
 
   if (youtube_url) {
     const id = extractYouTubeId(youtube_url);
@@ -81,17 +86,17 @@ function createPost({ title, description, youtube_url, image_url, published_at }
       const clickHref = youtube_url.startsWith('http')
         ? youtube_url
         : `https://www.youtube.com/watch?v=${id}`;
-      thumb.addEventListener('click', () => {
+      thumb?.addEventListener('click', () => {
         window.open(clickHref, '_blank', 'noopener');
       });
     } else {
-      thumb.remove();
+      thumb?.remove();
     }
   } else if (image_url) {
     img.src = image_url;
     img.alt = title || 'Bild';
   } else {
-    thumb.remove();
+    thumb?.remove();
   }
 
   const timeEl = tpl.querySelector('.post-date');
@@ -106,12 +111,86 @@ function createPost({ title, description, youtube_url, image_url, published_at }
   tpl.querySelector('.post-title').textContent = title || '';
   tpl.querySelector('.post-desc').innerHTML = (description || '').replace(/\n/g, '<br>');
 
+  // Share-Leiste verdrahten (funktioniert auch, wenn du sie nicht im Template hast)
+  let shareBar = tpl.querySelector('.share-bar');
+  if (!shareBar) {
+    shareBar = document.createElement('nav');
+    shareBar.className = 'share-bar';
+    shareBar.setAttribute('aria-label', 'Beitrag teilen');
+    shareBar.innerHTML = `
+      <button class="share-btn share-native" type="button">Teilen</button>
+      <a class="share-btn share-fb" href="#" target="_blank" rel="noopener">Facebook</a>
+      <a class="share-btn share-wa" href="#" target="_blank" rel="noopener">WhatsApp</a>
+      <button class="share-btn share-copy" type="button">Link kopieren</button>
+    `;
+    tpl.querySelector('.post-meta')?.appendChild(shareBar);
+  }
+
+  // Handler
+  const btnNative = shareBar.querySelector('.share-native');
+  const aFB = shareBar.querySelector('.share-fb');
+  const aWA = shareBar.querySelector('.share-wa');
+  const btnCopy = shareBar.querySelector('.share-copy');
+
+  btnNative?.addEventListener('click', async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: shareText, url: shareUrl, text: shareText });
+      } catch (e) {
+        // abgebrochen – nichts tun
+      }
+    } else {
+      // Fallback: Facebook auf
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank', 'noopener');
+    }
+  });
+
+  if (aFB) {
+    aFB.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+  }
+  if (aWA) {
+    const msg = `${shareText} ${shareUrl}`;
+    aWA.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+  }
+  btnCopy?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      btnCopy.textContent = 'Kopiert!';
+      setTimeout(() => (btnCopy.textContent = 'Link kopieren'), 1500);
+    } catch {
+      // Fallback: prompt
+      window.prompt('Link kopieren:', shareUrl);
+    }
+  });
+
   return tpl;
 }
 
-// ===============
-// Kategorien / Buttons / Hash
-// ===============
+/* ===========================
+   About Renderer (statisch)
+   =========================== */
+function renderAbout() {
+  postsContainer.innerHTML = '';
+  if (!aboutTemplate) {
+    postsContainer.innerHTML = '<p style="opacity:.7">About-Inhalt (Template) fehlt.</p>';
+    return;
+  }
+  const node = aboutTemplate.content.cloneNode(true);
+
+  // Datum „aktualisiert am …“
+  const timeEl = node.querySelector('.post-date');
+  if (timeEl) {
+    const d = new Date();
+    timeEl.textContent = `Aktualisiert am ${d.toLocaleDateString('de-DE')}`;
+    timeEl.setAttribute('datetime', d.toISOString().slice(0,10));
+  }
+
+  postsContainer.appendChild(node);
+}
+
+/* ===========================
+   Helpers
+   =========================== */
 function getKeyFromHash() {
   const key = (location.hash || '').replace('#', '').trim();
   return UI_KEYS.includes(key) ? key : 'video';
@@ -122,16 +201,20 @@ function setActiveButton(key) {
   });
 }
 
-// ===============
-// Daten laden – bevorzugt serverseitig gefiltert, mit Fallback
-// ===============
+/* ===========================
+   Daten laden (Posts)
+   =========================== */
 async function loadPosts(uiKey) {
   const safeKey = UI_KEYS.includes(uiKey) ? uiKey : 'video';
-  const dbCategory = KEY_TO_DB[safeKey] || 'video blog';
 
+  if (safeKey === 'about') {
+    renderAbout();
+    return;
+  }
+
+  const dbCategory = KEY_TO_DB[safeKey] || 'video blog';
   postsContainer.innerHTML = '<p style="opacity:.7">Lade Beiträge…</p>';
 
-  // 1) Serverseitig nach category filtern
   let { data, error } = await supabase
     .from('posts')
     .select('title, description, youtube_url, image_url, published_at, created_at, category')
@@ -139,7 +222,7 @@ async function loadPosts(uiKey) {
     .order('published_at', { ascending: false })
     .order('created_at', { ascending: false });
 
-  // 2) Fallback, falls Spalte (noch) fehlt -> clientseitig filtern
+  // Fallback, falls 'category' (noch) fehlt
   const missingColumn =
     error && (String(error.code) === '42703' || /column .*category.* does not exist/i.test(error.message));
 
@@ -171,9 +254,9 @@ async function loadPosts(uiKey) {
   data.forEach(row => postsContainer.appendChild(createPost(row)));
 }
 
-// ===============
-// Events
-// ===============
+/* ===========================
+   Events
+   =========================== */
 document.querySelectorAll('.chip-nav .chip').forEach(btn => {
   btn.addEventListener('click', () => {
     const key = btn.dataset.key;
@@ -192,7 +275,9 @@ window.addEventListener('hashchange', () => {
   loadPosts(key);
 });
 
-// Init
+/* ===========================
+   Init
+   =========================== */
 (function init() {
   const key = getKeyFromHash();
   setActiveButton(key);
