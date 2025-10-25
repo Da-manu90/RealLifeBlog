@@ -26,6 +26,36 @@ const KEY_TO_DB = {
 };
 
 /* ===========================
+   Skeleton Loader
+   =========================== */
+function showSkeleton(n = 3){
+  postsContainer.innerHTML = '';
+  for (let i = 0; i < n; i++){
+    const ph = document.createElement('div');
+    ph.className = 'card-skeleton skeleton';
+    postsContainer.appendChild(ph);
+  }
+}
+
+/* ===========================
+   Toast Helper („Link kopiert!“)
+   =========================== */
+function showToast(msg){
+  let t = document.querySelector('.toast');
+  if(!t){
+    t = document.createElement('div');
+    t.className = 'toast';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  // Reflow zum Neustarten der Transition
+  t.classList.remove('show');
+  void t.offsetWidth;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1400);
+}
+
+/* ===========================
    YouTube-ID Parser
    =========================== */
 function extractYouTubeId(input) {
@@ -60,17 +90,18 @@ function createPost(row) {
   const { title, description, youtube_url, image_url, published_at } = row;
   const tpl = postTemplate.content.cloneNode(true);
 
+   // Card für Deep-Link identifizierbar machen
+   const article = tpl.querySelector('article.post-card');
+   if (article && row.id) {
+     article.setAttribute('data-id', row.id);
+   }
+
   const thumb = tpl.querySelector('.thumb');
   const img   = tpl.querySelector('.thumb-img');
 
-  // Share-URL/-Text
-  let shareUrl  = window.location.origin + window.location.pathname + window.location.hash;
+  // Share-URL/-Text (Permalink bevorzugt)
+  let shareUrl  = row.permalink || (window.location.origin + window.location.pathname + window.location.hash);
   let shareText = title || 'Beitrag';
-  if (youtube_url && /^https?:\/\//i.test(youtube_url)) {
-    shareUrl = youtube_url;
-  } else if (image_url && /^https?:\/\//i.test(image_url)) {
-    shareUrl = image_url;
-  }
 
   // Thumbnail
   if (youtube_url) {
@@ -161,9 +192,7 @@ function createPost(row) {
   btnCopy?.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
-      const old = btnCopy.innerHTML;
-      btnCopy.innerHTML = `<img src="images/link.png" alt="" width="18" height="18"><span>Kopiert!</span>`;
-      setTimeout(() => (btnCopy.innerHTML = old), 1400);
+      showToast('Link kopiert!');
     } catch {
       window.prompt('Link kopieren:', shareUrl);
     }
@@ -204,6 +233,28 @@ function setActiveButton(key) {
   });
 }
 
+/* ============ Deep-Link Helpers ============ */
+function getIdFromHash(){
+  const h = location.hash || '';
+  const parts = h.split('?');
+  const section = (parts[0] || '').replace('#','').trim();
+  const params = new URLSearchParams(parts[1] || '');
+  const id = params.get('id');
+  return { section, id };
+}
+
+function revealDeepLink(id){
+  if (!id) return;
+  const sel = `[data-id="${CSS.escape(id)}"]`;
+  const el = postsContainer.querySelector(sel);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+  // Highlight-Animation neu triggern
+  el.classList.remove('highlight');
+  void el.offsetWidth; // reflow
+  el.classList.add('highlight');
+}
+
 /* ===========================
    Daten laden (Video/Thoughts aus 'posts')
    =========================== */
@@ -220,11 +271,14 @@ async function loadPosts(uiKey) {
   }
 
   const dbCategory = KEY_TO_DB[safeKey] || 'video blog';
-  postsContainer.innerHTML = '<p style="opacity:.7">Lade Beiträge…</p>';
 
+  // Skeleton anzeigen
+  showSkeleton();
+
+  // Posts laden (mit id)
   let { data, error } = await supabase
     .from('posts')
-    .select('title, description, youtube_url, image_url, published_at, created_at, category')
+    .select('id, title, description, youtube_url, image_url, published_at, created_at, category')
     .eq('category', dbCategory)
     .order('published_at', { ascending: false })
     .order('created_at', { ascending: false });
@@ -235,7 +289,7 @@ async function loadPosts(uiKey) {
   if (missingColumn) {
     ({ data, error } = await supabase
       .from('posts')
-      .select('title, description, youtube_url, image_url, published_at, created_at, category')
+      .select('id, title, description, youtube_url, image_url, published_at, created_at, category')
       .order('published_at', { ascending: false })
       .order('created_at', { ascending: false }));
 
@@ -257,7 +311,18 @@ async function loadPosts(uiKey) {
     return;
   }
 
-  data.forEach(row => postsContainer.appendChild(createPost(row)));
+  // Permalinks für video/thoughts
+  const keyForLinks = safeKey; // 'video' oder 'thoughts'
+  const withPermalinks = data.map(r => ({
+    ...r,
+    permalink: r.id
+      ? `${location.origin}${location.pathname}#${keyForLinks}?id=${encodeURIComponent(r.id)}`
+      : undefined
+  }));
+
+  withPermalinks.forEach(row => postsContainer.appendChild(createPost(row)));
+  const { id: deepId } = getIdFromHash();
+  if (deepId) revealDeepLink(deepId);
 }
 
 /* ===========================
@@ -266,7 +331,7 @@ async function loadPosts(uiKey) {
 async function fetchNewsFromSupabase() {
   const url = window.env?.SUPABASE_URL;
   const key = window.env?.SUPABASE_ANON;
-  const endpoint = `${url}/rest/v1/news?select=title,description,youtube_url,image_url,published_at&order=published_at.desc`;
+  const endpoint = `${url}/rest/v1/news?select=id,title,description,youtube_url,image_url,published_at&order=published_at.desc`;
   const res = await fetch(endpoint, {
     headers: { apikey: key, Authorization: `Bearer ${key}` }
   });
@@ -275,7 +340,8 @@ async function fetchNewsFromSupabase() {
 }
 
 async function renderNews() {
-  postsContainer.innerHTML = '<p style="opacity:.7">Lade Neuigkeiten…</p>';
+  // Skeleton anzeigen
+  showSkeleton();
   try {
     const data = await fetchNewsFromSupabase();
     postsContainer.innerHTML = '';
@@ -283,7 +349,16 @@ async function renderNews() {
       postsContainer.innerHTML = `<p style="opacity:.7">Keine Neuigkeiten gefunden.</p>`;
       return;
     }
-    data.forEach(row => postsContainer.appendChild(createPost(row)));
+    // Permalinks für News
+    const withPermalinks = data.map(r => ({
+      ...r,
+      permalink: r.id
+        ? `${location.origin}${location.pathname}#news?id=${encodeURIComponent(r.id)}`
+        : undefined
+    }));
+    withPermalinks.forEach(row => postsContainer.appendChild(createPost(row)));
+    const { id: deepId } = getIdFromHash();
+    if (deepId) revealDeepLink(deepId);
   } catch (e) {
     console.error(e);
     postsContainer.innerHTML = `<p style="color:#c00">Fehler beim Laden der Neuigkeiten.</p>`;
@@ -293,22 +368,26 @@ async function renderNews() {
 /* ===========================
    Events (ein Handler-Satz)
    =========================== */
-document.querySelectorAll('.chip-nav .chip').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const key = btn.dataset.key;
-    if (!UI_KEYS.includes(key)) return;
-    setActiveButton(key);
-    if (location.hash !== `#${key}`) history.replaceState(null, '', `#${key}`);
-    loadPosts(key);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+   document.querySelectorAll('.chip-nav .chip').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const key = btn.dataset.key;
+      if (!UI_KEYS.includes(key)) return;
+      setActiveButton(key);
+      if (location.hash !== `#${key}`) history.replaceState(null, '', `#${key}`);
+      await loadPosts(key); // wichtig: warten bis Cards da sind
+      const { id: deepId } = getIdFromHash();
+      if (deepId) revealDeepLink(deepId);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
   });
-});
 
-window.addEventListener('hashchange', () => {
-  const key = getKeyFromHash();
-  setActiveButton(key);
-  loadPosts(key);
-});
+  window.addEventListener('hashchange', async () => {
+    const key = getKeyFromHash();
+    setActiveButton(key);
+    await loadPosts(key); // wichtig: warten bis Cards da sind
+    const { id: deepId } = getIdFromHash();
+    if (deepId) revealDeepLink(deepId);
+  });
 
 /* ===========================
    Init

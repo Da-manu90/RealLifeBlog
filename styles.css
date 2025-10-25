@@ -361,3 +361,71 @@ main.container{
   main.container{ padding-top: calc(var(--header-h) + var(--nav-gap) + var(--nav-h) + 16px) !important; }
   .header-img{ height: 100% !important; width: 100% !important; object-fit: cover; object-position: center top; }
 }
+
+/* Sichtbarer Tastaturfokus für Chips/Share-Buttons */
+.chip:focus-visible,
+.share-btn:focus-visible{
+  outline: 3px solid #000;
+  outline-offset: 2px;
+}
+
+/* Skeleton Loader */
+.skeleton{
+  background: linear-gradient(90deg,#00000008, #00000012, #00000008);
+  background-size:200% 100%;
+  animation: sk 1.2s infinite linear;
+}
+@keyframes sk {
+  from{ background-position: 200% 0; }
+  to{   background-position: -200% 0; }
+}
+.card-skeleton{
+  height: 220px;
+  border-radius: var(--card-radius);
+  border: var(--card-border);
+  background: #fff8;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+  margin-bottom: var(--gap);
+}
+
+/* Auf Phones die Karten minimal opaker machen (bessere Lesbarkeit) */
+@media (max-width:600px){
+  :root{ --card-bg-rgba: rgba(255,255,255,0.7); }
+}
+
+/* Toast-Feedback unten mittig */
+.toast{
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  background: #000;
+  color:#fff;
+  padding:10px 14px;
+  border-radius:10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.25);
+  opacity:0;
+  pointer-events:none;
+  transition: opacity .25s ease, transform .25s ease;
+  z-index: 1000;
+}
+.toast.show{
+  opacity:1;
+  transform: translate(-50%, -6px);
+}
+
+.chip:focus-visible,
+.share-btn:focus-visible{
+  outline: 3px solid #000;
+  outline-offset: 2px;
+}
+
+/* Deep-Link Highlight für Cards */
+.post-card.highlight{
+  animation: hl 1.8s ease;
+}
+@keyframes hl{
+  0%   { box-shadow: 0 0 0 0 rgba(255,215,0,.9);    transform: translateY(0); }
+  30%  { box-shadow: 0 0 0 12px rgba(255,215,0,.25); transform: translateY(-2px); }
+  100% { box-shadow: 0 0 0 0 rgba(255,215,0,0);     transform: translateY(0); }
+}
