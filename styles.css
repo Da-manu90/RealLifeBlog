@@ -453,3 +453,51 @@ main.container{
 /* Farbakzente */
 .share-fb{ border-color: rgba(24,119,242,.18); }
 .share-wa{ border-color: rgba(37,211,102,.18); }
+
+
+/* Der Container füllt die ganze Nav-Höhe und dient als Positionierungs-Referenz */
+.nav-strip .container{
+  position: relative;
+  height: 100%;
+}
+
+/* Das PNG-Overlay liegt flächig unter den Buttons */
+.nav-overlay{
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 0;         /* UNTER den Buttons */
+}
+
+/* Die Button-Leiste sitzt oben im Streifen und liegt über dem Overlay */
+.chip-nav{
+  position: absolute; /* innerhalb .nav-strip .container */
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%); /* echte Zentrierung */
+  z-index: 1;         /* ÜBER dem Overlay */
+  margin: 0;          /* Margin aus dem alten Flow rausnehmen */
+  padding: 0;
+  width: max-content;
+  max-width: calc(100% - 2 * var(--container-pad));
+}
+
+/* Mobile-Layout beibehalten (Grid, 2 Spalten) */
+@media (max-width: 600px){
+  .chip-nav{
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    right: 16px;
+    transform: none;         /* zentrieren über left/right */
+    width: auto;
+    max-width: none;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 12px;
+  }
+}
