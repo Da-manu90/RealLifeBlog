@@ -97,7 +97,7 @@ body{
   width: 100vw;                            /* wirklich bis an beide Ränder */
   height: 100%;
   object-fit: cover;                       /* saubere Skalierung */
-  border-radius:40px;                        /* full-bleed – ohne Rundung */
+  border-radius: 40px 40px 0 0;  /* ⬅︎ nur oben links/rechts rund */                     /* full-bleed – ohne Rundung */
   pointer-events: none;
 }
 
@@ -135,23 +135,28 @@ body{
   z-index: 0;
 }
 
-/* Buttons im Nav – oben ausrichten, nicht mittig */
+/* Buttons: exakt über der Post-Spalte, gleiche Breite & linker Gutter */
 .chip-nav{
   position: relative;
-  z-index: 1;                              /* über dem Overlay-Bild */
-  display:flex;
-  flex-wrap:wrap;
-  gap:24px;
-  justify-content:center;
-  align-items:flex-start;                  /* <— statt center */
-  margin:0;
-  padding: 12px clamp(16px, 2vw, 24px) 12px clamp(140px, var(--posts-left), 300px);
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+  align-items: flex-start;
+  width: min(100%, var(--card-max));  /* gleiche Breite wie Cards */
+  margin-left: var(--posts-left);     /* gleicher linker Gutter */
+  margin-right: var(--safe-gap);
+  padding: 12px 0;                    /* symmetrisch, kein extra Links-Padding */
 }
+
 @media (max-width: 600px){
   .chip-nav{
-    display:grid;
+    width: auto;                      /* auf Phones normal zentrieren */
+    margin: 0;
+    display: grid;
     grid-template-columns: repeat(2, minmax(0,1fr));
-    gap:12px;
+    gap: 12px;
     padding: 12px 16px;
   }
 }
