@@ -5,13 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>RealLifeBlog</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- wichtig: Cache-Buster anpassen falls nötig -->
   <link rel="stylesheet" href="styles.css?v=clean-classic">
 </head>
 <body>
-  <!-- FIXER HINTERGRUND -->
+  <!-- FIXER HINTERGRUND – echtes DOM-Element, kein Pseudo -->
   <div id="bg" aria-hidden="true"></div>
 
-  <!-- HEADER -->
+  <!-- HEADER (220px hoch, rundes PNG) -->
   <header class="site-header">
     <div class="container">
       <img src="images/Header.png" alt="RealLifeBlog Banner" class="header-img">
@@ -20,6 +21,7 @@
 
   <!-- NAV-STREIFEN mit PNG-Overlay -->
   <section class="nav-strip" aria-label="Navigation">
+    <!-- Das Overlay liegt absolut im Streifen, Buttons liegen darüber -->
     <img src="images/nav-overlay.png" alt="" aria-hidden="true" class="nav-overlay">
     <div class="container">
       <nav class="chip-nav">
