@@ -148,7 +148,7 @@ function createPost(row) {
       </button>
 
       <a class="share-btn share-fb" href="#" target="_blank" rel="noopener" aria-label="Auf Facebook teilen">
-        <img src="images/fb.svg" alt="" aria-hidden="true">
+        <img src="images/fb.png" alt="" aria-hidden="true">
         <span>Facebook</span>
       </a>
 
