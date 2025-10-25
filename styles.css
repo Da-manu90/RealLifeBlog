@@ -64,6 +64,16 @@ body{
   transform: translateZ(0);
 }
 
+/* Desktop: Hintergrundbild in voller Höhe zeigen (Gesicht komplett sichtbar) */
+@media (min-width: 1024px){
+  #bg{
+    /* 1. Bild = deine PNG; 2. Ebene = der Verlauf (bleibt fullscreen) */
+    background-size: auto 100%, cover;   /* Bild an Höhe, Gradient füllt den Rest */
+    background-position: left center, left top;  /* Bild links verankert, vertikal zentriert */
+    background-repeat: no-repeat, no-repeat;
+  }
+}
+
 /* iOS Safe Areas */
 @supports (bottom: env(safe-area-inset-bottom)) {
   #bg::before, #bg::after{
