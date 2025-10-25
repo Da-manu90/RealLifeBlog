@@ -5,51 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>RealLifeBlog</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=rlb-fixed-bg-single-overlay">
+  <link rel="stylesheet" href="styles.css?v=rlb-fixed-hero-clean">
 </head>
 <body>
   <!-- FIXER HINTERGRUND – echtes DOM-Element, kein Pseudo -->
   <div id="bg" aria-hidden="true"></div>
 
-  <!-- HEADER (220px hoch, rundes PNG) -->
-  <header class="site-header">
-<!-- neu -->
-<div class="fixed-hero">
+  <!-- ===== FIXED WRAPPER: Header + Nav in EINEM Layer (keine Spalten, kein Flackern) ===== -->
+  <div class="fixed-hero">
+    <!-- HEADER (oben rund, unten eckig) -->
     <header class="site-header">
       <div class="container">
         <img src="images/Header.png" alt="RealLifeBlog Banner" class="header-img">
       </div>
     </header>
-  
+
+    <!-- NAV-STREIFEN (Overlay via CSS ::before, keine IMG-Nav mehr) -->
     <section class="nav-strip" aria-label="Navigation">
-      <!-- kein <img> overlay mehr -->
       <div class="container">
         <nav class="chip-nav">
-          <!-- Buttons unverändert -->
+          <button class="chip is-active" data-key="video">Video Blog</button>
+          <button class="chip" data-key="about">Über mich</button>
+          <button class="chip" data-key="news">Neuigkeiten</button>
+          <button class="chip" data-key="thoughts">Gedanken</button>
         </nav>
       </div>
     </section>
   </div>
-
-  <!-- NAV-STREIFEN mit EINEM Overlay-Bild (dein PNG mit 45%->0% Weißverlauf) -->
-  <section class="nav-strip" aria-label="Navigation">
-    <!-- Das Overlay liegt absolut im Streifen, Buttons liegen darüber -->
-    <div class="container">
-      <nav class="chip-nav">
-        <button class="chip is-active" data-key="video blog">Video Blog</button>
-        <button class="chip" data-key="about">Über mich</button>
-        <button class="chip" data-key="news">Neuigkeiten</button>
-        <button class="chip" data-key="thoughts">Gedanken</button>
-      </nav>
-    </div>
-  </section>
+  <!-- ===== /fixed-hero ===== -->
 
   <main class="container">
     <!-- Posts -->
     <section id="posts" class="posts" aria-live="polite"></section>
   </main>
 
-  <!-- Template -->
+  <!-- Template für Beiträge -->
   <template id="post-template">
     <article class="post-card">
       <div class="post-inner">
@@ -66,37 +56,37 @@
     </article>
   </template>
 
-<!-- About-Template (statisch, 2-Spalten, Avatar + Feature-Liste + Social + Why-Box) -->
-<!-- About-Template (Einspalter: Avatar oben, Text darunter) -->
-<template id="about-template">
+  <!-- About-Template (Einspalter: Avatar oben, Text darunter) -->
+  <template id="about-template">
     <article class="post-card">
       <div class="post-inner about-inner">
         <!-- Avatar / Bild (oben) -->
         <div class="thumb about-avatar" aria-hidden="true" style="aspect-ratio:1/1;">
           <img class="thumb-img" src="images/manuel.jpg" alt="Porträt von Manuel Storch" width="800" height="800" loading="lazy" style="object-position:center;">
         </div>
-  
+
         <!-- Text + Socials (unter dem Avatar) -->
         <div class="post-meta">
           <time class="post-date" datetime=""></time>
           <h3 class="post-title">Über mich</h3>
-  
+
           <p class="post-desc">
             Hey! Ich bin <strong>Manuel Storch</strong> – Creator, der echte Momente teilt.
             In meinem RealLifeBlog findest du Videos, Gedanken und News aus meinem Alltag.
             Kein Hochglanz, sondern echte Stories aus dem echten Leben.
           </p>
-  
+
           <ul class="post-desc about-facts">
             <li>35 Jahre, hauptberuflich Krankenpfleger</li>
             <li>Echte Höhen & Tiefen – dokumentiert & reflektiert</li>
             <li>Kreativität als Ausdruck von Lebensumständen</li>
           </ul>
-  
+
           <p class="post-desc" style="margin-top:10px;">
             <em>Interessen:</em> Storytelling, Short-Form-Video, Productivity, Reisen, Kaffee ☕
           </p>
-  
+
+          <!-- Warum ich das mache – Box -->
           <section class="why-box" aria-labelledby="why-title">
             <h4 id="why-title">Warum ich das mache</h4>
             <p>
@@ -105,7 +95,7 @@
               über das Leben zu reflektieren und ihren eigenen Weg zu gehen.
             </p>
           </section>
-  
+
           <!-- Social-Links (Icons + Label) -->
           <nav class="about-social" aria-label="Social Links">
             <a class="share-chip" href="https://www.instagram.com/reallife_podcast_2o25/" target="_blank" rel="noopener">
@@ -125,7 +115,6 @@
       </div>
     </article>
   </template>
-  
 
   <footer class="site-footer">
     <div class="container">© RealLifeBlog</div>
@@ -139,6 +128,7 @@
     };
   </script>
 
-  <script type="module" src="app.js?v=rlb-fixed-bg-single-overlay"></script>
+  <!-- App -->
+  <script type="module" src="app.js?v=rlb-fixed-hero-clean"></script>
 </body>
 </html>
