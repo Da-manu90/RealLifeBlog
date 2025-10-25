@@ -10,7 +10,7 @@
   /* feste Höhen für fixe Bereiche */
   --header-h: 220px;          /* Höhe des Header.png (Desktop) */
   --nav-h: 240px;             /* Höhe des Nav-Streifens/Overlays */
-  --nav-gap: 10px;            /* Abstand Header -> Nav */
+  --nav-gap: 0px;            /* Abstand Header -> Nav */
 
   /* Card-Breiten / Gutter */
   --face-gutter-max: 320px;   /* kompakter Max-Gutter auf Desktop */
