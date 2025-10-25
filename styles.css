@@ -455,3 +455,11 @@ main.container{
 /* leichte Farbakzente (optional) */
 .share-fb{ border-color: rgba(24,119,242,.18); }
 .share-wa{ border-color: rgba(37,211,102,.18); }
+
+.share-btn img,
+.share-chip img{
+  width:18px;
+  height:18px;
+  display:inline-block;
+  flex:0 0 auto;
+}

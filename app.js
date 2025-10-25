@@ -154,19 +154,15 @@ function createPost(row) {
         <span>Facebook</span>
       </a>
 
-      <a class="share-btn share-wa" href="#" target="_blank" rel="noopener" aria-label="Per WhatsApp teilen">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M.5 23.5 2.3 18A10 10 0 1 1 18 21.7L12.5 23.5 7 22A10 10 0 0 1 2.3 18L.5 23.5zM12 4a8 8 0 0 0-6.8 12.2l-.5 1.4 1.5-.5A8 8 0 1 0 12 4zm4.6 9.8c-.2-.1-1.3-.6-1.5-.7s-.3-.1-.5.1-.6.7-.8.9-.3.2-.5.1a6.8 6.8 0 0 1-2-1.2 7.6 7.6 0 0 1-1.4-1.8c-.1-.2 0-.3.1-.4l.4-.4.2-.3c.1-.1.1-.3 0-.4l-.7-1.6c-.2-.4-.4-.3-.5-.3h-.4a.8.8 0 0 0-.6.3c-.2.3-.9.9-.9 2.2s.9 2.6 1 2.7a8.8 8.8 0 0 0 3.3 3c.4.2.8.4 1.1.5a2.7 2.7 0 0 0 1.2.1c.4-.1 1.3-.5 1.5-1s.2-.9.1-1c0-.1-.2-.1-.4-.2z"/>
-        </svg>
-        <span>WhatsApp</span>
-      </a>
+ <a class="share-btn share-wa" href="#" target="_blank" rel="noopener" aria-label="Per WhatsApp teilen">
+  <img src="images/whatsapp.svg.webp" alt="" aria-hidden="true">
+  <span>WhatsApp</span>
+</a>
 
-      <button class="share-btn share-copy" type="button" aria-label="Link kopieren">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M9 7h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm-3 0V5a2 2 0 0 1 2-2h8v2H8v2H6Z"/>
-        </svg>
-        <span>Link kopieren</span>
-      </button>
+<button class="share-btn share-copy" type="button" aria-label="Link kopieren">
+  <img src="images/copy-link.png" alt="" />
+  <span>Link kopieren</span>
+</button>
     `;
     tpl.querySelector('.post-meta')?.appendChild(shareBar);
   }
